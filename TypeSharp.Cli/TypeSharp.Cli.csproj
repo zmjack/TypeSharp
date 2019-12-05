@@ -1,0 +1,59 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Label="Globals">
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <AssemblyName>dotnet-ts</AssemblyName>
+    <Company>dawnx.net</Company>
+    <Authors>dawnx.net</Authors>
+    <Owners>zmjack</Owners>
+    <Description>TypeSharp cli tools.</Description>
+    <PackageId>dotnet-ts</PackageId>
+    <Copyright>Copyright © dawnx.net 2019-2020</Copyright>
+    <PackageProjectUrl>https://github.com/zmjack/Dawnx</PackageProjectUrl>
+    <PackageIconUrl>http://dawnx.net/logo32.png</PackageIconUrl>
+    <Version>0.0.1</Version>
+    <PackageLicenseUrl></PackageLicenseUrl>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageType>DotnetCliTool</PackageType>
+    <PackAsTool>true</PackAsTool>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <LangVersion>7.3</LangVersion>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <DocumentationFile>D:\TeamProjects\Dawnx\Dawnx.Tools\dotnet-nx.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <LangVersion>default</LangVersion>
+    <DocumentationFile></DocumentationFile>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotNetCli" Version="0.0.1.2" />
+    <PackageReference Include="NEcho" Version="0.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TypeSharp\TypeSharp.csproj" />
+  </ItemGroup>
+
+</Project>
