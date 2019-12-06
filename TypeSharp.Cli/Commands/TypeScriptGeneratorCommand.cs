@@ -40,7 +40,7 @@ Options:
             }
 
             var outFolder = cargs["-o"] ?? cargs["-out"] ?? "Typings";
-            var includes = cargs["-i"].Split(",") ?? cargs["--include"]?.Split(",") ?? new string[0];
+            var includes = cargs["-i"]?.Split(",") ?? cargs["--include"]?.Split(",") ?? new string[0];
 
             GenerateTypeScript(outFolder, includes);
         }
