@@ -1,4 +1,5 @@
-﻿using DotNetCli;
+﻿using Dawnx;
+using DotNetCli;
 using NEcho;
 using NStandard;
 using System;
@@ -6,9 +7,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using TypeSharp;
 
-namespace Dawnx.Tools
+namespace TypeSharp.Cli
 {
     [Command("TSGenerator", "tsg", Description = "Generate TypeScript model from CSharp class.")]
     public class TypeScriptGeneratorCommand : ICommand

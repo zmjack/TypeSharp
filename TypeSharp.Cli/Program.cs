@@ -4,7 +4,7 @@ using NStandard;
 using System;
 using System.Reflection;
 
-namespace Dawnx.Tools
+namespace TypeSharp.Cli
 {
     public class Program
     {
