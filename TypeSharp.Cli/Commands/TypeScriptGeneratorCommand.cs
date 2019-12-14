@@ -77,7 +77,7 @@ Options:
                 var builder = new TypeScriptModelBuilder();
                 var fileName = $"{Path.GetFullPath($"{outFolder}/JSend.ts")}";
 
-                builder.CacheType<JSend>(new TypeScriptModelAttribute { Namespace = "Nx" });
+                builder.CacheType<JSend>(new TypeScriptModelAttribute { Namespace = "TypeSharp" });
                 builder.WriteTo(fileName);
 
                 Console.WriteLine($"File saved: {fileName}");

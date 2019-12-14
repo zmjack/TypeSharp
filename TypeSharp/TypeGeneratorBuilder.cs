@@ -97,7 +97,7 @@ namespace TypeSharp
 
             #region Compile Types
             {
-                var typeGroup1 = TypeDefinitions.Values.Where(x => x.Namespace != null).GroupBy(x => x.Namespace);
+                var typeGroup1 = TypeDefinitions.Values.Where(x => x.Namespace != null && x.Code != null).GroupBy(x => x.Namespace);
                 if (typeGroup1.Any()) code.AppendLine();
                 foreach (var typeGroupItem1 in typeGroup1)
                 {
@@ -170,7 +170,8 @@ namespace TypeSharp
                         typeDef = GetTypeDefinition(elementType);
                         TypeDefinitions[type.FullName] = new TypeDefinition
                         {
-                            Name = $"{typeDef.Name}{"[]".Repeat(type.FullName.Count("[]"))}"
+                            Namespace = typeDef.Namespace,
+                            Name = $"{typeDef.Name}{"[]".Repeat(type.FullName.Count("[]"))}",
                         };
                         break;
 
