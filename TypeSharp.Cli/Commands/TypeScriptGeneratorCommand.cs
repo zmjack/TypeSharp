@@ -45,7 +45,6 @@ Options:
             GenerateTypeScript(outFolder, includes);
         }
 
-
         private static void GenerateTypeScript(string outFolder, string[] includes)
         {
             includes = includes?.Select(x => x.ToLower()).ToArray() ?? new string[0];
