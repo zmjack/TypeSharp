@@ -11,7 +11,7 @@ C# model to the TypeScript model compiler.
 
 ### Use annotation
 
-1. Set **TypeScriptModel** annotation to class：
+1. Set **TypeScriptModel** annotation to class:
 
    ```C#
    [TypeScriptModel(Namespace = "App")]
@@ -23,7 +23,7 @@ C# model to the TypeScript model compiler.
 
    If **TypeScriptModelAttribute** not set. the namespace is same as the class **Namespace**。
 
-2. Compile to **TypeScript** code：
+2. Compile to **TypeScript** code:
 
    ```C#
    var builder = new TypeScriptModelBuilder();

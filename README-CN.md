@@ -14,11 +14,11 @@ C# 模型到 TypeScript 模型转换工具。
 1. 定义并使用 **TypeScriptModel** 注解类型：
 
    ```C#
-[TypeScriptModel(Namespace = "App")]
-public class Cls
-{
-        public int Value { get; set; }
-}
+   [TypeScriptModel(Namespace = "App")]
+   public class Cls
+   {
+   public int Value { get; set; }
+   }
    ```
    
    **TypeScriptModelAttribute** 如果不指定 **Namespace**，则使用当前类所属 **Namespace**。
