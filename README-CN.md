@@ -17,7 +17,7 @@ C# 模型到 TypeScript 模型转换工具。
    [TypeScriptModel(Namespace = "App")]
    public class Cls
    {
-   public int Value { get; set; }
+       public int Value { get; set; }
    }
    ```
    
