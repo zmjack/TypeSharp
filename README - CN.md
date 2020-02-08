@@ -12,6 +12,7 @@ C# 模型到 TypeScript 模型转换工具。
 ### 注解方法
 
 1. 定义并使用 **TypeScriptModel** 注解类型：
+
    ```C#
 [TypeScriptModel(Namespace = "App")]
 public class Cls
