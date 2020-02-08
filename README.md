@@ -2,8 +2,8 @@
 
 C# model to the TypeScript model compiler.
 
-- [Readme: English](https://github.com/zmjack/TypeSharp/blob/master/LICENSE.md)
-- [Readme: 中文](https://github.com/zmjack/TypeSharp/blob/master/LICENSE - CN.md)
+- [English Readme](https://github.com/zmjack/TypeSharp/blob/master/README.md)
+- [中文自述](https://github.com/zmjack/TypeSharp/blob/master/LICENSE - CN.md)
 
 
 
