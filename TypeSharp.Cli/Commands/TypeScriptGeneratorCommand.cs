@@ -1,5 +1,6 @@
 ﻿using Dawnx;
 using DotNetCli;
+using Frontend;
 using NEcho;
 using NStandard;
 using System;
@@ -76,7 +77,7 @@ Options:
                 var builder = new TypeScriptModelBuilder();
                 var fileName = $"{Path.GetFullPath($"{outFolder}/JSend.ts")}";
 
-                builder.CacheType<JSend>(new TypeScriptModelAttribute { Namespace = "TypeSharp" });
+                builder.CacheType<JSend>();
                 builder.WriteTo(fileName);
 
                 Console.WriteLine($"File saved: {fileName}");

@@ -1,5 +1,4 @@
-﻿using Dawnx.Utilities;
-using NStandard;
+﻿using NStandard;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -129,7 +128,7 @@ namespace TypeSharp
         {
             var propType = propertyInfo.PropertyType;
             var typeDef = GetTypeDefinition(propType);
-            return $"{StringUtility.CamelCase(propertyInfo.Name)}? : {typeDef.ReferenceName}";
+            return $"{StringEx.CamelCase(propertyInfo.Name)}? : {typeDef.ReferenceName}";
         }
 
         private string GetConstValue(FieldInfo fieldInfo)
