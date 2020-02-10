@@ -4,6 +4,7 @@ using Frontend;
 using NEcho;
 using NStandard;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -14,12 +15,48 @@ namespace TypeSharp.Cli
     [Command("TSGenerator", "tsg", Description = "Generate TypeScript model from CSharp class.")]
     public class TypeScriptGeneratorCommand : ICommand
     {
-        private static string[] SearchDirs = new[]
+        private static string TargetBinFolder = Path.GetFullPath($"{Program.ProjectInfo.ProjectRoot}/bin/Debug/{Program.ProjectInfo.TargetFramework}");
+        private static string ProgramFilesFolder = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+        private static string UserProfileFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+        private static string GetTargetDllFile(string assembly) => $"{TargetBinFolder}/{assembly}.dll";
+        private static string GetDllFile(string assembly, string version)
         {
-            Path.GetFullPath($"{Program.ProjectInfo.ProjectRoot}/bin/Debug/{Program.ProjectInfo.TargetFramework}"),
-            $"{Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)}/dotnet/sdk/NuGetFallbackFolder",
-            $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}/.nuget/packages",
-        };
+            var possibleFiles = new List<string>();
+            var nugetVersion = version.For(ver =>
+            {
+                if (ver.EndsWith(".0"))
+                    return ver.Substring(0, ver.Length - 2);
+                else return ver;
+            });
+
+            possibleFiles.Add(GetTargetDllFile(assembly));
+            switch (Program.ProjectInfo.TargetFramework)
+            {
+                case string framework when framework == "netcoreapp3.0":
+                    possibleFiles.Add($"{ProgramFilesFolder}/dotnet/packs/NETStandard.Library.Ref/2.1.0/ref/netstandard2.1/{assembly}.dll");
+                    goto default;
+
+                case string framework when framework == "netcoreapp3.1":
+                    possibleFiles.Add($"{ProgramFilesFolder}/dotnet/packs/NETStandard.Library.Ref/2.1.0/ref/netcoreapp3.1/{assembly}.dll");
+                    possibleFiles.Add($"{ProgramFilesFolder}/dotnet/packs/Microsoft.NETCore.App.Ref/3.1.0/ref/netcoreapp3.1/{assembly}.dll");
+                    possibleFiles.Add($"{ProgramFilesFolder}/dotnet/packs/Microsoft.AspNetCore.App.Ref/3.1.0/ref/netcoreapp3.1/{assembly}.dll");
+                    possibleFiles.Add($"{ProgramFilesFolder}/dotnet/packs/Microsoft.WindowsDesktop.App.Ref/3.1.0/ref/netcoreapp3.1/{assembly}.dll");
+                    goto default;
+
+                default:
+                    possibleFiles.AddRange(new[]
+                    {
+                        $"{ProgramFilesFolder}/dotnet/sdk/NuGetFallbackFolder/{assembly}/{nugetVersion}/lib/netstandard2.0/{assembly}.dll",
+                        $"{UserProfileFolder}/.nuget/packages/{assembly}/{nugetVersion}/lib/netstandard2.0/{assembly}.dll",
+                    });
+                    break;
+            }
+
+            foreach (var file in possibleFiles)
+                if (File.Exists(file)) return file;
+            return null;
+        }
 
         public void PrintUsage()
         {
@@ -53,8 +90,7 @@ Options:
             if (!Directory.Exists(outFolder))
                 Directory.CreateDirectory(outFolder);
 
-            var dllPath = Path.GetFullPath($"{SearchDirs[0]}/{Program.ProjectInfo.AssemblyName}.dll");
-
+            var dllPath = GetTargetDllFile(Program.ProjectInfo.AssemblyName);
             var assembly = Assembly.LoadFrom(dllPath);
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
 
@@ -90,28 +126,20 @@ Options:
             var regex = new Regex("([^,]+), Version=([^,]+), Culture=[^,]+, PublicKeyToken=.+");
             var match = regex.Match(args.Name);
 
-            var assemblyName = match.Groups[1].Value;
-            var version = match.Groups[2].Value.For(ver =>
+            var assembly = match.Groups[1].Value;
+            var version = match.Groups[2].Value;
+
+            var dll = GetDllFile(assembly, version);
+            if (dll != null)
             {
-                if (ver.EndsWith(".0"))
-                    return ver.Substring(0, ver.Length - 2);
-                else return ver;
-            });
-
-            foreach (var kv in SearchDirs.AsKvPairs())
-            {
-                var dir = kv.Value;
-                string file;
-
-                if (kv.Key == 0)
-                    file = $"{dir}/{assemblyName}.dll";
-                else file = $"{dir}/{assemblyName}/{version}/lib/netstandard2.0/{assemblyName}.dll";
-
-                if (File.Exists(file))
-                    return Assembly.LoadFile(file);
+                Console.WriteLine($"Loaded assembly {assembly} {version}.");
+                return Assembly.LoadFile(dll);
             }
-
-            return null;
+            else
+            {
+                Console.WriteLine($"! Can not find assembly {assembly} {version}.");
+                return null;
+            }
         }
 
     }
