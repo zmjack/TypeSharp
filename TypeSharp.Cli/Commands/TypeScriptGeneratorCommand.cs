@@ -3,6 +3,7 @@ using DotNetCli;
 using Frontend;
 using NEcho;
 using NStandard;
+using NStandard.Reference;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -92,7 +93,7 @@ Options:
 
             var dllPath = GetTargetDllFile(Program.ProjectInfo.AssemblyName);
             var assembly = Assembly.LoadFrom(dllPath);
-            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+            AppDomain.CurrentDomain.AssemblyResolve += GAC.CreateAssemblyResolver(Program.ProjectInfo.TargetFramework, GACFolders.All); ;
 
             #region Assembly Types
             {
