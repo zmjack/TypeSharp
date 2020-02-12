@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Dawnx.Tools": {
+    "TypeSharp.Cli": {
       "commandName": "Project"
     }
   }
