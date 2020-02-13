@@ -1,4 +1,4 @@
-﻿using Frontend;
+﻿using Ajax;
 using System.Reflection;
 using Xunit;
 
@@ -47,7 +47,7 @@ declare namespace TSNS1 {{
         nGuid? : string;
     }}
 }}
-declare namespace Frontend {{
+declare namespace Ajax {{
     interface JSend {{
         status? : string;
         data? : any;

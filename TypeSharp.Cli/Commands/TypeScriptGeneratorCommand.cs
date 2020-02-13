@@ -1,6 +1,6 @@
 ﻿using Dawnx;
 using DotNetCli;
-using Frontend;
+using Ajax;
 using NEcho;
 using NStandard;
 using NStandard.Reference;
