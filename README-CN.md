@@ -5,7 +5,7 @@ C# 模型到 TypeScript 模型转换工具。
 - [English Readme](https://github.com/zmjack/TypeSharp/blob/master/README.md)
 - [中文自述](https://github.com/zmjack/TypeSharp/blob/master/README-CN.md)
 
-
+<br/>
 
 ## 如何使用
 
@@ -31,7 +31,8 @@ C# 模型到 TypeScript 模型转换工具。
    var tscode = builderCompile();
    ```
 
-   
+
+<br/>
 
 ### 使用时指定
 
@@ -54,7 +55,7 @@ C# 模型到 TypeScript 模型转换工具。
 
    **TypeScriptModelAttribute** 如果不指定 **Namespace**，则使用当前类所属 **Namespace**。
 
-
+<br/>
 
 ### 输出结果
 

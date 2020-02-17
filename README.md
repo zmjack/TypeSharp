@@ -5,7 +5,7 @@ C# model to the TypeScript model compiler.
 - [English Readme](https://github.com/zmjack/TypeSharp/blob/master/README.md)
 - [中文自述](https://github.com/zmjack/TypeSharp/blob/master/README-CN.md)
 
-
+<br/>
 
 ## How to use
 
@@ -31,7 +31,8 @@ C# model to the TypeScript model compiler.
    var tscode = builderCompile();
    ```
 
-   
+
+<br/>
 
 ### Specified directly
 
@@ -54,7 +55,7 @@ C# model to the TypeScript model compiler.
 
    If **TypeScriptModelAttribute** not set. the namespace is same as the class **Namespace**。
 
-
+<br/>
 
 ### Output result
 
