@@ -1,5 +1,4 @@
-﻿#define DEV_OFF
-using DotNetCli;
+﻿using DotNetCli;
 using NEcho;
 using NStandard;
 using System;
@@ -10,21 +9,12 @@ namespace TypeSharp.Cli
     public class Program
     {
         public static readonly string CLI_VERSION = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-
-#if DEV
-        public static CommandContainer CommandContainer = new CommandContainer(ProjectInfo.Get(@""), "ts");
-#else
-        public static CommandContainer CommandContainer = new CommandContainer(ProjectInfo.GetCurrent(), "ts");
-#endif
-
+        public static CommandContainer CommandContainer;
         public static ProjectInfo ProjectInfo => CommandContainer.ProjectInfo;
 
         static void Main(string[] args)
         {
-#if DEV
-            args = new[] { "tsg" };
-#endif
-
+            CommandContainer = new CommandContainer(ProjectInfo.GetCurrent(), "ts");
             CommandContainer.CacheCommands(Assembly.GetExecutingAssembly());
 
             PrintWelcome();
