@@ -29,16 +29,17 @@ Options:
 ");
         }
 
-        public void Run(ConArgs cargs)
+        public void Run(string[] args)
         {
-            if (cargs.Properties.For(x => x.ContainsKey("-h") || x.ContainsKey("--help")))
+            var conArgs = new ConArgs(args, "-");
+            if (conArgs.Properties.For(x => x.ContainsKey("-h") || x.ContainsKey("--help")))
             {
                 PrintUsage();
                 return;
             }
 
-            var outFolder = cargs["-o"] ?? cargs["-out"] ?? "Typings";
-            var includes = cargs["-i"]?.Split(",") ?? cargs["--include"]?.Split(",") ?? new string[0];
+            var outFolder = conArgs["-o"] ?? conArgs["-out"] ?? "Typings";
+            var includes = conArgs["-i"]?.Split(",") ?? conArgs["--include"]?.Split(",") ?? new string[0];
 
             GenerateTypeScript(outFolder, includes);
         }

@@ -20,8 +20,4 @@
     <ProjectReference Include="..\TypeSharp\TypeSharp.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="~Cli\" />
-  </ItemGroup>
-
 </Project>

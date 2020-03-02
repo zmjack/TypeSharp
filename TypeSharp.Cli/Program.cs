@@ -14,14 +14,13 @@ namespace TypeSharp.Cli
 
         static void Main(string[] args)
         {
-            CommandContainer = new CommandContainer(ProjectInfo.GetCurrent(), "ts");
+            CommandContainer = new CommandContainer("ts", ProjectInfo.GetCurrent());
             CommandContainer.CacheCommands(Assembly.GetExecutingAssembly());
 
             PrintWelcome();
 
-            var conArgs = new ConArgs(args, "-");
             CommandContainer.PrintProjectInfo();
-            CommandContainer.Run(conArgs);
+            CommandContainer.Run(args);
         }
 
         public static void PrintWelcome()
