@@ -19,19 +19,20 @@
     <PackageId>dotnet-ts</PackageId>
     <Copyright>Copyright © dawnx.net 2019-2020</Copyright>
     <PackageProjectUrl>https://github.com/zmjack/Dawnx</PackageProjectUrl>
-    <PackageIconUrl>http://dawnx.net/logo32.png</PackageIconUrl>
-    <Version>0.7.0</Version>
+    <PackageIconUrl></PackageIconUrl>
+    <Version>1.0.0</Version>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageType>DotnetCliTool</PackageType>
     <PackAsTool>true</PackAsTool>
+    <PackageIcon>icon.png</PackageIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <LangVersion>7.3</LangVersion>
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
-    <DocumentationFile>D:\TeamProjects\Dawnx\Dawnx.Tools\dotnet-nx.xml</DocumentationFile>
+    <DocumentationFile>dotnet-nx.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -48,6 +49,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="..\icon.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
     <None Include="..\LICENSE.md">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
