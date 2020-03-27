@@ -25,14 +25,14 @@
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageType>DotnetCliTool</PackageType>
     <PackAsTool>true</PackAsTool>
-    <PackageIcon>icon.png</PackageIcon>
+    <PackageIcon>typesharp.png</PackageIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <LangVersion>7.3</LangVersion>
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
-    <DocumentationFile>dotnet-nx.xml</DocumentationFile>
+    <DocumentationFile>dotnet-ts.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -48,7 +48,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\icon.png">
+    <None Include="..\typesharp.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
