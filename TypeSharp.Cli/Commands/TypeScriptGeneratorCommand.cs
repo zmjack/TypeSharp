@@ -34,7 +34,7 @@ Options:
                 return;
             }
 
-            var outFolder = conArgs["-o"] ?? conArgs["-out"] ?? "Typings";
+            var outFolder = conArgs["-o"] ?? conArgs["-out"] ?? "";
             var includes = conArgs["-i"]?.Split(";") ?? conArgs["--include"]?.Split(";") ?? new string[0];
 
             GenerateTypeScript(outFolder, includes);
@@ -42,8 +42,6 @@ Options:
 
         private static void GenerateTypeScript(string outFolder, string[] includes)
         {
-            includes = includes?.Select(x => x.ToLower()).ToArray() ?? new string[0];
-
             if (!Directory.Exists(outFolder))
                 Directory.CreateDirectory(outFolder);
 
