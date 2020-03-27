@@ -1,5 +1,4 @@
-﻿using Ajax;
-using DotNetCli;
+﻿using DotNetCli;
 using Ink;
 using NStandard;
 using NStandard.Reference;
@@ -18,7 +17,7 @@ namespace TypeSharp.Cli
         public void PrintUsage()
         {
             Console.WriteLine($@"
-Usage: dotnet nx (tsg|tsgenerator) [Options]
+Usage: dotnet ts (tsg|tsgenerator) [Options]
 
 Options:
   {"-o|--out".PadRight(20)}{"\t"}Specify the output directory path. (default: Typings)
@@ -36,7 +35,7 @@ Options:
             }
 
             var outFolder = conArgs["-o"] ?? conArgs["-out"] ?? "Typings";
-            var includes = conArgs["-i"]?.Split(",") ?? conArgs["--include"]?.Split(",") ?? new string[0];
+            var includes = conArgs["-i"]?.Split(";") ?? conArgs["--include"]?.Split(";") ?? new string[0];
 
             GenerateTypeScript(outFolder, includes);
         }
@@ -66,16 +65,32 @@ Options:
             #endregion
 
             #region JSend Types
-            if (includes.Contains("jsend"))
+            foreach (var include in includes)
             {
                 var builder = new TypeScriptModelBuilder();
-                var fileName = $"{Path.GetFullPath($"{outFolder}/JSend.ts")}";
+                var fileName = $"{Path.GetFullPath($"{outFolder}/{include}.ts")}";
+                Type type = null;
 
-                builder.CacheType<JSend>();
-                builder.WriteTo(fileName);
+                if (!include.Contains(","))
+                {
+                    type = assembly.GetType(include);
+                }
+                else if (include.Count(",") == 1)
+                {
+                    var parts = include.Split(",");
+                    var refDllPath = $"{TargetBinFolder}/{parts[1]}.dll";
+                    var refAssembly = Assembly.LoadFrom(refDllPath);
+                    type = refAssembly.GetType(parts[0]);
+                }
 
-                Console.WriteLine($"File saved: {fileName}");
-            };
+                if (type != null)
+                {
+                    builder.CacheType(type);
+                    builder.WriteTo(fileName);
+                    Console.WriteLine($"File saved: {fileName}");
+                }
+                else Console.Error.WriteLine($"Can not resolve: {include}");
+            }
             #endregion
         }
 
