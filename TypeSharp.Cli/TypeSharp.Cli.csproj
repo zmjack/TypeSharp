@@ -20,7 +20,7 @@
     <Copyright>Copyright © dawnx.net 2019-2020</Copyright>
     <PackageProjectUrl>https://github.com/zmjack/Dawnx</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>
-    <Version>1.0.0.2</Version>
+    <Version>1.0.0.3</Version>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageType>DotnetCliTool</PackageType>

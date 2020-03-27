@@ -34,7 +34,7 @@ Options:
                 return;
             }
 
-            var outFolder = conArgs["-o"] ?? conArgs["-out"] ?? "";
+            var outFolder = conArgs["-o"] ?? conArgs["-out"] ?? ".";
             var includes = conArgs["-i"]?.Split(";") ?? conArgs["--include"]?.Split(";") ?? new string[0];
 
             GenerateTypeScript(outFolder, includes);
