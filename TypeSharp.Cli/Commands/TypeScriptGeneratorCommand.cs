@@ -66,12 +66,13 @@ Options:
             foreach (var include in includes)
             {
                 var builder = new TypeScriptModelBuilder();
-                var fileName = $"{Path.GetFullPath($"{outFolder}/{include}.ts")}";
                 Type type = null;
+                string fileName = null;
 
                 if (!include.Contains(","))
                 {
                     type = assembly.GetType(include);
+                    fileName = $"{Path.GetFullPath($"{outFolder}/{include}.ts")}";
                 }
                 else if (include.Count(",") == 1)
                 {
@@ -79,6 +80,7 @@ Options:
                     var refDllPath = $"{TargetBinFolder}/{parts[1]}.dll";
                     var refAssembly = Assembly.LoadFrom(refDllPath);
                     type = refAssembly.GetType(parts[0]);
+                    fileName = $"{Path.GetFullPath($"{outFolder}/{parts[1]}.ts")}";
                 }
 
                 if (type != null)
