@@ -22,6 +22,13 @@ namespace TypeSharp.Test
         public string Name { get; set; }
     }
 
+    [TypeScriptModel(Namespace = "TSNS3")]
+    public class GenericClass<T>
+    {
+        public T Value { get; set; }
+        public GenericClass<int> IntValue { get; set; }
+    }
+
     public enum EState
     {
         Ready, Running, Complete

@@ -24,6 +24,17 @@ namespace TSNS1 {{
     }}
 }}
 
+declare namespace TSNS1 {{
+    interface RootClass {{
+        state? : TypeSharp.Test.EState;
+        sub? : TSNS2.SubClass;
+        subs? : TSNS2.SubClass[];
+        str? : string;
+        int? : number;
+        strArray? : string[];
+        nGuid? : string;
+    }}
+}}
 declare namespace TypeSharp.Test {{
     export const enum EState {{
         Ready = 0,
@@ -36,17 +47,6 @@ declare namespace TSNS2 {{
         name? : string;
     }}
 }}
-declare namespace TSNS1 {{
-    interface RootClass {{
-        state? : TypeSharp.Test.EState;
-        sub? : TSNS2.SubClass;
-        subs? : TSNS2.SubClass[];
-        str? : string;
-        int? : number;
-        strArray? : string[];
-        nGuid? : string;
-    }}
-}}
 declare namespace Ajax {{
     interface JSend {{
         status? : string;
@@ -57,6 +57,14 @@ declare namespace Ajax {{
 }}
 ";
             Assert.Equal(expectedCode, tscode);
+        }
+
+        [Fact]
+        public void GenericTest()
+        {
+            var builder = new TypeScriptModelBuilder();
+            builder.CacheType(typeof(GenericClass<int>));
+            var tscode = builder.Compile();
         }
 
     }
