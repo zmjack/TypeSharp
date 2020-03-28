@@ -163,7 +163,18 @@ namespace TypeSharp
                 attr = type.GetCustomAttribute<TypeScriptModelAttribute>();
 
             var tsNamespace = attr?.Namespace ?? GetTsNamespace(type);
-            if (type.IsClass)
+            if (type.IsImplement(typeof(IEnumerable<>)))
+            {
+                var enumerable = type.AsInterface(typeof(IEnumerable<>));
+                var elementType = enumerable.GetGenericArguments()[0];
+                var elementTypeDef = GetTypeDefinition(elementType);
+                TypeDefinitions[type.FullName] = new TypeDefinition
+                {
+                    Namespace = elementTypeDef.Namespace,
+                    Name = $"{elementTypeDef.Name}{"[]"}",
+                };
+            }
+            else if (type.IsClass)
             {
                 switch (type)
                 {
@@ -172,8 +183,7 @@ namespace TypeSharp
                         break;
 
                     case Type _ when type.IsArray:
-                        var elementTypeName = type.FullName.Replace("[]", "");
-                        var elementType = type.Assembly.GetType(elementTypeName);
+                        var elementType = type.GetElementType();
                         var elementTypeDef = GetTypeDefinition(elementType);
                         TypeDefinitions[type.FullName] = new TypeDefinition
                         {

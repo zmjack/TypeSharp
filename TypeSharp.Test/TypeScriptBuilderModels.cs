@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace TypeSharp.Test
 {
@@ -20,6 +21,7 @@ namespace TypeSharp.Test
     public class SubClass
     {
         public string Name { get; set; }
+        public ICollection<string> Members { get; set; }
     }
 
     [TypeScriptModel(Namespace = "TSNS3")]
