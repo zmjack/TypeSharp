@@ -182,16 +182,6 @@ namespace TypeSharp
                         TypeDefinitions[type.FullName] = new TypeDefinition { Name = "any" };
                         break;
 
-                    case Type _ when type.IsArray:
-                        var elementType = type.GetElementType();
-                        var elementTypeDef = GetTypeDefinition(elementType);
-                        TypeDefinitions[type.FullName] = new TypeDefinition
-                        {
-                            Namespace = elementTypeDef.Namespace,
-                            Name = $"{elementTypeDef.Name}{"[]".Repeat(type.FullName.Count("[]"))}",
-                        };
-                        break;
-
                     default:
                         #region Cache Consts
                         {

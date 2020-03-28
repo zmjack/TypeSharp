@@ -13,7 +13,7 @@ namespace TypeSharp.Test
         public SubClass[] Subs { get; set; }
         public string Str { get; set; }
         public int Int { get; set; }
-        public string[] StrArray { get; set; }
+        public string[][] StrArray { get; set; }
         public Guid? NGuid { get; set; }
     }
 
