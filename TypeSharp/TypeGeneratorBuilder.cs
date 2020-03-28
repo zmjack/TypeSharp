@@ -216,7 +216,7 @@ namespace TypeSharp
 
                             if (type.IsGenericType && !type.IsGenericTypeDefinition)
                             {
-                                CacheType(type.GetGenericTypeDefinition());
+                                GetTypeDefinition(type.GetGenericTypeDefinition());
 
                                 var typeDef = new TypeDefinition
                                 {
