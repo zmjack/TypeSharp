@@ -63,7 +63,7 @@ namespace TypeSharp
         };
         public TypeDefinition GetTypeDefinition(Type type)
         {
-            if (!TypeDefinitions.ContainsKey(type.FullName)) CacheType(type);
+            CacheType(type);
             return TypeDefinitions[type.FullName];
         }
 
@@ -157,7 +157,7 @@ namespace TypeSharp
         public void CacheType<TType>(TypeScriptModelAttribute attr = null) => CacheType(typeof(TType), attr);
         public void CacheType(Type type, TypeScriptModelAttribute attr = null)
         {
-            if (TypeDefinitions.ContainsKey(type.FullName)) return;
+            if (type.FullName != null && TypeDefinitions.ContainsKey(type.FullName)) return;
 
             if (attr is null)
                 attr = type.GetCustomAttribute<TypeScriptModelAttribute>();
