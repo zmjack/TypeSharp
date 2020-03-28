@@ -1,4 +1,5 @@
 ﻿using NStandard;
+using NStandard.Caching;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,61 +12,60 @@ namespace TypeSharp
 {
     public class TypeScriptModelBuilder
     {
-        public class ConstDefinition
-        {
-            public string OuterNamespace { get; set; }
-            public string InnerNamespace { get; set; }
-            public string Name { get; set; }
-            public string Code { get; set; }
+        public static readonly TsType TsNumberType = new TsType { TypeName = "number" };
+        public static readonly TsType TsBooleanType = new TsType { TypeName = "boolean" };
+        public static readonly TsType TsAnyType = new TsType { TypeName = "any" };
+        public static readonly TsType TsStringType = new TsType { TypeName = "string" };
+        public static readonly TsType TsDateType = new TsType { TypeName = "Date" };
 
-            public string ReferenceName => $"{OuterNamespace}.{InnerNamespace}.{Name}";
+        public CacheContainer<Type, TsType> TsTypes { get; private set; }
+
+        public TypeScriptModelBuilder()
+        {
+            TsTypes = new CacheContainer<Type, TsType>
+            {
+                CacheMethod = type =>
+                {
+                    return new CacheDelegate<TsType>(() =>
+                    {
+                        switch (type)
+                        {
+                            case Type _ when type == typeof(bool): return TsBooleanType;
+
+                            case Type _ when type == typeof(string):
+                            case Type _ when type == typeof(Guid): return TsStringType;
+
+                            case Type _ when type == typeof(byte):
+                            case Type _ when type == typeof(sbyte):
+                            case Type _ when type == typeof(char):
+                            case Type _ when type == typeof(short):
+                            case Type _ when type == typeof(ushort):
+                            case Type _ when type == typeof(int):
+                            case Type _ when type == typeof(uint):
+                            case Type _ when type == typeof(long):
+                            case Type _ when type == typeof(ulong):
+                            case Type _ when type == typeof(float):
+                            case Type _ when type == typeof(double):
+                            case Type _ when type == typeof(decimal): return TsNumberType;
+
+                            case Type _ when type == typeof(object):
+                            case Type _ when type.IsImplement(typeof(IDictionary<,>)): return TsAnyType;
+
+                            case Type _ when type.IsImplement(typeof(IEnumerable<>)): return ParseIEnumerable(type);
+
+                            case Type _ when type.IsClass: return ParseType(type);
+
+                            case Type _ when type.IsType(typeof(Nullable<>)): return TsTypes[type.GenericTypeArguments[0]].Value;
+
+                            case Type _ when type.IsEnum: return ParseEnum(type);
+
+                            default: throw new NotSupportedException($"{type.FullName} is not supported.");
+                        }
+                    });
+                },
+            };
         }
-
-        public class TypeDefinition
-        {
-            /// <summary>
-            /// Hint: If Namespace is null, then the code should be null.
-            /// </summary>
-            public string Namespace { get; set; }
-
-            public string Name { get; set; }
-
-            /// <summary>
-            /// Hint: If Namespace is null, then the code should be empty.
-            /// </summary>
-            public string Code => CodePtr.ToString();
-
-            public StringBuilder CodePtr { get; } = new StringBuilder();
-
-            public string ReferenceName => Namespace is null ? Name : $"{Namespace}.{Name}";
-        }
-
-        public Dictionary<string, ConstDefinition> ConstDefinitions = new Dictionary<string, ConstDefinition>();
-        public Dictionary<string, TypeDefinition> TypeDefinitions = new Dictionary<string, TypeDefinition>()
-        {
-            [typeof(object).FullName] = new TypeDefinition { Name = "any" },
-            [typeof(bool).FullName] = new TypeDefinition { Name = "boolean" },
-            [typeof(byte).FullName] = new TypeDefinition { Name = "number" },
-            [typeof(sbyte).FullName] = new TypeDefinition { Name = "number" },
-            [typeof(char).FullName] = new TypeDefinition { Name = "number" },
-            [typeof(short).FullName] = new TypeDefinition { Name = "number" },
-            [typeof(ushort).FullName] = new TypeDefinition { Name = "number" },
-            [typeof(int).FullName] = new TypeDefinition { Name = "number" },
-            [typeof(uint).FullName] = new TypeDefinition { Name = "number" },
-            [typeof(long).FullName] = new TypeDefinition { Name = "number" },
-            [typeof(ulong).FullName] = new TypeDefinition { Name = "number" },
-            [typeof(float).FullName] = new TypeDefinition { Name = "number" },
-            [typeof(double).FullName] = new TypeDefinition { Name = "number" },
-            [typeof(decimal).FullName] = new TypeDefinition { Name = "number" },
-            [typeof(string).FullName] = new TypeDefinition { Name = "string" },
-            [typeof(Guid).FullName] = new TypeDefinition { Name = "string" },
-            [typeof(DateTime).FullName] = new TypeDefinition { Name = "Date" },
-        };
-        public TypeDefinition GetTypeDefinition(Type type)
-        {
-            CacheType(type);
-            return TypeDefinitions[type.FullName];
-        }
+        public Dictionary<FieldInfo, TsConst> TsConsts { get; private set; } = new Dictionary<FieldInfo, TsConst>();
 
         public void WriteTo(string path) => File.WriteAllText(path, Compile());
 
@@ -75,37 +75,55 @@ namespace TypeSharp
             code.AppendLine($"/* Generated by TypeSharp v{Assembly.GetExecutingAssembly().GetName().Version} */");
 
             #region Compile Consts
+            var tsConstOuterGroup = TsConsts.Values.GroupBy(x => x.OuterNamespace);
+            if (tsConstOuterGroup.Any()) code.AppendLine();
+            foreach (var tsConstOuterGroupItem in tsConstOuterGroup)
             {
-                var constGroup1 = ConstDefinitions.Values.GroupBy(x => x.OuterNamespace);
-
-                if (constGroup1.Any()) code.AppendLine();
-                foreach (var constGroupItem1 in constGroup1)
+                var tsConstInnerGroup = tsConstOuterGroupItem.GroupBy(x => x.InnerNamespace);
+                code.AppendLine($"namespace {tsConstOuterGroupItem.Key} {{");
+                foreach (var tsConstInnerGroupItem in tsConstInnerGroup)
                 {
-                    var constGroup2 = constGroupItem1.GroupBy(x => x.InnerNamespace);
-                    code.AppendLine($"namespace {constGroupItem1.Key} {{");
-                    foreach (var constGroupItem2 in constGroup2)
+                    code.AppendLine($"{" ".Repeat(4)}export namespace {tsConstInnerGroupItem.Key} {{");
+                    foreach (var tsConst in tsConstInnerGroupItem)
                     {
-                        code.AppendLine($"    export namespace {constGroup2.First().Key} {{");
-                        foreach (var definition in constGroupItem2)
-                            code.AppendLine(definition.Code);
-                        code.AppendLine($"    }}");
+                        code.AppendLine($"{" ".Repeat(8)}export const {tsConst.ConstName} : {tsConst.ConstType.TypeName} = {tsConst.ConstValue};");
                     }
-                    code.AppendLine($"}}");
+                    code.AppendLine($"{" ".Repeat(4)}}}");
                 }
+                code.AppendLine($"}}");
             }
             #endregion
 
             #region Compile Types
+            var typeGroup = TsTypes.Values.Select(x => x.Value).Where(x => x.Namespace != null).GroupBy(x => x.Namespace);
+            if (typeGroup.Any()) code.AppendLine();
+            foreach (var typeGroupItem in typeGroup)
             {
-                var typeGroup1 = TypeDefinitions.Values.Where(x => x.Namespace != null && !x.Code.IsNullOrWhiteSpace()).GroupBy(x => x.Namespace);
-                if (typeGroup1.Any()) code.AppendLine();
-                foreach (var typeGroupItem1 in typeGroup1)
+                code.AppendLine($"declare namespace {typeGroupItem.Key} {{");
+                foreach (var tsType in typeGroupItem)
                 {
-                    code.AppendLine($"declare namespace {typeGroupItem1.Key} {{");
-                    foreach (var definition in typeGroupItem1)
-                        code.AppendLine(definition.Code);
-                    code.AppendLine($"}}");
+                    switch(tsType.TypeClass)
+                    {
+                        case TsTypeClass.Interface:
+                            code.AppendLine($"{" ".Repeat(4)}interface {tsType.TypeName} {{");
+                            foreach (var tsProperty in tsType.TsProperties)
+                            {
+                                code.AppendLine($"{" ".Repeat(8)}{tsProperty.PropertyName}? : {tsProperty.PropertyTypeDefinition ?? tsProperty.PropertyType.ReferenceName};");
+                            }
+                            code.AppendLine($"{" ".Repeat(4)}}}");
+                            break;
+
+                        case TsTypeClass.Enum:
+                            code.AppendLine($"{" ".Repeat(4)}export const enum {tsType.TypeName} {{");
+                            foreach (var tsEnumValue in tsType.TsEnumValues)
+                            {
+                                code.AppendLine($"{" ".Repeat(8)}{tsEnumValue.Name} = {tsEnumValue.Value},");
+                            }
+                            code.AppendLine($"{" ".Repeat(4)}}}");
+                            break;
+                    }
                 }
+                code.AppendLine($"}}");
             }
             #endregion
 
@@ -125,152 +143,124 @@ namespace TypeSharp
             else return attr.Namespace;
         }
 
-        private string GetTypeValue(PropertyInfo propertyInfo)
+        private TsType ParseIEnumerable(Type type)
         {
-            var propType = propertyInfo.PropertyType;
-            if (propType.IsGenericParameter)
+            var enumerable = type.AsInterface(typeof(IEnumerable<>));
+            var elementType = enumerable.GetGenericArguments()[0];
+            var tsType = TsTypes[elementType];
+            return new TsType
             {
-                return $"{StringEx.CamelCase(propertyInfo.Name)}? : {propType.Name}";
-            }
-            else
-            {
-                var typeDef = GetTypeDefinition(propType);
-                return $"{StringEx.CamelCase(propertyInfo.Name)}? : {typeDef.ReferenceName}";
-            }
+                Namespace = tsType.Value.Namespace,
+                TypeName = $"{tsType.Value.TypeName}{"[]"}",
+            };
         }
 
-        private string GetConstValue(FieldInfo fieldInfo)
+        private void CacheConsts(Type type)
         {
-            var fieldType = fieldInfo.FieldType;
-            var typeDef = GetTypeDefinition(fieldType);
-
-            var value = fieldInfo.GetValue(null);
-            string sValue;
-            if (value is string)
-                sValue = $"'{value}'";
-            else sValue = value.ToString();
-
-            return $"{fieldInfo.Name} : {typeDef.ReferenceName} = {sValue}";
-        }
-
-        public void CacheTypes(params Type[] types) => types.Each(type => CacheType(type));
-        public void CacheType<TType>(TypeScriptModelAttribute attr = null) => CacheType(typeof(TType), attr);
-        public void CacheType(Type type, TypeScriptModelAttribute attr = null)
-        {
-            if (type.FullName != null && TypeDefinitions.ContainsKey(type.FullName)) return;
-
-            if (attr is null)
-                attr = type.GetCustomAttribute<TypeScriptModelAttribute>();
-
-            var tsNamespace = attr?.Namespace ?? GetTsNamespace(type);
-            if (type.IsImplement(typeof(IEnumerable<>)))
+            var consts = type.GetFields().Where(x => x.IsStatic && x.IsLiteral && x.IsPublic);
+            foreach (var field in consts)
             {
-                var enumerable = type.AsInterface(typeof(IEnumerable<>));
-                var elementType = enumerable.GetGenericArguments()[0];
-                var elementTypeDef = GetTypeDefinition(elementType);
-                TypeDefinitions[type.FullName] = new TypeDefinition
+                TsConsts[field] = new TsConst
                 {
-                    Namespace = elementTypeDef.Namespace,
-                    Name = $"{elementTypeDef.Name}{"[]"}",
+                    OuterNamespace = GetTsNamespace(type),
+                    InnerNamespace = type.Name,
+                    ConstName = field.Name,
+                    ConstType = TsTypes[field.FieldType].Value,
+                    ConstValue = field.GetValue(null).For(v => v is string ? $"'{v}'" : v.ToString()),
                 };
             }
-            else if (type.IsClass)
+        }
+
+        private TsType ParseEnum(Type type)
+        {
+            return new TsType
             {
-                switch (type)
+                Namespace = GetTsNamespace(type),
+                TypeName = type.Name,
+                TypeClass = TsTypeClass.Enum,
+                TsEnumValues = Enum.GetNames(type).Select(name => new TsEnumValue
                 {
-                    case Type _ when type.IsType(typeof(Dictionary<,>)):
-                        TypeDefinitions[type.FullName] = new TypeDefinition { Name = "any" };
-                        break;
+                    Name = name,
+                    Value = (int)Enum.Parse(type, name),
+                }).ToArray(),
+            };
+        }
 
-                    default:
-                        #region Cache Consts
+        private TsType ParseType(Type type)
+        {
+            var tsNamespace = GetTsNamespace(type);
+
+            CacheConsts(type);
+
+            var props = type.GetProperties();
+            if (type.IsGenericType)
+            {
+                var pureName = type.Name.Project(new Regex(@"([^`]+)"));
+                var genericTypes = type.IsGenericTypeDefinition
+                    ? type.GetGenericArguments().Select(x => x.Name)
+                    : type.GetGenericArguments().Select(x => TsTypes[x].Value.ReferenceName);
+                var typeName = $"{pureName}<{genericTypes.Join(", ")}>";
+
+                if (type.IsGenericTypeDefinition)
+                {
+                    return new TsType
+                    {
+                        Namespace = tsNamespace,
+                        TypeName = typeName,
+                        TsProperties = props.Select(prop =>
                         {
-                            var consts = type.GetFields().Where(x => x.IsStatic && x.IsLiteral && x.IsPublic);
-                            foreach (var field in consts)
+                            var propType = prop.PropertyType;
+                            if (propType.IsGenericParameter)
                             {
-                                ConstDefinitions[$"{field.DeclaringType.FullName}.{field.Name}"] = new ConstDefinition
+                                return new TsProperty
                                 {
-                                    OuterNamespace = tsNamespace,
-                                    InnerNamespace = type.Name,
-                                    Name = field.Name,
-                                    Code = $"        export const {GetConstValue(field)};",
+                                    PropertyName = StringEx.CamelCase(prop.Name),
+                                    PropertyTypeDefinition = propType.Name,
                                 };
-                            }
-                        }
-                        #endregion
-
-                        #region Cache Properties
-                        {
-                            var props = type.GetProperties();
-                            string typeName;
-
-                            if (type.IsGenericType)
-                            {
-                                var pureName = type.Name.Project(new Regex(@"([^`]+)"));
-                                var genericTypes = type.IsGenericTypeDefinition
-                                    ? type.GetGenericArguments().Select(x => x.Name)
-                                    : type.GetGenericArguments().Select(x => GetTypeDefinition(x).ReferenceName);
-                                typeName = $"{pureName}<{genericTypes.Join(", ")}>";
-                            }
-                            else typeName = type.Name;
-
-                            if (type.IsGenericType && !type.IsGenericTypeDefinition)
-                            {
-                                GetTypeDefinition(type.GetGenericTypeDefinition());
-
-                                var typeDef = new TypeDefinition
-                                {
-                                    Namespace = null,
-                                    Name = typeName,
-                                };
-                                TypeDefinitions[type.FullName] = typeDef;
                             }
                             else
                             {
-                                var typeDef = new TypeDefinition
+                                return new TsProperty
                                 {
-                                    Namespace = tsNamespace,
-                                    Name = typeName,
+                                    PropertyName = StringEx.CamelCase(prop.Name),
+                                    PropertyType = TsTypes[propType].Value,
                                 };
-                                TypeDefinitions[type.FullName] = typeDef;
-
-                                typeDef.CodePtr.AppendLine($"    interface {typeName} {{");
-                                foreach (var prop in props)
-                                    typeDef.CodePtr.AppendLine($"        {GetTypeValue(prop)};");
-                                typeDef.CodePtr.Append($"    }}");
                             }
-                        }
-                        #endregion
-                        break;
+                        }).ToArray()
+                    };
+                }
+                else
+                {
+                    return new TsType
+                    {
+                        Namespace = null,
+                        TypeName = typeName,
+                    };
                 }
             }
-            else if (type.IsEnum)
+            else
             {
-                var typeDef = new TypeDefinition
+                var typeName = type.Name;
+                return new TsType
                 {
                     Namespace = tsNamespace,
-                    Name = type.Name,
+                    TypeName = typeName,
+                    TsProperties = props.Select(prop =>
+                    {
+                        var propType = prop.PropertyType;
+                        return new TsProperty
+                        {
+                            PropertyName = StringEx.CamelCase(prop.Name),
+                            PropertyType = TsTypes[propType].Value,
+                        };
+                    }).ToArray()
                 };
-                TypeDefinitions[type.FullName] = typeDef;
-
-                typeDef.CodePtr.AppendLine($"    export const enum {type.Name} {{");
-                foreach (var name in Enum.GetNames(type))
-                    typeDef.CodePtr.AppendLine($"        {name} = {(int)Enum.Parse(type, name)},");
-                typeDef.CodePtr.Append($"    }}");
-
             }
-            else if (type.IsValueType)
-            {
-                switch (type)
-                {
-                    case Type _ when type.IsType(typeof(Nullable<>)):
-                        var typeDef = GetTypeDefinition(type.GenericTypeArguments[0]);
-                        TypeDefinitions[type.FullName] = new TypeDefinition { Name = typeDef.Name };
-                        break;
-                }
-            }
-            else throw new NotSupportedException($"{type.FullName} is not supported.");
         }
+
+        public void CacheTypes(params Type[] types) => types.Each(type => CacheType(type));
+        public void CacheType<TType>() => CacheType(typeof(TType));
+        public void CacheType(Type type) => _ = TsTypes[type];
 
     }
 }
