@@ -21,4 +21,18 @@
     <ProjectReference Include="..\TypeSharp\TypeSharp.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="SimpleTest.ts">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Code</SubType>
+    </None>
+    <None Update="GenericTest.ts">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Code</SubType>
+    </None>
+    <None Update="LiveAccountTest.ts">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

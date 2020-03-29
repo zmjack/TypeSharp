@@ -95,7 +95,7 @@ namespace TypeSharp
                                     (tsProperty.PropertyType.Namespace == tsNamespace
                                         ? tsProperty.PropertyType.TypeName
                                         : tsProperty.PropertyType.ReferenceName);
-                                code.AppendLine($"{" ".Repeat(8)}{tsProperty.PropertyName}? : {typeString};");
+                                code.AppendLine($"{" ".Repeat(8)}{tsProperty.PropertyName}?: {typeString};");
                             }
                             code.AppendLine($"{" ".Repeat(4)}}}");
                             break;
@@ -126,7 +126,7 @@ namespace TypeSharp
                     code.AppendLine($"{" ".Repeat(4)}export namespace {tsConstInnerGroupItem.Key} {{");
                     foreach (var tsConst in tsConstInnerGroupItem)
                     {
-                        code.AppendLine($"{" ".Repeat(8)}export const {tsConst.ConstName} : {tsConst.ConstType.TypeName} = {tsConst.ConstValue};");
+                        code.AppendLine($"{" ".Repeat(8)}export const {tsConst.ConstName}: {tsConst.ConstType.TypeName} = {tsConst.ConstValue};");
                     }
                     code.AppendLine($"{" ".Repeat(4)}}}");
                 }
