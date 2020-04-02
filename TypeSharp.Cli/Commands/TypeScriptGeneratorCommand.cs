@@ -45,53 +45,60 @@ Options:
             if (!Directory.Exists(outFolder))
                 Directory.CreateDirectory(outFolder);
 
-            var dllPath = $"{TargetBinFolder}/{Program.ProjectInfo.AssemblyName}.dll";
+            var assemblyName = Program.ProjectInfo.AssemblyName;
+            var dllPath = $"{TargetBinFolder}/{assemblyName}.dll";
             var assembly = Assembly.LoadFrom(dllPath);
             AppDomain.CurrentDomain.AssemblyResolve += GAC.CreateAssemblyResolver(Program.ProjectInfo.TargetFramework, GACFolders.All);
 
             #region Assembly Types
             {
                 var builder = new TypeScriptModelBuilder();
-                var fileName = $"{Path.GetFullPath($"{outFolder}/{Program.ProjectInfo.AssemblyName}.ts")}";
+                var fileName = $"{Path.GetFullPath($"{outFolder}/{assemblyName}.ts")}";
                 var modelTypes = assembly.GetTypesWhichMarkedAs<TypeScriptModelAttribute>();
 
                 builder.CacheTypes(modelTypes);
+                foreach (var include in includes.Where(x => !x.Contains(",")))
+                {
+                    var type = assembly.GetType(include);
+                    if (type != null)
+                        builder.CacheTypes(type);
+                    else Console.Error.WriteLine($"Can not resolve: {include}");
+                }
                 builder.WriteTo(fileName);
 
                 Console.WriteLine($"File saved: {fileName}");
             }
             #endregion
 
-            #region JSend Types
-            foreach (var include in includes)
+            var _includes = includes.Where(x => x.Count(",") == 1).Select(include =>
             {
+                var parts = include.Split(",");
+                return new
+                {
+                    String = include,
+                    TypeName = parts[0],
+                    FileName = parts[1],
+                };
+            });
+
+            foreach (var group in _includes.GroupBy(x => x.FileName))
+            {
+                var refDllPath = $"{TargetBinFolder}/{group.Key}.dll";
+                var refAssembly = Assembly.LoadFrom(refDllPath);
+                var fileName = $"{Path.GetFullPath($"{outFolder}/{group.Key}.ts")}";
+
                 var builder = new TypeScriptModelBuilder();
-                Type type = null;
-                string fileName = null;
-
-                if (!include.Contains(","))
+                foreach (var item in group)
                 {
-                    type = assembly.GetType(include);
-                    fileName = $"{Path.GetFullPath($"{outFolder}/{include}.ts")}";
-                }
-                else if (include.Count(",") == 1)
-                {
-                    var parts = include.Split(",");
-                    var refDllPath = $"{TargetBinFolder}/{parts[1]}.dll";
-                    var refAssembly = Assembly.LoadFrom(refDllPath);
-                    type = refAssembly.GetType(parts[0]);
-                    fileName = $"{Path.GetFullPath($"{outFolder}/{parts[1]}.ts")}";
+                    var type = refAssembly.GetType(item.TypeName);
+                    if (type != null)
+                        builder.CacheType(type);
+                    else Console.Error.WriteLine($"Can not resolve: {item.String}");
                 }
 
-                if (type != null)
-                {
-                    builder.CacheType(type);
-                    builder.WriteTo(fileName);
-                    Console.WriteLine($"File saved: {fileName}");
-                }
-                else Console.Error.WriteLine($"Can not resolve: {include}");
+                builder.WriteTo(fileName);
+                Console.WriteLine($"File saved: {fileName}");
             }
-            #endregion
         }
 
     }
