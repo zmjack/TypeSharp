@@ -43,6 +43,7 @@ namespace TypeSharp
                             case Type _ when type == typeof(decimal): return new TsType(TsTypes) { TypeName = "number", Declare = true };
 
                             case Type _ when type == typeof(DateTime): return new TsType(TsTypes) { TypeName = "Date", Declare = true };
+                            case Type _ when type == typeof(DateTimeOffset): return new TsType(TsTypes) { TypeName = "Date", Declare = true };
 
                             case Type _ when type == typeof(object):
                             case Type _ when type.IsImplement(typeof(IDictionary<,>)): return new TsType(TsTypes) { TypeName = "any", Declare = true };

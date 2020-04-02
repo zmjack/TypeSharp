@@ -15,6 +15,8 @@ namespace TypeSharp.Test
         public int Int { get; set; }
         public string[] StrArray { get; set; }
         public Guid? NGuid { get; set; }
+        public DateTime DateTime { get; set; }
+        public DateTimeOffset DateTimeOffset { get; set; }
     }
 
     [TypeScriptModel(Namespace = "TSNS2")]

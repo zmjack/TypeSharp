@@ -7,6 +7,8 @@
         int?: number;
         strArray?: string[];
         nGuid?: string;
+        dateTime?: Date;
+        dateTimeOffset?: Date;
     }
 }
 declare namespace Ajax {
