@@ -22,6 +22,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="ApiBuildTest.ts">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="SimpleTest.ts">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Code</SubType>

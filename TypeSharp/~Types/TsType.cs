@@ -8,18 +8,20 @@ namespace TypeSharp
 {
     public class TsType
     {
-        public TsType(CacheContainer<Type, TsType> tsTypes, Type classType = null)
+        public TsType(CacheContainer<Type, TsType> tsTypes, Type clrType, bool cacheProperties)
         {
+            ClrType = clrType;
+
             TsProperties = new Cache<TsProperty[]>
             {
                 CacheMethod = () =>
                 {
-                    if (classType != null)
+                    if (cacheProperties)
                     {
-                        var props = classType.GetProperties();
-                        if (classType.IsGenericType)
+                        var props = clrType.GetProperties();
+                        if (clrType.IsGenericType)
                         {
-                            if (classType.IsGenericTypeDefinition)
+                            if (clrType.IsGenericTypeDefinition)
                             {
                                 return props.Select(prop =>
                                 {
@@ -69,7 +71,9 @@ namespace TypeSharp
 
         public string TypeName { get; set; }
 
-        public TsTypeClass TypeClass { get; set; }
+        public Type ClrType { get; private set; }
+
+        public TsTypeClass TypeClass => ClrType.IsEnum ? TsTypeClass.Enum : TsTypeClass.Interface;
 
         public Cache<TsProperty[]> TsProperties { get; private set; }
 

@@ -8,7 +8,7 @@ namespace TypeSharp.Test
 {
     public class TypeScriptModelBuilderTests
     {
-        private static Version AssemblyVersion = Assembly.LoadFrom("TypeSharp").GetName().Version;
+        private static readonly Version AssemblyVersion = Assembly.LoadFrom("TypeSharp").GetName().Version;
 
         private string GetExpectedCode(string name)
         {

@@ -24,29 +24,29 @@ namespace TypeSharp
                     {
                         switch (type)
                         {
-                            case Type _ when type == typeof(bool): return new TsType(TsTypes) { TypeName = "boolean", Declare = true };
+                            case Type _ when type == typeof(bool): return new TsType(TsTypes, type, false) { TypeName = "boolean", Declare = true };
 
-                            case Type _ when type == typeof(string):
-                            case Type _ when type == typeof(Guid): return new TsType(TsTypes) { TypeName = "string", Declare = true };
+                            case Type _ when type == typeof(string): return new TsType(TsTypes, type, false) { TypeName = "string", Declare = true };
+                            case Type _ when type == typeof(Guid): return new TsType(TsTypes, type, false) { TypeName = "string", Declare = true };
 
-                            case Type _ when type == typeof(byte):
-                            case Type _ when type == typeof(sbyte):
-                            case Type _ when type == typeof(char):
-                            case Type _ when type == typeof(short):
-                            case Type _ when type == typeof(ushort):
-                            case Type _ when type == typeof(int):
-                            case Type _ when type == typeof(uint):
-                            case Type _ when type == typeof(long):
-                            case Type _ when type == typeof(ulong):
-                            case Type _ when type == typeof(float):
-                            case Type _ when type == typeof(double):
-                            case Type _ when type == typeof(decimal): return new TsType(TsTypes) { TypeName = "number", Declare = true };
+                            case Type _ when type == typeof(byte): return new TsType(TsTypes, type, false) { TypeName = "number", Declare = true };
+                            case Type _ when type == typeof(sbyte): return new TsType(TsTypes, type, false) { TypeName = "number", Declare = true };
+                            case Type _ when type == typeof(char): return new TsType(TsTypes, type, false) { TypeName = "number", Declare = true };
+                            case Type _ when type == typeof(short): return new TsType(TsTypes, type, false) { TypeName = "number", Declare = true };
+                            case Type _ when type == typeof(ushort): return new TsType(TsTypes, type, false) { TypeName = "number", Declare = true };
+                            case Type _ when type == typeof(int): return new TsType(TsTypes, type, false) { TypeName = "number", Declare = true };
+                            case Type _ when type == typeof(uint): return new TsType(TsTypes, type, false) { TypeName = "number", Declare = true };
+                            case Type _ when type == typeof(long): return new TsType(TsTypes, type, false) { TypeName = "number", Declare = true };
+                            case Type _ when type == typeof(ulong): return new TsType(TsTypes, type, false) { TypeName = "number", Declare = true };
+                            case Type _ when type == typeof(float): return new TsType(TsTypes, type, false) { TypeName = "number", Declare = true };
+                            case Type _ when type == typeof(double): return new TsType(TsTypes, type, false) { TypeName = "number", Declare = true };
+                            case Type _ when type == typeof(decimal): return new TsType(TsTypes, type, false) { TypeName = "number", Declare = true };
 
-                            case Type _ when type == typeof(DateTime): return new TsType(TsTypes) { TypeName = "Date", Declare = true };
-                            case Type _ when type == typeof(DateTimeOffset): return new TsType(TsTypes) { TypeName = "Date", Declare = true };
+                            case Type _ when type == typeof(DateTime): return new TsType(TsTypes, type, false) { TypeName = "Date", Declare = true };
+                            case Type _ when type == typeof(DateTimeOffset): return new TsType(TsTypes, type, false) { TypeName = "Date", Declare = true };
 
-                            case Type _ when type == typeof(object):
-                            case Type _ when type.IsImplement(typeof(IDictionary<,>)): return new TsType(TsTypes) { TypeName = "any", Declare = true };
+                            case Type _ when type == typeof(object): return new TsType(TsTypes, type, false) { TypeName = "any", Declare = true };
+                            case Type _ when type.IsImplement(typeof(IDictionary<,>)): return new TsType(TsTypes, type, false) { TypeName = "any", Declare = true };
 
                             case Type _ when type.IsImplement(typeof(IEnumerable<>)): return ParseIEnumerable(type);
 
@@ -69,7 +69,7 @@ namespace TypeSharp
         public string Compile()
         {
             var code = new StringBuilder();
-            code.AppendLine($"/* Generated by TypeSharp v{Assembly.GetExecutingAssembly().GetName().Version} */");
+            code.AppendLine(Declare.Info);
 
             #region Compile Types
             for (int skipCount = 0; skipCount < TsTypes.Count; skipCount++)
@@ -78,13 +78,13 @@ namespace TypeSharp
                 cache.Value.TsProperties.Update();
             }
 
-            var typeGroup = TsTypes.Values.Select(x => x.Value).Where(x => !x.Declare).GroupBy(x => x.Namespace);
-            if (typeGroup.Any()) code.AppendLine();
-            foreach (var typeGroupItem in typeGroup)
+            var typeGroups = TsTypes.Values.Select(x => x.Value).Where(x => !x.Declare).GroupBy(x => x.Namespace);
+            if (typeGroups.Any()) code.AppendLine();
+            foreach (var typeGroup in typeGroups)
             {
-                var tsNamespace = typeGroupItem.Key;
+                var tsNamespace = typeGroup.Key;
                 code.AppendLine($"declare namespace {tsNamespace} {{");
-                foreach (var tsType in typeGroupItem)
+                foreach (var tsType in typeGroup)
                 {
                     switch (tsType.TypeClass)
                     {
@@ -116,16 +116,16 @@ namespace TypeSharp
             #endregion
 
             #region Compile Consts
-            var tsConstOuterGroup = TsConsts.Values.ToArray().GroupBy(x => x.OuterNamespace);
-            if (tsConstOuterGroup.Any()) code.AppendLine();
-            foreach (var tsConstOuterGroupItem in tsConstOuterGroup)
+            var tsConstOuterGroups = TsConsts.Values.ToArray().GroupBy(x => x.OuterNamespace);
+            if (tsConstOuterGroups.Any()) code.AppendLine();
+            foreach (var tsConstOuterGroup in tsConstOuterGroups)
             {
-                var tsConstInnerGroup = tsConstOuterGroupItem.GroupBy(x => x.InnerNamespace);
-                code.AppendLine($"namespace {tsConstOuterGroupItem.Key} {{");
-                foreach (var tsConstInnerGroupItem in tsConstInnerGroup)
+                var tsConstInnerGroups = tsConstOuterGroup.GroupBy(x => x.InnerNamespace);
+                code.AppendLine($"namespace {tsConstOuterGroup.Key} {{");
+                foreach (var tsConstInnerGroup in tsConstInnerGroups)
                 {
-                    code.AppendLine($"{" ".Repeat(4)}export namespace {tsConstInnerGroupItem.Key} {{");
-                    foreach (var tsConst in tsConstInnerGroupItem)
+                    code.AppendLine($"{" ".Repeat(4)}export namespace {tsConstInnerGroup.Key} {{");
+                    foreach (var tsConst in tsConstInnerGroup)
                     {
                         code.AppendLine($"{" ".Repeat(8)}export const {tsConst.ConstName}: {tsConst.ConstType.TypeName} = {tsConst.ConstValue};");
                     }
@@ -156,7 +156,7 @@ namespace TypeSharp
             var enumerable = type.AsInterface(typeof(IEnumerable<>));
             var elementType = enumerable.GetGenericArguments()[0];
             var tsType = TsTypes[elementType];
-            return new TsType(TsTypes, type)
+            return new TsType(TsTypes, type, true)
             {
                 Namespace = tsType.Value.Namespace,
                 TypeName = $"{tsType.Value.TypeName}{"[]"}",
@@ -182,11 +182,10 @@ namespace TypeSharp
 
         private TsType ParseEnum(Type type)
         {
-            return new TsType(TsTypes)
+            return new TsType(TsTypes, type, false)
             {
                 Namespace = GetTsNamespace(type),
                 TypeName = type.Name,
-                TypeClass = TsTypeClass.Enum,
                 TsEnumValues = Enum.GetNames(type).Select(name => new TsEnumValue
                 {
                     Name = name,
@@ -212,7 +211,7 @@ namespace TypeSharp
 
                 if (type.IsGenericTypeDefinition)
                 {
-                    return new TsType(TsTypes, type)
+                    return new TsType(TsTypes, type, true)
                     {
                         Namespace = tsNamespace,
                         TypeName = typeName,
@@ -221,7 +220,7 @@ namespace TypeSharp
                 else
                 {
                     _ = TsTypes[type.GetGenericTypeDefinition()];
-                    return new TsType(TsTypes, type)
+                    return new TsType(TsTypes, type, true)
                     {
                         Namespace = tsNamespace,
                         TypeName = typeName,
@@ -231,7 +230,7 @@ namespace TypeSharp
             }
             else
             {
-                return new TsType(TsTypes, type)
+                return new TsType(TsTypes, type, true)
                 {
                     Namespace = tsNamespace,
                     TypeName = type.Name,

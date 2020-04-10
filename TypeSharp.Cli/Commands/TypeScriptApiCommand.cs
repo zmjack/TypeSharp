@@ -9,15 +9,15 @@ using System.Reflection;
 
 namespace TypeSharp.Cli
 {
-    [Command("TSGenerator", "tsg", Description = "Generate TypeScript model from CSharp class.")]
-    public class TypeScriptGeneratorCommand : ICommand
+    [Command("TSGenerator", "tsg", Description = "Generate TypeScript api class from CSharp class.")]
+    public class TypeScriptApiCommand : ICommand
     {
         private static string TargetBinFolder = Path.GetFullPath($"{Program.ProjectInfo.ProjectRoot}/bin/Debug/{Program.ProjectInfo.TargetFramework}");
 
         public void PrintUsage()
         {
             Console.WriteLine($@"
-Usage: dotnet ts (tsg|tsgenerator) [Options]
+Usage: dotnet ts (tsapi) [Options]
 
 Options:
   {"-o|--out",20}{"\t"}Specify the output directory path. (default: Typings)

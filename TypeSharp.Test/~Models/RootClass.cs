@@ -18,23 +18,4 @@ namespace TypeSharp.Test
         public DateTime DateTime { get; set; }
         public DateTimeOffset DateTimeOffset { get; set; }
     }
-
-    [TypeScriptModel(Namespace = "TSNS2")]
-    public class SubClass
-    {
-        public string Name { get; set; }
-        public ICollection<string> Members { get; set; }
-    }
-
-    [TypeScriptModel(Namespace = "TSNS3")]
-    public class GenericClass<T>
-    {
-        public T Value { get; set; }
-        public GenericClass<int> IntValue { get; set; }
-    }
-
-    public enum EState
-    {
-        Ready, Running, Complete
-    }
 }
