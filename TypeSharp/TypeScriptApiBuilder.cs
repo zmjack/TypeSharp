@@ -100,7 +100,7 @@ namespace TypeSharp
 
         private string GetRouteTemplate(ICustomAttributeProvider provider)
         {
-            var attr = provider.GetAttributesViaName("Microsoft.AspNetCore.Mvc.Route");
+            var attr = provider.GetAttributeViaName("Microsoft.AspNetCore.Mvc.RouteAttribute");
             var template = attr?.GetReflector().DeclaredProperty<string>("Template")?.Value;
             return template;
         }
