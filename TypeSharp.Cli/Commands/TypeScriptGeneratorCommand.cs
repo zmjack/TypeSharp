@@ -21,7 +21,7 @@ Usage: dotnet ts (tsg|tsgenerator) [Options]
 
 Options:
   {"-o|--out",20}{"\t"}Specify the output directory path. (default: Typings)
-  {"-i|--include",20}{"\t"}Specify to include other built-in models, such as 'JSend'.
+  {"-i|--include",20}{"\t"}Specify the include other types, such as 'Ajax.JSend,JSend.dll'.
 ");
         }
 
@@ -34,7 +34,7 @@ Options:
                 return;
             }
 
-            var outFolder = conArgs["-o"] ?? conArgs["-out"] ?? ".";
+            var outFolder = conArgs["-o"] ?? conArgs["--out"] ?? ".";
             var includes = conArgs["-i"]?.Split(";") ?? conArgs["--include"]?.Split(";") ?? new string[0];
 
             GenerateTypeScript(outFolder, includes);
@@ -46,6 +46,7 @@ Options:
                 Directory.CreateDirectory(outFolder);
 
             var assemblyName = Program.ProjectInfo.AssemblyName;
+            Assembly.LoadFrom($"{TargetBinFolder}/{assemblyName}.dll");
             AppDomain.CurrentDomain.AssemblyResolve += GAC.CreateAssemblyResolver(Program.ProjectInfo.TargetFramework, GACFolders.All);
 
             var _includes = includes.Select(include =>
@@ -55,7 +56,7 @@ Options:
                     var parts = include.Split(",");
                     return new
                     {
-                        String = include,
+                        TypeString = include,
                         TypeName = parts[0],
                         AssemblyName = parts[1],
                     };
@@ -64,12 +65,20 @@ Options:
                 {
                     return new
                     {
-                        String = include,
+                        TypeString = include,
                         TypeName = include,
                         AssemblyName = assemblyName,
                     };
                 }
-            });
+            }).Concat(new[]
+            {
+                new
+                {
+                    TypeString = "",
+                    TypeName = (string)null,
+                    AssemblyName = assemblyName,
+                }
+            }).OrderBy(x => x.AssemblyName == assemblyName ? 0 : 1);
 
             foreach (var group in _includes.GroupBy(x => x.AssemblyName))
             {
@@ -78,21 +87,24 @@ Options:
                 var outFile = $"{Path.GetFullPath($"{outFolder}/{group.Key}.d.ts")}";
                 var assembly = Assembly.LoadFrom(dll);
 
-                var includeTypes = group.Select(include =>
-                {
-                    var type = assembly.GetType(include.TypeName);
-                    if (type == null) Console.Error.WriteLine($"Can not resolve: {include.String}");
-
-                    return type;
-                }).ToArray();
-
-                builder.CacheTypes(includeTypes);
-
                 if (group.Key == assemblyName)
                 {
                     var types = assembly.GetTypesWhichMarkedAs<TypeScriptModelAttribute>();
                     builder.CacheTypes(types);
                 }
+
+                var includeTypes = group.Select(include =>
+                {
+                    if (!include.TypeString.IsNullOrWhiteSpace())
+                    {
+                        var type = assembly.GetType(include.TypeName);
+                        if (type == null) Console.Error.WriteLine($"Can not resolve: {include.TypeString}");
+                        return type;
+                    }
+                    else return null;
+                }).Where(x => x != null).ToArray();
+                builder.CacheTypes(includeTypes);
+
                 builder.WriteTo(outFile);
 
                 Console.WriteLine($"File saved: {outFile}");

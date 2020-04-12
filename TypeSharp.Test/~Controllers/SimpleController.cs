@@ -6,7 +6,7 @@ using System.Text;
 namespace TypeSharp.Test
 {
     [TypeScriptApi]
-    [Route("/com/{controller}/{action}")]
+    [Route("com/{controller}/{action}")]
     public class SimpleController : Controller
     {
         [Return(typeof(SubClass[]))]

@@ -18,7 +18,7 @@ namespace TypeSharp.Test
         [Fact]
         public void ApiBuildTest()
         {
-            var builder = new TypeScriptApiBuilder();
+            var builder = new TypeScriptApiBuilder("");
             builder.CacheType<SimpleController>();
 
             var tscode = builder.Compile();

@@ -14,10 +14,13 @@ namespace TypeSharp
     {
         private readonly TypeScriptModelBuilder ModelBuilder = new TypeScriptModelBuilder();
         private CacheContainer<Type, TsType> TsTypes => ModelBuilder.TsTypes;
+        private readonly string RootUri;
+
         public HashSet<Type> TypeList = new HashSet<Type>();
 
-        public TypeScriptApiBuilder()
+        public TypeScriptApiBuilder(string rootUri)
         {
+            RootUri = rootUri;
         }
 
         public void WriteTo(string path) => File.WriteAllText(path, Compile());
@@ -72,17 +75,18 @@ namespace TypeSharp
                         var formParameters = parameters.Where(x => x.HasAttributeViaName("Microsoft.AspNetCore.Mvc.FromFormAttribute"));
                         var queryParameters = parameters.Except(bodyParameters).Except(formParameters);
                         var queryParametersDeclare = queryParameters.Any() ? $" {queryParameters.Select(x => x.Name).Join(", ")} " : " ";
+                        var uri = $"{RootUri}/{route}";
 
                         if (new[] { "post", "put", "patch" }.Contains(verb))
                         {
                             code.AppendLine($"{" ".Repeat(4)}static {StringEx.CamelCase(method.Name)}({parametersDeclare}): Promise<{returnTsType.ReferenceName}> {{" +
-                                $" return ApiHelper.{verb}('{route}', {bodyParameters.FirstOrDefault()?.Name ?? "{ }"}, {{{queryParametersDeclare}}});" +
+                                $" return ApiHelper.{verb}('{uri}', {bodyParameters.FirstOrDefault()?.Name ?? "{ }"}, {{{queryParametersDeclare}}});" +
                                 $" }}");
                         }
                         else
                         {
                             code.AppendLine($"{" ".Repeat(4)}static {StringEx.CamelCase(method.Name)}({parametersDeclare}): Promise<{returnTsType.ReferenceName}> {{" +
-                                $" return ApiHelper.{verb}('{route}', {{{queryParametersDeclare}}});" +
+                                $" return ApiHelper.{verb}('{uri}', {{{queryParametersDeclare}}});" +
                                 $" }}");
                         }
                     }
