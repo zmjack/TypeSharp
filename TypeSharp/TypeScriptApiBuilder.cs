@@ -94,14 +94,14 @@ namespace TypeSharp
             return code.ToString();
         }
 
-        public string GetRouteTemplate(ICustomAttributeProvider provider)
+        private string GetRouteTemplate(ICustomAttributeProvider provider)
         {
             var attr = provider.GetAttributesViaName("Microsoft.AspNetCore.Mvc.Route");
             var template = attr?.GetReflector().DeclaredProperty<string>("Template")?.Value;
             return template;
         }
 
-        public string[] GetMethodVerbs(MethodInfo provider)
+        private string[] GetMethodVerbs(MethodInfo provider)
         {
             var verbDefines = new[]
             {

@@ -12,7 +12,7 @@ namespace TypeSharp.Cli
     [Command("TSGenerator", "tsg", Description = "Generate TypeScript model from CSharp class.")]
     public class TypeScriptGeneratorCommand : ICommand
     {
-        private static string TargetBinFolder = Path.GetFullPath($"{Program.ProjectInfo.ProjectRoot}/bin/Debug/{Program.ProjectInfo.TargetFramework}");
+        private static readonly string TargetBinFolder = Path.GetFullPath($"{Program.ProjectInfo.ProjectRoot}/bin/Debug/{Program.ProjectInfo.TargetFramework}");
 
         public void PrintUsage()
         {
@@ -46,58 +46,56 @@ Options:
                 Directory.CreateDirectory(outFolder);
 
             var assemblyName = Program.ProjectInfo.AssemblyName;
-            var dllPath = $"{TargetBinFolder}/{assemblyName}.dll";
-            var assembly = Assembly.LoadFrom(dllPath);
             AppDomain.CurrentDomain.AssemblyResolve += GAC.CreateAssemblyResolver(Program.ProjectInfo.TargetFramework, GACFolders.All);
 
-            #region Assembly Types
+            var _includes = includes.Select(include =>
             {
-                var builder = new TypeScriptModelBuilder();
-                var fileName = $"{Path.GetFullPath($"{outFolder}/{assemblyName}.ts")}";
-                var modelTypes = assembly.GetTypesWhichMarkedAs<TypeScriptModelAttribute>();
-
-                builder.CacheTypes(modelTypes);
-                foreach (var include in includes.Where(x => !x.Contains(",")))
+                if (include.Count(",") == 1)
                 {
-                    var type = assembly.GetType(include);
-                    if (type != null)
-                        builder.CacheTypes(type);
-                    else Console.Error.WriteLine($"Can not resolve: {include}");
+                    var parts = include.Split(",");
+                    return new
+                    {
+                        String = include,
+                        TypeName = parts[0],
+                        AssemblyName = parts[1],
+                    };
                 }
-                builder.WriteTo(fileName);
-
-                Console.WriteLine($"File saved: {fileName}");
-            }
-            #endregion
-
-            var _includes = includes.Where(x => x.Count(",") == 1).Select(include =>
-            {
-                var parts = include.Split(",");
-                return new
+                else
                 {
-                    String = include,
-                    TypeName = parts[0],
-                    FileName = parts[1],
-                };
+                    return new
+                    {
+                        String = include,
+                        TypeName = include,
+                        AssemblyName = assemblyName,
+                    };
+                }
             });
 
-            foreach (var group in _includes.GroupBy(x => x.FileName))
+            foreach (var group in _includes.GroupBy(x => x.AssemblyName))
             {
-                var refDllPath = $"{TargetBinFolder}/{group.Key}.dll";
-                var refAssembly = Assembly.LoadFrom(refDllPath);
-                var fileName = $"{Path.GetFullPath($"{outFolder}/{group.Key}.ts")}";
-
                 var builder = new TypeScriptModelBuilder();
-                foreach (var item in group)
-                {
-                    var type = refAssembly.GetType(item.TypeName);
-                    if (type != null)
-                        builder.CacheType(type);
-                    else Console.Error.WriteLine($"Can not resolve: {item.String}");
-                }
+                var dll = $"{TargetBinFolder}/{group.Key}.dll";
+                var outFile = $"{Path.GetFullPath($"{outFolder}/{group.Key}.d.ts")}";
+                var assembly = Assembly.LoadFrom(dll);
 
-                builder.WriteTo(fileName);
-                Console.WriteLine($"File saved: {fileName}");
+                var includeTypes = group.Select(include =>
+                {
+                    var type = assembly.GetType(include.TypeName);
+                    if (type == null) Console.Error.WriteLine($"Can not resolve: {include.String}");
+
+                    return type;
+                }).ToArray();
+
+                builder.CacheTypes(includeTypes);
+
+                if (group.Key == assemblyName)
+                {
+                    var types = assembly.GetTypesWhichMarkedAs<TypeScriptModelAttribute>();
+                    builder.CacheTypes(types);
+                }
+                builder.WriteTo(outFile);
+
+                Console.WriteLine($"File saved: {outFile}");
             }
         }
 
