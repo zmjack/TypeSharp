@@ -39,8 +39,9 @@ namespace TypeSharp
                 var ns = group.Key;
                 foreach (var type in group)
                 {
-                    var typeName = GetTypeName(type.ClrType);
+                    var typeName = GetTypeName(type.ClrType).Project(new Regex(@"^(\w+?)(?:Controller)?$"), "$1Api");
                     code.AppendLine($@"export class {typeName} {{");
+                    code.AppendLine($@"    constructor(public api: ApiHelper = ApiHelper.default) {{ }}");
 
                     var classRouteTemplate = GetRouteTemplate(type.ClrType);
                     var methods = type.ClrType.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
@@ -74,19 +75,19 @@ namespace TypeSharp
                         var bodyParameters = parameters.Where(x => x.HasAttributeViaName("Microsoft.AspNetCore.Mvc.FromBodyAttribute"));
                         var formParameters = parameters.Where(x => x.HasAttributeViaName("Microsoft.AspNetCore.Mvc.FromFormAttribute"));
                         var queryParameters = parameters.Except(bodyParameters).Except(formParameters);
-                        var queryParametersDeclare = queryParameters.Any() ? $" {queryParameters.Select(x => x.Name).Join(", ")} " : " ";
+                        var queryParametersDeclare = queryParameters.Any() ? $" {queryParameters.Select(x => x.Name).Join(", ")} " : "";
                         var uri = $"{RootUri}/{route}";
 
                         if (new[] { "post", "put", "patch" }.Contains(verb))
                         {
-                            code.AppendLine($"{" ".Repeat(4)}static {StringEx.CamelCase(method.Name)}({parametersDeclare}): Promise<{returnTsType.ReferenceName}> {{" +
-                                $" return ApiHelper.{verb}('{uri}', {bodyParameters.FirstOrDefault()?.Name ?? "{ }"}, {{{queryParametersDeclare}}});" +
+                            code.AppendLine($"{" ".Repeat(4)}{StringEx.CamelCase(method.Name)}({parametersDeclare}): Promise<{returnTsType.ReferenceName}> {{" +
+                                $" return this.api.{verb}('{uri}', {bodyParameters.FirstOrDefault()?.Name ?? "{}"}, {{{queryParametersDeclare}}});" +
                                 $" }}");
                         }
                         else
                         {
-                            code.AppendLine($"{" ".Repeat(4)}static {StringEx.CamelCase(method.Name)}({parametersDeclare}): Promise<{returnTsType.ReferenceName}> {{" +
-                                $" return ApiHelper.{verb}('{uri}', {{{queryParametersDeclare}}});" +
+                            code.AppendLine($"{" ".Repeat(4)}{StringEx.CamelCase(method.Name)}({parametersDeclare}): Promise<{returnTsType.ReferenceName}> {{" +
+                                $" return this.api.{verb}('{uri}', {{{queryParametersDeclare}}});" +
                                 $" }}");
                         }
                     }
