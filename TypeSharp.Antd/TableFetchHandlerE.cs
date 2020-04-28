@@ -26,7 +26,7 @@ namespace TypeSharp.Antd
                 }
             }
 
-            if (Orders != null && FetchParams.SortKey.IsNullOrWhiteSpace())
+            if (Orders != null && !FetchParams.SortKey.IsNullOrWhiteSpace())
             {
                 if (Orders.ContainsKey(FetchParams.SortKey))
                     source = Orders[FetchParams.SortKey](new OrderHandlerE<TSource>(source, FetchParams.ESortOrder));
