@@ -18,12 +18,21 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TypeSharp.Antd\TypeSharp.Antd.csproj" />
     <ProjectReference Include="..\TypeSharp\TypeSharp.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="GenericJSendTest.ts">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Code</SubType>
+    </None>
     <None Update="ApiBuildTest.ts">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="JSendTest.ts">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Code</SubType>
     </None>
     <None Update="SimpleTest.ts">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

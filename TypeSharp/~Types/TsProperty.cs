@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace TypeSharp
+﻿namespace TypeSharp
 {
     public class TsProperty
     {

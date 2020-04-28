@@ -197,10 +197,8 @@ namespace TypeSharp
         private TsType ParseType(Type type)
         {
             var tsNamespace = GetTsNamespace(type);
-
+            
             CacheConsts(type);
-
-            var props = type.GetProperties();
             if (type.IsGenericType)
             {
                 var pureName = type.Name.Project(new Regex(@"([^`]+)"));

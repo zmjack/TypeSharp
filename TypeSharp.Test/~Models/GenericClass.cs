@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace TypeSharp.Test
+﻿namespace TypeSharp.Test
 {
     [TypeScriptModel(Namespace = "TSNS3")]
     public class GenericClass<T>

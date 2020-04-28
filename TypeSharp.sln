@@ -17,6 +17,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeSharp.Antd", "TypeSharp.Antd\TypeSharp.Antd.csproj", "{5C5A1EDE-6F1F-4BC1-A73F-9935D0CCEDDB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,18 @@ Global
 		{84B26CC6-7ADB-416F-92F9-163108301561}.Release|x64.Build.0 = Release|Any CPU
 		{84B26CC6-7ADB-416F-92F9-163108301561}.Release|x86.ActiveCfg = Release|Any CPU
 		{84B26CC6-7ADB-416F-92F9-163108301561}.Release|x86.Build.0 = Release|Any CPU
+		{5C5A1EDE-6F1F-4BC1-A73F-9935D0CCEDDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C5A1EDE-6F1F-4BC1-A73F-9935D0CCEDDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C5A1EDE-6F1F-4BC1-A73F-9935D0CCEDDB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5C5A1EDE-6F1F-4BC1-A73F-9935D0CCEDDB}.Debug|x64.Build.0 = Debug|Any CPU
+		{5C5A1EDE-6F1F-4BC1-A73F-9935D0CCEDDB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5C5A1EDE-6F1F-4BC1-A73F-9935D0CCEDDB}.Debug|x86.Build.0 = Debug|Any CPU
+		{5C5A1EDE-6F1F-4BC1-A73F-9935D0CCEDDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C5A1EDE-6F1F-4BC1-A73F-9935D0CCEDDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C5A1EDE-6F1F-4BC1-A73F-9935D0CCEDDB}.Release|x64.ActiveCfg = Release|Any CPU
+		{5C5A1EDE-6F1F-4BC1-A73F-9935D0CCEDDB}.Release|x64.Build.0 = Release|Any CPU
+		{5C5A1EDE-6F1F-4BC1-A73F-9935D0CCEDDB}.Release|x86.ActiveCfg = Release|Any CPU
+		{5C5A1EDE-6F1F-4BC1-A73F-9935D0CCEDDB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

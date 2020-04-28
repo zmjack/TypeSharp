@@ -1,8 +1,7 @@
 ﻿using NStandard;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Reflection;
 
 namespace TypeSharp
 {
@@ -18,7 +17,11 @@ namespace TypeSharp
                 {
                     if (cacheProperties)
                     {
-                        var props = clrType.GetProperties();
+                        var allProps = clrType.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+                        var declaredProps = allProps.Where(x => x.DeclaringType == clrType);
+                        var duplicateNames = allProps.Select(x => x.Name).Intersect(declaredProps.Select(x => x.Name)).ToArray();
+                        var props = allProps.Where(x => !duplicateNames.Contains(x.Name)).Concat(declaredProps);
+
                         if (clrType.IsGenericType)
                         {
                             if (clrType.IsGenericTypeDefinition)
