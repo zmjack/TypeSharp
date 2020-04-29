@@ -29,6 +29,7 @@ declare namespace TypeSharp.Test {
 declare namespace TSNS2 {
     interface SubClass {
         name?: string;
+        value?: string;
         members?: string[];
     }
 }

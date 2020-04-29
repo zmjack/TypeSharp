@@ -20,7 +20,7 @@ namespace TypeSharp
             {
                 CacheMethod = type =>
                 {
-                    return new CacheDelegate<TsType>(() =>
+                    return () =>
                     {
                         switch (type)
                         {
@@ -28,6 +28,7 @@ namespace TypeSharp
 
                             case Type _ when type == typeof(string): return new TsType(TsTypes, type, false) { TypeName = "string", Declare = true };
                             case Type _ when type == typeof(Guid): return new TsType(TsTypes, type, false) { TypeName = "string", Declare = true };
+                            case Type _ when type == typeof(VariantString): return new TsType(TsTypes, type, false) { TypeName = "string", Declare = true };
 
                             case Type _ when type == typeof(byte): return new TsType(TsTypes, type, false) { TypeName = "number", Declare = true };
                             case Type _ when type == typeof(sbyte): return new TsType(TsTypes, type, false) { TypeName = "number", Declare = true };
@@ -58,7 +59,7 @@ namespace TypeSharp
 
                             default: throw new NotSupportedException($"{type.FullName} is not supported.");
                         }
-                    });
+                    };
                 },
             };
         }
@@ -197,7 +198,7 @@ namespace TypeSharp
         private TsType ParseType(Type type)
         {
             var tsNamespace = GetTsNamespace(type);
-            
+
             CacheConsts(type);
             if (type.IsGenericType)
             {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using NStandard;
+using System.Collections.Generic;
 
 namespace TypeSharp.Test
 {
@@ -6,6 +7,7 @@ namespace TypeSharp.Test
     public class SubClass
     {
         public string Name { get; set; }
+        public VariantString Value { get; set; }
         public ICollection<string> Members { get; set; }
     }
 }
