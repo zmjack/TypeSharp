@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>0.0.2</Version>
+    <Version>0.0.3</Version>
     <Authors>zmjack</Authors>
     <Description>DotNet interface for Antd.</Description>
     <Copyright>Copyright © typesharp.net 2018-2021</Copyright>

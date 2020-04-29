@@ -32,7 +32,7 @@ namespace TypeSharp.Antd
                     source = Orders[FetchParams.SortKey](new OrderHandlerE<TSource>(source, FetchParams.ESortOrder));
             }
 
-            return source.SelectPage(FetchParams.Page, FetchParams.PageSize);
+            return source.SelectPage(FetchParams.Page.For(x => x < 1 ? 1 : x), FetchParams.PageSize.For(x => x < 1 ? 20 : x));
         }
     }
 
