@@ -94,7 +94,7 @@ Options:
                     {
                         if (!include.TypeString.IsNullOrWhiteSpace())
                         {
-                            var type = Type.GetType(include.TypeName);
+                            var type = Type.GetType(include.TypeString);
                             if (type == null) Console.Error.WriteLine($"Can not resolve(#1): {include.TypeString}");
                             return type;
                         }
