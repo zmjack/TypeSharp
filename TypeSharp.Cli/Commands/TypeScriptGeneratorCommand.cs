@@ -13,7 +13,8 @@ namespace TypeSharp.Cli
     public class TypeScriptGeneratorCommand : ICommand
     {
         private static readonly string TargetBinFolder = Path.GetFullPath($"{Program.ProjectInfo.ProjectRoot}/bin/Debug/{Program.ProjectInfo.TargetFramework}");
-        private static Assembly CoreLibAssembly = AppDomain.CurrentDomain.GetCoreLibAssembly();
+        private static readonly Assembly CoreLibAssembly = AppDomain.CurrentDomain.GetCoreLibAssembly();
+        private static readonly string[] CliReferencedAssemblyNames = Assembly.GetExecutingAssembly().GetReferencedAssemblies().Select(x => x.Name).ToArray();
 
         public void PrintUsage()
         {
@@ -46,8 +47,8 @@ Options:
             if (!Directory.Exists(outFolder))
                 Directory.CreateDirectory(outFolder);
 
-            var assemblyName = Program.ProjectInfo.AssemblyName;
-            Assembly.LoadFrom($"{TargetBinFolder}/{assemblyName}.dll");
+            var targetAssemblyName = Program.ProjectInfo.AssemblyName;
+            Assembly.LoadFrom($"{TargetBinFolder}/{targetAssemblyName}.dll");
             AppDomain.CurrentDomain.AssemblyResolve += GAC.CreateAssemblyResolver(Program.ProjectInfo.TargetFramework, GACFolders.All);
 
             var _includes = includes.Select(include =>
@@ -68,7 +69,7 @@ Options:
                     {
                         TypeString = include,
                         TypeName = include,
-                        AssemblyName = assemblyName,
+                        AssemblyName = targetAssemblyName,
                     };
                 }
             }).Concat(new[]
@@ -77,34 +78,51 @@ Options:
                 {
                     TypeString = "",
                     TypeName = (string)null,
-                    AssemblyName = assemblyName,
+                    AssemblyName = targetAssemblyName,
                 }
-            }).OrderBy(x => x.AssemblyName == assemblyName ? 0 : 1);
+            }).OrderBy(x => x.AssemblyName == targetAssemblyName ? 0 : 1);
 
             foreach (var group in _includes.GroupBy(x => x.AssemblyName))
             {
                 var builder = new TypeScriptModelBuilder();
                 var dll = $"{TargetBinFolder}/{group.Key}.dll";
                 var outFile = $"{Path.GetFullPath($"{outFolder}/{group.Key}.d.ts")}";
-                var assembly = Assembly.LoadFrom(dll);
 
-                if (group.Key == assemblyName)
+                if (CliReferencedAssemblyNames.Contains(group.Key))
                 {
-                    var types = assembly.GetTypesWhichMarkedAs<TypeScriptModelAttribute>();
-                    builder.CacheTypes(types);
-                }
-
-                var includeTypes = group.Select(include =>
-                {
-                    if (!include.TypeString.IsNullOrWhiteSpace())
+                    var includeTypes = group.Select(include =>
                     {
-                        var type = assembly.GetType(include.TypeName) ?? CoreLibAssembly.GetType(include.TypeName);
-                        if (type == null) Console.Error.WriteLine($"Can not resolve: {include.TypeString}");
-                        return type;
+                        if (!include.TypeString.IsNullOrWhiteSpace())
+                        {
+                            var type = Type.GetType(include.TypeName);
+                            if (type == null) Console.Error.WriteLine($"Can not resolve(#1): {include.TypeString}");
+                            return type;
+                        }
+                        else return null;
+                    }).Where(x => x != null).ToArray();
+                }
+                else
+                {
+                    var assembly = Assembly.LoadFrom(dll);
+
+                    if (group.Key == targetAssemblyName)
+                    {
+                        var types = assembly.GetTypesWhichMarkedAs<TypeScriptModelAttribute>();
+                        builder.CacheTypes(types);
                     }
-                    else return null;
-                }).Where(x => x != null).ToArray();
-                builder.CacheTypes(includeTypes);
+
+                    var includeTypes = group.Select(include =>
+                    {
+                        if (!include.TypeString.IsNullOrWhiteSpace())
+                        {
+                            var type = assembly.GetType(include.TypeName) ?? CoreLibAssembly.GetType(include.TypeName);
+                            if (type == null) Console.Error.WriteLine($"Can not resolve(#2): {include.TypeString}");
+                            return type;
+                        }
+                        else return null;
+                    }).Where(x => x != null).ToArray();
+                    builder.CacheTypes(includeTypes);
+                }
 
                 builder.WriteTo(outFile);
 
