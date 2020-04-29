@@ -13,6 +13,7 @@ namespace TypeSharp.Cli
     public class TypeScriptGeneratorCommand : ICommand
     {
         private static readonly string TargetBinFolder = Path.GetFullPath($"{Program.ProjectInfo.ProjectRoot}/bin/Debug/{Program.ProjectInfo.TargetFramework}");
+        private static Assembly CoreLibAssembly = AppDomain.CurrentDomain.GetCoreLibAssembly();
 
         public void PrintUsage()
         {
@@ -97,7 +98,7 @@ Options:
                 {
                     if (!include.TypeString.IsNullOrWhiteSpace())
                     {
-                        var type = assembly.GetType(include.TypeName);
+                        var type = assembly.GetType(include.TypeName) ?? CoreLibAssembly.GetType(include.TypeName);
                         if (type == null) Console.Error.WriteLine($"Can not resolve: {include.TypeString}");
                         return type;
                     }

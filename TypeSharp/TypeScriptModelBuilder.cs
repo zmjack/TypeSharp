@@ -55,7 +55,7 @@ namespace TypeSharp
 
                             case Type _ when type.IsEnum: return ParseEnum(type);
 
-                            case Type _ when type.IsClass: return ParseType(type);
+                            case Type _ when type.IsClass || type.IsValueType: return ParseType(type);
 
                             default: throw new NotSupportedException($"{type.FullName} is not supported.");
                         }
