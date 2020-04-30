@@ -100,6 +100,7 @@ Options:
                         }
                         else return null;
                     }).Where(x => x != null).ToArray();
+                    builder.CacheTypes(includeTypes);
                 }
                 else
                 {
