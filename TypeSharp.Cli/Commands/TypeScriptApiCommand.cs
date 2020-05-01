@@ -29,7 +29,7 @@ Options:
         public void Run(string[] args)
         {
             var conArgs = new ConArgs(args, "-");
-            if (conArgs.Properties.For(x => x.ContainsKey("-h") || x.ContainsKey("--help")))
+            if ((conArgs["-h"] ?? conArgs["--help"]) != null)
             {
                 PrintUsage();
                 return;

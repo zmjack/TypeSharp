@@ -64,9 +64,9 @@ namespace TypeSharp
         }
         public Dictionary<FieldInfo, TsConst> TsConsts { get; private set; } = new Dictionary<FieldInfo, TsConst>();
 
-        public void WriteTo(string path) => File.WriteAllText(path, Compile());
+        public void WriteTo(string path, CompileOptions options = null) => File.WriteAllText(path, Compile(options));
 
-        public string Compile()
+        public string Compile(CompileOptions options = null)
         {
             var code = new StringBuilder();
             code.AppendLine(Declare.Info);
@@ -99,6 +99,16 @@ namespace TypeSharp
                                 code.AppendLine($"{" ".Repeat(8)}{tsProperty.PropertyName}?: {typeString};");
                             }
                             code.AppendLine($"{" ".Repeat(4)}}}");
+
+                            if (options?.OutputNames ?? false)
+                            {
+                                code.AppendLine($"{" ".Repeat(4)}export const enum {tsType.PureName}_names {{");
+                                foreach (var tsProperty in tsType.TsProperties.Value)
+                                {
+                                    code.AppendLine($"{" ".Repeat(8)}{tsProperty.PropertyName} = '{tsProperty.ClrName}',");
+                                }
+                                code.AppendLine($"{" ".Repeat(4)}}}");
+                            }
                             break;
 
                         case TsTypeClass.Enum:

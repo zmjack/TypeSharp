@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace TypeSharp
 {
@@ -33,6 +34,7 @@ namespace TypeSharp
                                     {
                                         return new TsProperty
                                         {
+                                            ClrName = prop.Name,
                                             PropertyName = StringEx.CamelCase(prop.Name),
                                             PropertyTypeDefinition = propType.Name,
                                         };
@@ -41,6 +43,7 @@ namespace TypeSharp
                                     {
                                         return new TsProperty
                                         {
+                                            ClrName = prop.Name,
                                             PropertyName = StringEx.CamelCase(prop.Name),
                                             PropertyType = tsTypes[propType].Value,
                                         };
@@ -56,6 +59,7 @@ namespace TypeSharp
                                 var propType = prop.PropertyType;
                                 return new TsProperty
                                 {
+                                    ClrName = prop.Name,
                                     PropertyName = StringEx.CamelCase(prop.Name),
                                     PropertyType = tsTypes[propType].Value,
                                 };
@@ -73,6 +77,8 @@ namespace TypeSharp
         public string Namespace { get; set; }
 
         public string TypeName { get; set; }
+
+        public string PureName => TypeName.Project(new Regex(@"^([^<]+)"));
 
         public Type ClrType { get; private set; }
 

@@ -32,8 +32,8 @@ namespace TypeSharp.Antd.Test
                 new Model { Name = "A1", Age = 18 },
                 new Model { Name = "A2", Age = 19 },
                 new Model { Name = "A3", Age = 20 },
-                new Model { Name = "B1", Age = 21 },
-                new Model { Name = "B2", Age = 22 },
+                new Model { Name = "B1", Age = 22 },
+                new Model { Name = "B2", Age = 23 },
             };
 
             var handler = new TableFetchHandlerE<Model>(fetchParams)
@@ -52,7 +52,7 @@ namespace TypeSharp.Antd.Test
             };
 
             var record = handler.Handle(source).First();
-            Assert.Equal("A3", record.Name);
+            Assert.Equal("A1", record.Name);
         }
     }
 }

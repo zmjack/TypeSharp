@@ -35,7 +35,7 @@ namespace TypeSharp.Test
             var builder = new TypeScriptModelBuilder();
             builder.CacheType(typeof(GenericClass<int>));
             var tscode = builder.Compile();
-            var expectedCode = GetExpectedCode("GenericTest");
+            var expectedCode = GetExpectedCode("GenericTest1");
             Assert.Equal(expectedCode, tscode);
         }
 
@@ -44,8 +44,11 @@ namespace TypeSharp.Test
         {
             var builder = new TypeScriptModelBuilder();
             builder.CacheType(Type.GetType("TypeSharp.Test.GenericClass`1"));
-            var tscode = builder.Compile();
-            var expectedCode = GetExpectedCode("GenericTest");
+            var tscode = builder.Compile(new CompileOptions
+            {
+                OutputNames = true,
+            });
+            var expectedCode = GetExpectedCode("GenericTest2");
             Assert.Equal(expectedCode, tscode);
         }
 

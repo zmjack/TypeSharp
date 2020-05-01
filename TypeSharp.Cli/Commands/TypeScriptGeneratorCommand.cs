@@ -24,25 +24,27 @@ Usage: dotnet ts (tsg|tsgenerator) [Options]
 Options:
   {"-o|--out",20}{"\t"}Specify the output directory path. (default: Typings)
   {"-i|--include",20}{"\t"}Specify the include other types, such as 'Ajax.JSend,JSend.dll'.
+  {"-n|--names",20}{"\t"}Include original names of properties.
 ");
         }
 
         public void Run(string[] args)
         {
             var conArgs = new ConArgs(args, "-");
-            if (conArgs.Properties.For(x => x.ContainsKey("-h") || x.ContainsKey("--help")))
+            if ((conArgs["-h"] ?? conArgs["--help"]) != null)
             {
                 PrintUsage();
                 return;
             }
 
             var outFolder = conArgs["-o"] ?? conArgs["--out"] ?? ".";
-            var includes = conArgs["-i"]?.Split(";") ?? conArgs["--include"]?.Split(";") ?? new string[0];
+            var includes = (conArgs["-i"] ?? conArgs["--include"])?.Split(";") ?? new string[0];
+            var outputNames = (conArgs["-n"] ?? conArgs["--names"]) != null;
 
-            GenerateTypeScript(outFolder, includes);
+            GenerateTypeScript(outFolder, includes, outputNames);
         }
 
-        private static void GenerateTypeScript(string outFolder, string[] includes)
+        private static void GenerateTypeScript(string outFolder, string[] includes, bool outputNames)
         {
             if (!Directory.Exists(outFolder))
                 Directory.CreateDirectory(outFolder);
@@ -125,7 +127,10 @@ Options:
                     builder.CacheTypes(includeTypes);
                 }
 
-                builder.WriteTo(outFile);
+                builder.WriteTo(outFile, new CompileOptions
+                {
+                    OutputNames = outputNames,
+                });
 
                 Console.WriteLine($"File saved: {outFile}");
             }
