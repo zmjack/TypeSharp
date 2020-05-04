@@ -3,7 +3,7 @@
         id?: string;
         sub?: string;
         name?: string;
-        userRoles?: LiveUserRole<LiveAccount.LiveUser, LiveAccount.LiveRole>[];
+        userRoles?: LiveUserRole<LiveUser, LiveRole>[];
     }
     interface LiveRole {
         id?: string;
@@ -12,11 +12,11 @@
         superiorRole?: string;
         superRoleLink?: LiveRole;
         inferiorRoles?: LiveRole[];
-        userRoles?: LiveUserRole<LiveAccount.LiveUser, LiveAccount.LiveRole>[];
-        roleOperations?: LiveRoleOperation<LiveAccount.LiveUser, LiveAccount.LiveRole>[];
-        roleGrants?: LiveRoleGrantRole<LiveAccount.LiveUser, LiveAccount.LiveRole>[];
-        roleGrantGroups?: LiveRoleGrantGroup<LiveAccount.LiveUser, LiveAccount.LiveRole>[];
-        roleGroups?: LiveRoleGroup<LiveAccount.LiveUser, LiveAccount.LiveRole>[];
+        userRoles?: LiveUserRole<LiveUser, LiveRole>[];
+        roleOperations?: LiveRoleOperation<LiveUser, LiveRole>[];
+        roleGrants?: LiveRoleGrantRole<LiveUser, LiveRole>[];
+        roleGrantGroups?: LiveRoleGrantGroup<LiveUser, LiveRole>[];
+        roleGroups?: LiveRoleGroup<LiveUser, LiveRole>[];
     }
     interface LiveUserRole<TLiveUser, TLiveRole> {
         id?: string;

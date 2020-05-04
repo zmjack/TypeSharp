@@ -46,9 +46,12 @@ namespace TypeSharp
                             case Type _ when type == typeof(DateTimeOffset): return new TsType(TsTypes, type, false) { TypeName = "Date", Declare = true };
 
                             case Type _ when type == typeof(object): return new TsType(TsTypes, type, false) { TypeName = "any", Declare = true };
+
+                            case Type _ when type.IsArray: return ParseType(typeof(IEnumerable<>).MakeGenericType(type.GetElementType()));
+                            case Type _ when type.IsImplement(typeof(IEnumerable<>)): return ParseType(typeof(IEnumerable<>).MakeGenericType(type.GetGenericArguments()[0]));
+
                             case Type _ when type.IsImplement(typeof(IDictionary<,>)): return new TsType(TsTypes, type, false) { TypeName = "any", Declare = true };
 
-                            case Type _ when type.IsImplement(typeof(IEnumerable<>)): return ParseIEnumerable(type);
 
                             case Type _ when type.IsType(typeof(Nullable<>)): return TsTypes[type.GenericTypeArguments[0]].Value;
 
@@ -92,10 +95,8 @@ namespace TypeSharp
                             code.AppendLine($"{" ".Repeat(4)}interface {tsType.TypeName} {{");
                             foreach (var tsProperty in tsType.TsProperties.Value)
                             {
-                                var typeString = tsProperty.PropertyTypeDefinition ??
-                                    (tsProperty.PropertyType.Namespace == tsNamespace
-                                        ? tsProperty.PropertyType.TypeName
-                                        : tsProperty.PropertyType.ReferenceName);
+                                var typeString = tsProperty.PropertyTypeDefinition ?? tsProperty.PropertyType.ReferenceName;
+                                typeString = typeString.RegexReplace(new Regex($@"(?<![\w\d\._]){tsNamespace}\."), "");
                                 code.AppendLine($"{" ".Repeat(8)}{tsProperty.PropertyName}?: {typeString};");
                             }
                             code.AppendLine($"{" ".Repeat(4)}}}");
@@ -215,7 +216,17 @@ namespace TypeSharp
                 var genericTypes = type.IsGenericTypeDefinition
                     ? type.GetGenericArguments().Select(x => x.Name)
                     : type.GetGenericArguments().Select(x => x.IsGenericParameter ? x.Name : TsTypes[x].Value.ReferenceName);
-                var typeName = $"{pureName}<{genericTypes.Join(", ")}>";
+                var generics = genericTypes.Join(", ");
+                var typeName = $"{pureName}<{generics}>";
+
+                if (tsNamespace == "System.Collections.Generic" && pureName == "IEnumerable")
+                {
+                    return new TsType(TsTypes, type, true)
+                    {
+                        TypeName = $"{generics}[]",
+                        Declare = true,
+                    };
+                }
 
                 if (type.IsGenericTypeDefinition)
                 {

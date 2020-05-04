@@ -10,4 +10,5 @@ namespace TypeSharp.Test
         public string Value { get; set; }
         public ICollection<string> Members { get; set; }
     }
+
 }
