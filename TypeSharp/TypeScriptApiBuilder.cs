@@ -74,8 +74,8 @@ namespace TypeSharp
                         };
 
                         var route = (methodRouteTemplate ?? classRouteTemplate)?
-                            .RegexReplace(new Regex(@"{controller}|{controller\s*=[^}]}"), controller)
-                            .RegexReplace(new Regex(@"{action}|{action\s*=[^}]}"), action)
+                            .RegexReplace(new Regex(@"[\{\[]controller[\}\]]|[\{\[]controller\s*=[^\}\]]}"), controller)
+                            .RegexReplace(new Regex(@"[\{\[]action[\}\]]|[\{\[]action\s*=[^\}\]]}"), action)
                             ?? $"{controller}/{action}";
                         var parameters = method.GetParameters();
                         var parametersDeclare = parameters.Select(x => $"{x.Name}: {TsTypes[x.ParameterType].Value.ReferenceName}").Join(", ");
