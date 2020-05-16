@@ -2,11 +2,11 @@
 
 namespace TypeSharp
 {
-    public class ReturnAttribute : Attribute
+    public class ApiReturnAttribute : Attribute
     {
         public Type ReturnType { get; set; }
 
-        public ReturnAttribute(Type returnType)
+        public ApiReturnAttribute(Type returnType)
         {
             ReturnType = returnType;
         }

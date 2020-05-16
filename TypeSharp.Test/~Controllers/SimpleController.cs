@@ -6,7 +6,7 @@ namespace TypeSharp.Test
     [Route("com/{controller}/{action}")]
     public class SimpleController : Controller
     {
-        [Return(typeof(SubClass[]))]
+        [ApiReturn(typeof(SubClass[]))]
         public JsonResult GetUsers(string group)
         {
             var model = new[]
@@ -18,14 +18,14 @@ namespace TypeSharp.Test
         }
 
         [HttpGet]
-        [Return(typeof(int))]
+        [ApiReturn(typeof(int))]
         public JsonResult GetAction(int groupId)
         {
             return Json(1);
         }
 
         [HttpPost]
-        [Return(typeof(int))]
+        [ApiReturn(typeof(int))]
         public JsonResult PostAction([FromBody] RootClass model)
         {
             return Json(2);

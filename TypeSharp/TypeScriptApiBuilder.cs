@@ -46,8 +46,17 @@ namespace TypeSharp
                     var methods = type.ClrType.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
                     foreach (var method in methods)
                     {
-                        var returnAttr = method.GetCustomAttribute<ReturnAttribute>();
-                        var returnClrType = returnAttr?.ReturnType ?? typeof(object);
+                        Type returnClrType;
+                        var returnAttr = method.GetCustomAttribute<ApiReturnAttribute>();
+                        if (returnAttr != null) returnClrType = returnAttr.ReturnType;
+                        else
+                        {
+                            var returnType = method.ReturnType;
+                            if (returnType.FullName.StartsWith("Microsoft.AspNetCore.Mvc"))
+                                returnClrType = typeof(object);
+                            else returnClrType = returnType;
+                        }
+
                         var returnTsType = TsTypes[returnClrType].Value;
                         var methodRouteTemplate = GetRouteTemplate(type.ClrType);
                         var controller = type.ClrType.Name.Project(new Regex(@"^(\w+?)(?:Controller)?$"));
