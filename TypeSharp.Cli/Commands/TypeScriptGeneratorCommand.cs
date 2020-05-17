@@ -13,8 +13,6 @@ namespace TypeSharp.Cli
     public class TypeScriptGeneratorCommand : ICommand
     {
         private static readonly string TargetBinFolder = Path.GetFullPath($"{Program.ProjectInfo.ProjectRoot}/bin/Debug/{Program.ProjectInfo.TargetFramework}");
-        private static readonly Assembly CoreLibAssembly = AppDomain.CurrentDomain.GetCoreLibAssembly();
-        private static readonly string[] CliReferencedAssemblyNames = Assembly.GetExecutingAssembly().GetReferencedAssemblies().Select(x => x.Name).ToArray();
 
         public void PrintUsage()
         {
@@ -24,6 +22,7 @@ Usage: dotnet ts (tsg|tsgenerator) [Options]
 Options:
   {"-o|--out",20}{"\t"}Specify the output directory path. (default: Typings)
   {"-i|--include",20}{"\t"}Specify the include other types, such as 'Ajax.JSend,JSend.dll'.
+  {"-r|--relative",20}{"\t"}Treat a specified type as a defined type.
   {"-n|--names",20}{"\t"}Include original names of properties.
 ");
         }

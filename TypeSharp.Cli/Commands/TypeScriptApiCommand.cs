@@ -22,6 +22,7 @@ Usage: dotnet ts (tsapi) [Options]
 Options:
   {"-o|--out",20}{"\t"}Specify the output directory path. (default: Typings)
   {"-i|--include",20}{"\t"}Specify the include other types, such as 'Ajax.JSend,JSend.dll'.
+  {"-r|--relative",20}{"\t"}Treat a specified type as a defined type.
   {"-u|--uri",20}{"\t"}Specify the root uri of apis.
 ");
         }

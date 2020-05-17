@@ -55,7 +55,6 @@ namespace TypeSharp
 
                             case Type _ when type.IsImplement(typeof(IDictionary<,>)): return new TsType(TsTypes, type, false) { TypeName = "any", Declare = true };
 
-
                             case Type _ when type.IsType(typeof(Nullable<>)): return TsTypes[type.GenericTypeArguments[0]].Value;
 
                             case Type _ when type.IsEnum: return ParseEnum(type);
