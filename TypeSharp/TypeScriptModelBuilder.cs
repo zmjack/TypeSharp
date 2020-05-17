@@ -13,6 +13,7 @@ namespace TypeSharp
     public class TypeScriptModelBuilder
     {
         public CacheContainer<Type, TsType> TsTypes { get; private set; }
+        public Dictionary<Type, string> DeclaredTypes { get; private set; } = new Dictionary<Type, string>();
 
         public TypeScriptModelBuilder()
         {
@@ -22,6 +23,8 @@ namespace TypeSharp
                 {
                     return () =>
                     {
+                        if (DeclaredTypes.ContainsKey(type)) return new TsType(TsTypes, type, false) { TypeName = DeclaredTypes[type], Declare = true };
+
                         switch (type)
                         {
                             case Type _ when type == typeof(bool): return new TsType(TsTypes, type, false) { TypeName = "boolean", Declare = true };
@@ -162,19 +165,6 @@ namespace TypeSharp
             else return attr.Namespace;
         }
 
-        private TsType ParseIEnumerable(Type type)
-        {
-            var enumerable = type.AsInterface(typeof(IEnumerable<>));
-            var elementType = enumerable.GetGenericArguments()[0];
-            var tsType = TsTypes[elementType];
-            return new TsType(TsTypes, type, true)
-            {
-                Namespace = tsType.Value.Namespace,
-                TypeName = $"{tsType.Value.TypeName}{"[]"}",
-                Declare = true,
-            };
-        }
-
         private void CacheConsts(Type type)
         {
             var consts = type.GetFields().Where(x => x.IsStatic && x.IsLiteral && x.IsPublic);
@@ -260,6 +250,8 @@ namespace TypeSharp
         public void CacheTypes(params Type[] types) => types.Each(type => CacheType(type));
         public void CacheType<TType>() => CacheType(typeof(TType));
         public void CacheType(Type type) => _ = TsTypes[type];
+
+        public void AddDeclaredType(Type type, string typeName) => DeclaredTypes.Add(type, typeName);
 
     }
 }

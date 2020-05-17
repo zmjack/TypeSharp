@@ -142,5 +142,7 @@ namespace TypeSharp
         public void CacheType<TType>() => CacheType(typeof(TType));
         public void CacheType(Type type) => TypeList.Add(type);
 
+        public void AddDeclaredType(Type type, string typeName) => ModelBuilder.AddDeclaredType(type, typeName);
+
     }
 }

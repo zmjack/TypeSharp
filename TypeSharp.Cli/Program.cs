@@ -1,6 +1,7 @@
 ﻿using DotNetCli;
 using NStandard;
 using System;
+using System.Linq;
 using System.Reflection;
 
 namespace TypeSharp.Cli
