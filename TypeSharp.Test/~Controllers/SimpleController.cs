@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace TypeSharp.Test
 {
     [TypeScriptApi]
-    [Route("com/[controller]/[action]")]
+    [Route("com/[controller]/[action=Index]")]
     public class SimpleController : Controller
     {
         [ApiReturn(typeof(SubClass[]))]
