@@ -51,7 +51,7 @@ Options:
 
             var targetAssemblyName = Program.ProjectInfo.AssemblyName;
             var targetAssembly = Assembly.LoadFile($"{TargetBinFolder}/{targetAssemblyName}.dll");
-            AppDomain.CurrentDomain.AssemblyResolve += GAC.CreateAssemblyResolver(Program.ProjectInfo.TargetFramework, GACFolders.All, new[] { TargetBinFolder });
+            AppDomain.CurrentDomain.AssemblyResolve += GAC.CreateAssemblyResolver(targetAssembly, Program.ProjectInfo.TargetFramework, GACFolders.All, new[] { TargetBinFolder });
 
             var typeDefs = includes
                 .Select(include => new ClrTypeDefinition(TargetBinFolder, include, targetAssemblyName))

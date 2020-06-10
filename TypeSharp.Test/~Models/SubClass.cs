@@ -1,6 +1,4 @@
-﻿using LinqSharp.EFCore;
-using NStandard;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace TypeSharp.Test
 {
