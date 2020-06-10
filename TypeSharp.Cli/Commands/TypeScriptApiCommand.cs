@@ -50,11 +50,11 @@ Options:
                 Directory.CreateDirectory(outFolder);
 
             var targetAssemblyName = Program.ProjectInfo.AssemblyName;
-            var targetAssembly = Assembly.LoadFrom($"{TargetBinFolder}/{targetAssemblyName}.dll");
-            AppDomain.CurrentDomain.AssemblyResolve += GAC.CreateAssemblyResolver(Program.ProjectInfo.TargetFramework, GACFolders.All);
+            var targetAssembly = Assembly.LoadFile($"{TargetBinFolder}/{targetAssemblyName}.dll");
+            AppDomain.CurrentDomain.AssemblyResolve += GAC.CreateAssemblyResolver(Program.ProjectInfo.TargetFramework, GACFolders.All, new[] { TargetBinFolder });
 
             var typeDefs = includes
-                .Select(typeString => new ClrTypeDefinition(TargetBinFolder, typeString, targetAssemblyName))
+                .Select(include => new ClrTypeDefinition(TargetBinFolder, include, targetAssemblyName))
                 .Concat(new[] { new ClrTypeDefinition { AssemblyName = targetAssemblyName } })
                 .OrderBy(x => x.AssemblyName == targetAssemblyName ? 0 : 1);
 

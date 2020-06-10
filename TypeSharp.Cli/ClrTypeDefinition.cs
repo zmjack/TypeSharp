@@ -48,7 +48,7 @@ namespace TypeSharp
                 CacheMethod = () =>
                 {
                     var dll = $"{TargetBinFolder}/{AssemblyName}.dll";
-                    var assembly = Assembly.LoadFrom(dll);
+                    var assembly = Assembly.LoadFile(dll);
                     return assembly;
                 },
             };

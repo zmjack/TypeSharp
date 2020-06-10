@@ -17,4 +17,5 @@ namespace TypeSharp.Test
         public DateTime DateTime { get; set; }
         public DateTimeOffset DateTimeOffset { get; set; }
     }
+
 }

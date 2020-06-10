@@ -20,6 +20,7 @@ namespace TypeSharp.Test
         [Fact]
         public void SimpleTest()
         {
+            var types = Assembly.GetExecutingAssembly().GetTypesWhichMarkedAs<TypeScriptModelAttribute>();
             var builder = new TypeScriptModelBuilder();
             builder.CacheType<RootClass>();
             builder.CacheType<JSend>();
