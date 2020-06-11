@@ -17,7 +17,7 @@
 
   <ItemGroup>
     <PackageReference Include="LinqSharp" Version="3.0.10" />
-    <PackageReference Include="NStandard" Version="0.4.8" />
+    <PackageReference Include="NStandard" Version="0.4.9" />
   </ItemGroup>
 
   <ItemGroup>
