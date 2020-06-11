@@ -50,59 +50,34 @@ Options:
                 Directory.CreateDirectory(outFolder);
 
             var targetAssemblyName = Program.ProjectInfo.AssemblyName;
-            var targetAssembly = Assembly.LoadFile($"{TargetBinFolder}/{targetAssemblyName}.dll");
-            AppDomain.CurrentDomain.AssemblyResolve += GAC.CreateAssemblyResolver(targetAssembly, Program.ProjectInfo.TargetFramework, GACFolders.All, new[] { TargetBinFolder });
+            var assemblyContext = new AssemblyContext($"{TargetBinFolder}/{targetAssemblyName}.dll", DotNetFramework.Parse(Program.ProjectInfo.TargetFramework));
 
-            var typeDefs = includes
-                .Select(include => new ClrTypeDefinition(TargetBinFolder, include, targetAssemblyName))
-                .Concat(new[] { new ClrTypeDefinition { AssemblyName = targetAssemblyName } })
-                .OrderBy(x => x.AssemblyName == targetAssemblyName ? 0 : 1);
+            var builder = new TypeScriptModelBuilder();
+            var outFile = $"{Path.GetFullPath($"{outFolder}/{targetAssemblyName}.d.ts")}";
 
-            var relativeDefs = relatives
-                .Select(relative =>
-                {
-                    if (relative.Count(";") == 1)
-                    {
-                        var pair = relative.Split(";");
-                        return new
-                        {
-                            new ClrTypeDefinition(TargetBinFolder, pair[0], targetAssemblyName).Type,
-                            TypeName = pair[1],
-                        };
-                    }
-                    else
-                    {
-                        Console.Error.WriteLine("The 'relative' parameter must contain a semicolon(;).");
-                        return null;
-                    }
-                })
-                .Where(x => x != null)
-                .ToArray();
+            var markAttr = assemblyContext.GetType($"{nameof(TypeSharp)}.{nameof(TypeScriptModelAttribute)},{nameof(TypeSharp)}");
+            var modelTypes = assemblyContext.RootAssembly.GetTypesWhichMarkedAs(markAttr);
+            builder.CacheTypes(modelTypes);
 
-            foreach (var group in typeDefs.GroupBy(x => x.AssemblyName))
+            var includeTypes = includes.Select(include => assemblyContext.GetType(include)).ToArray();
+            builder.CacheTypes(includeTypes);
+
+            foreach (var relative in relatives)
             {
-                var builder = new TypeScriptModelBuilder();
-                var outFile = $"{Path.GetFullPath($"{outFolder}/{group.Key}.d.ts")}";
-
-                foreach (var relative in relativeDefs)
-                    builder.AddDeclaredType(relative.Type, relative.TypeName);
-
-                if (group.Key == targetAssemblyName)
+                if (relative.Count(";") == 1)
                 {
-                    var types = targetAssembly.GetTypesWhichMarkedAs<TypeScriptModelAttribute>();
-                    builder.CacheTypes(types);
+                    var pair = relative.Split(";");
+                    builder.AddDeclaredType(assemblyContext.GetType(pair[0]), pair[1]);
                 }
-
-                var includeTypes = group.Select(x => x.Type).Where(x => x != null).ToArray();
-                builder.CacheTypes(includeTypes);
-
-                builder.WriteTo(outFile, new CompileOptions
-                {
-                    OutputNames = outputNames,
-                });
-
-                Console.WriteLine($"File saved: {outFile}");
+                else Console.Error.WriteLine("The 'relative' parameter must contain a semicolon(;).");
             }
+
+            builder.WriteTo(outFile, new CompileOptions
+            {
+                OutputNames = outputNames,
+            });
+
+            Console.WriteLine($"File saved: {outFile}");
         }
 
     }
