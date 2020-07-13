@@ -20,16 +20,30 @@ namespace TypeSharp.Test
 
         [HttpGet]
         [ApiReturn(typeof(int))]
-        public JsonResult GetAction(int groupId)
+        public IActionResult GetAction(int groupId)
         {
             return Json(1);
         }
 
         [HttpPost]
         [ApiReturn(typeof(int))]
-        public JsonResult PostAction([FromBody] RootClass model)
+        public IActionResult PostAction([FromBody] RootClass model)
         {
             return Json(2);
+        }
+
+        [HttpGet]
+        [ApiReturnFile]
+        public IActionResult GetFile(int groupId)
+        {
+            return NotFound();
+        }
+
+        [HttpPost]
+        [ApiReturnFile]
+        public IActionResult PostFile([FromBody] RootClass model)
+        {
+            return NotFound();
         }
 
     }

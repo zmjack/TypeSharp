@@ -47,6 +47,7 @@ namespace TypeSharp
                     foreach (var method in methods)
                     {
                         Type returnClrType;
+
                         var returnAttr = method.GetCustomAttribute<ApiReturnAttribute>();
                         if (returnAttr != null) returnClrType = returnAttr.ReturnType;
                         else
@@ -86,17 +87,38 @@ namespace TypeSharp
                         var queryParametersDeclare = queryParameters.Any() ? $" {queryParameters.Select(x => x.Name).Join(", ")} " : "";
                         var uri = $"{RootUri}/{route}";
 
-                        if (new[] { "post", "put", "patch" }.Contains(verb))
+
+                        var returnFileAttr = method.GetCustomAttribute<ApiReturnFileAttribute>();
+                        if (returnFileAttr == null)
                         {
-                            code.AppendLine($"{" ".Repeat(4)}{StringEx.CamelCase(method.Name)}({parametersDeclare}): Promise<{returnTsType.ReferenceName}> {{" +
-                                $" return this.api.{verb}('{uri}', {bodyParameters.FirstOrDefault()?.Name ?? "{}"}, {{{queryParametersDeclare}}});" +
-                                $" }}");
+                            if (new[] { "post", "put", "patch" }.Contains(verb))
+                            {
+                                code.AppendLine($"{" ".Repeat(4)}{StringEx.CamelCase(method.Name)}({parametersDeclare}): Promise<{returnTsType.ReferenceName}> {{" +
+                                    $" return this.api.{verb}('{uri}', {bodyParameters.FirstOrDefault()?.Name ?? "{}"}, {{{queryParametersDeclare}}});" +
+                                    $" }}");
+                            }
+                            else
+                            {
+                                code.AppendLine($"{" ".Repeat(4)}{StringEx.CamelCase(method.Name)}({parametersDeclare}): Promise<{returnTsType.ReferenceName}> {{" +
+                                    $" return this.api.{verb}('{uri}', {{{queryParametersDeclare}}});" +
+                                    $" }}");
+                            }
                         }
                         else
                         {
-                            code.AppendLine($"{" ".Repeat(4)}{StringEx.CamelCase(method.Name)}({parametersDeclare}): Promise<{returnTsType.ReferenceName}> {{" +
-                                $" return this.api.{verb}('{uri}', {{{queryParametersDeclare}}});" +
-                                $" }}");
+                            if (new[] { "post" }.Contains(verb))
+                            {
+                                code.AppendLine($"{" ".Repeat(4)}{StringEx.CamelCase(method.Name)}({parametersDeclare}): Promise<void> {{" +
+                                    $" return this.api.{verb}_save('{uri}', {bodyParameters.FirstOrDefault()?.Name ?? "{}"}, {{{queryParametersDeclare}}});" +
+                                    $" }}");
+                            }
+                            else if (new[] { "get" }.Contains(verb))
+                            {
+                                code.AppendLine($"{" ".Repeat(4)}{StringEx.CamelCase(method.Name)}({parametersDeclare}): Promise<void> {{" +
+                                    $" return this.api.{verb}_save('{uri}', {{{queryParametersDeclare}}});" +
+                                    $" }}");
+                            }
+                            else throw new NotSupportedException($"Only GET and POST is supported with {nameof(ApiReturnFileAttribute)}.");
                         }
                     }
 
