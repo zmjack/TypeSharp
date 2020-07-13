@@ -79,7 +79,7 @@ namespace TypeSharp
 
         public string TypeName { get; set; }
 
-        public string PureName => TypeName.Project(new Regex(@"^([^<]+)"));
+        public string PureName => TypeName.ExtractFirst(new Regex(@"^([^<]+)"));
 
         public Type ClrType { get; private set; }
 

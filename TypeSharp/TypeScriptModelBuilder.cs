@@ -201,7 +201,7 @@ namespace TypeSharp
             CacheConsts(type);
             if (type.IsGenericType)
             {
-                var pureName = type.Name.Project(new Regex(@"([^`]+)"));
+                var pureName = type.Name.ExtractFirst(new Regex(@"([^`]+)"));
                 var genericTypes = type.IsGenericTypeDefinition
                     ? type.GetGenericArguments().Select(x => x.Name)
                     : type.GetGenericArguments().Select(x => x.IsGenericParameter ? x.Name : TsTypes[x].Value.ReferenceName);

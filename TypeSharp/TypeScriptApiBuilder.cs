@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -38,7 +39,7 @@ namespace TypeSharp
                 var ns = group.Key;
                 foreach (var type in group)
                 {
-                    var typeName = GetTypeName(type.ClrType).Project(new Regex(@"^(\w+?)(?:Controller)?$"), "$1Api");
+                    var typeName = GetTypeName(type.ClrType).ExtractFirst(new Regex(@"^(\w+?)(?:Controller)?$"), "$1Api");
                     code.AppendLine($@"export class {typeName} {{");
                     code.AppendLine($@"    constructor(public api: ApiHelper = ApiHelper.default) {{ }}");
 
@@ -48,7 +49,13 @@ namespace TypeSharp
                     {
                         Type returnClrType;
 
-                        var returnAttr = method.GetCustomAttribute<ApiReturnAttribute>();
+                        var returnAttr = method.GetCustomAttributes()
+                            .FirstOrDefault(x => x.GetType().FullName == typeof(ApiReturnAttribute).FullName)?
+                            .For(x =>
+                            {
+                                var eobj = x.ToExpandoObject() as IDictionary<string, object>;
+                                return new ApiReturnAttribute(eobj[nameof(ApiReturnAttribute.ReturnType)] as Type);
+                            });
                         if (returnAttr != null) returnClrType = returnAttr.ReturnType;
                         else
                         {
@@ -60,7 +67,7 @@ namespace TypeSharp
 
                         var returnTsType = TsTypes[returnClrType].Value;
                         var methodRouteTemplate = GetRouteTemplate(type.ClrType);
-                        var controller = type.ClrType.Name.Project(new Regex(@"^(\w+?)(?:Controller)?$"));
+                        var controller = type.ClrType.Name.ExtractFirst(new Regex(@"^(\w+?)(?:Controller)?$"));
                         var action = method.Name;
                         var verb = GetMethodVerbs(method) switch
                         {
@@ -88,7 +95,7 @@ namespace TypeSharp
                         var uri = $"{RootUri}/{route}";
 
 
-                        var returnFileAttr = method.GetCustomAttribute<ApiReturnFileAttribute>();
+                        var returnFileAttr = method.GetCustomAttributes().FirstOrDefault(x => x.GetType().FullName == typeof(ApiReturnFileAttribute).FullName);
                         if (returnFileAttr == null)
                         {
                             if (new[] { "post", "put", "patch" }.Contains(verb))
