@@ -1,8 +1,9 @@
 ﻿declare namespace LiveAccount {
     interface LiveUser {
         id?: string;
-        sub?: string;
         name?: string;
+        issuer?: string;
+        sub?: string;
         userRoles?: LiveUserRole<LiveUser, LiveRole>[];
     }
     interface LiveRole {

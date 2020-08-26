@@ -31,6 +31,7 @@ namespace TypeSharp
                                 return props.Select(prop =>
                                 {
                                     var propType = prop.PropertyType;
+                                    var required = prop.HasAttributeViaName("System.ComponentModel.DataAnnotations.RequiredAttribute");
                                     if (propType.IsGenericParameter)
                                     {
                                         return new TsProperty
@@ -38,6 +39,7 @@ namespace TypeSharp
                                             ClrName = prop.Name,
                                             PropertyName = StringEx.CamelCase(prop.Name),
                                             PropertyTypeDefinition = propType.Name,
+                                            Required = required,
                                         };
                                     }
                                     else
@@ -47,6 +49,7 @@ namespace TypeSharp
                                             ClrName = prop.Name,
                                             PropertyName = StringEx.CamelCase(prop.Name),
                                             PropertyType = tsTypes[propType].Value,
+                                            Required = required,
                                         };
                                     }
                                 }).ToArray();
@@ -58,11 +61,13 @@ namespace TypeSharp
                             return props.Select(prop =>
                             {
                                 var propType = prop.PropertyType;
+                                var required = prop.HasAttributeViaName("System.ComponentModel.DataAnnotations.RequiredAttribute");
                                 return new TsProperty
                                 {
                                     ClrName = prop.Name,
                                     PropertyName = StringEx.CamelCase(prop.Name),
                                     PropertyType = tsTypes[propType].Value,
+                                    Required = required,
                                 };
                             }).ToArray();
                         }

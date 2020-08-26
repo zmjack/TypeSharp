@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace TypeSharp.Test
 {
@@ -10,7 +11,11 @@ namespace TypeSharp.Test
         public EState State { get; set; }
         public SubClass Sub { get; set; }
         public SubClass[] Subs { get; set; }
+
+        [Required]
         public string Str { get; set; }
+
+        [Required]
         public int Int { get; set; }
         public string[] StrArray { get; set; }
         public Guid? NGuid { get; set; }

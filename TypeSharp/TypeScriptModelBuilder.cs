@@ -99,7 +99,7 @@ namespace TypeSharp
                             {
                                 var typeString = tsProperty.PropertyTypeDefinition ?? tsProperty.PropertyType.ReferenceName;
                                 typeString = typeString.RegexReplace(new Regex($@"(?<![\w\d\._]){tsNamespace}\."), "");
-                                code.AppendLine($"{" ".Repeat(8)}{tsProperty.PropertyName}?: {typeString};");
+                                code.AppendLine($"{" ".Repeat(8)}{tsProperty.PropertyName}{(tsProperty.Required ? "" : "?")}: {typeString};");
                             }
                             code.AppendLine($"{" ".Repeat(4)}}}");
 

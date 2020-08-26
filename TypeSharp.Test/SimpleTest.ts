@@ -3,8 +3,8 @@
         state?: TypeSharp.Test.EState;
         sub?: TSNS2.SubClass;
         subs?: TSNS2.SubClass[];
-        str?: string;
-        int?: number;
+        str: string;
+        int: number;
         strArray?: string[];
         nGuid?: string;
         dateTime?: Date;
