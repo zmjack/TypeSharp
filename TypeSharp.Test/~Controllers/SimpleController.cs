@@ -1,5 +1,4 @@
-﻿using Ajax;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace TypeSharp.Test
 {

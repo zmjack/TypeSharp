@@ -12,14 +12,14 @@ namespace TypeSharp
 {
     public class TypeScriptModelBuilder
     {
-        public CacheContainer<Type, TsType> TsTypes { get; private set; }
+        public CacheSet<Type, TsType> TsTypes { get; private set; }
         public Dictionary<Type, string> DeclaredTypes { get; private set; } = new Dictionary<Type, string>();
 
         public TypeScriptModelBuilder()
         {
-            TsTypes = new CacheContainer<Type, TsType>
+            TsTypes = new CacheSet<Type, TsType>
             {
-                CacheMethod = type =>
+                CacheMethodBuilder = type =>
                 {
                     return () =>
                     {

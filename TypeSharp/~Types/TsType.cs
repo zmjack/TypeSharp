@@ -1,6 +1,6 @@
 ﻿using NStandard;
+using NStandard.Caching;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -9,7 +9,7 @@ namespace TypeSharp
 {
     public class TsType
     {
-        public TsType(CacheContainer<Type, TsType> tsTypes, Type clrType, bool cacheProperties)
+        public TsType(CacheSet<Type, TsType> tsTypes, Type clrType, bool cacheProperties)
         {
             ClrType = clrType;
 

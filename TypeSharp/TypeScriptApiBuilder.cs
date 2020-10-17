@@ -1,10 +1,10 @@
 ﻿using NStandard;
+using NStandard.Caching;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -13,7 +13,7 @@ namespace TypeSharp
     public class TypeScriptApiBuilder
     {
         private readonly TypeScriptModelBuilder ModelBuilder = new TypeScriptModelBuilder();
-        private CacheContainer<Type, TsType> TsTypes => ModelBuilder.TsTypes;
+        private CacheSet<Type, TsType> TsTypes => ModelBuilder.TsTypes;
         private readonly string RootUri;
 
         public HashSet<Type> TypeList = new HashSet<Type>();
