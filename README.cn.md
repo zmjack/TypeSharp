@@ -3,7 +3,7 @@
 C# 模型到 TypeScript 模型转换工具。
 
 - [English Readme](https://github.com/zmjack/TypeSharp/blob/master/README.md)
-- [中文自述](https://github.com/zmjack/TypeSharp/blob/master/README-CN.md)
+- [中文自述](https://github.com/zmjack/TypeSharp/blob/master/README.cn.md)
 
 <br/>
 

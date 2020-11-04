@@ -20,7 +20,7 @@ namespace TypeSharp.Cli
 Usage: dotnet ts (tsapi) [Options]
 
 Options:
-  {"-o|--out",20}{"\t"}Specify the output directory path. (default: Typings)
+  {"-o|--out",20}{"\t"}Specify the output directory or file path.
   {"-i|--include",20}{"\t"}Specify the include other types, such as 'Ajax.JSend,JSend.dll'.
   {"-r|--relative",20}{"\t"}Treat a specified type as a defined type.
   {"-u|--uri",20}{"\t"}Specify the root uri of apis.
@@ -44,17 +44,27 @@ Options:
             GenerateTypeScript(outFolder, includes, relatives, uri);
         }
 
-        private static void GenerateTypeScript(string outFolder, string[] includes, string[] relatives, string uri)
+        private static void GenerateTypeScript(string outParam, string[] includes, string[] relatives, string uri)
         {
-            if (!Directory.Exists(outFolder))
-                Directory.CreateDirectory(outFolder);
-
             var targetAssemblyName = Program.ProjectInfo.AssemblyName;
             var assemblyContext = new AssemblyContext($"{TargetBinFolder}/{targetAssemblyName}.dll", DotNetFramework.Parse(Program.ProjectInfo.TargetFramework));
 
-            var builder = new TypeScriptApiBuilder(uri);
-            var outFile = $"{Path.GetFullPath($"{outFolder}/{targetAssemblyName}@Api.ts")}";
+            string outFile;
+            if (outParam.Last().For(c => c == '/' || c == '\\'))
+            {
+                // if Directory
+                if (!Directory.Exists(outParam)) Directory.CreateDirectory(outParam);
+                outFile = Path.GetFullPath($"{outParam}{targetAssemblyName}.ts");
+            }
+            else
+            {
+                // if File
+                var dir = Path.GetDirectoryName(outParam);
+                if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+                outFile = Path.GetFullPath(outParam);
+            }
 
+            var builder = new TypeScriptApiBuilder(uri);
             var markAttr = assemblyContext.GetType($"{nameof(TypeSharp)}.{nameof(TypeScriptApiAttribute)},{nameof(TypeSharp)}");
             var modelTypes = assemblyContext.RootAssembly.GetTypesWhichMarkedAs(markAttr);
             builder.CacheTypes(modelTypes);

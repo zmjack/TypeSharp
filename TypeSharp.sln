@@ -13,11 +13,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		LICENSE.md = LICENSE.md
 		push.cmd = push.cmd
-		README-CN.md = README-CN.md
+		README.cn.md = README.cn.md
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeSharp.Antd", "TypeSharp.Antd\TypeSharp.Antd.csproj", "{5C5A1EDE-6F1F-4BC1-A73F-9935D0CCEDDB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeSharp.Antd", "TypeSharp.Antd\TypeSharp.Antd.csproj", "{5C5A1EDE-6F1F-4BC1-A73F-9935D0CCEDDB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
