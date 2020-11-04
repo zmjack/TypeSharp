@@ -54,7 +54,7 @@ Options:
             {
                 // if Directory
                 if (!Directory.Exists(outParam)) Directory.CreateDirectory(outParam);
-                outFile = Path.GetFullPath($"{outParam}{targetAssemblyName}.ts");
+                outFile = Path.GetFullPath($"{outParam}{targetAssemblyName}.api.ts");
             }
             else
             {
