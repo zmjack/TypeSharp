@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="JSend" Version="0.9.5" />
+    <PackageReference Include="JSend" Version="1.0.0" />
     <PackageReference Include="LiveAccount" Version="0.0.2-alpha1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
     <PackageReference Include="xunit" Version="2.4.1" />
