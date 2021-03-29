@@ -1,8 +1,10 @@
 ﻿declare namespace TSNS1 {
     interface RootClass {
         state?: TypeSharp.Test.EState;
-        sub?: TSNS2.SubClass;
-        subs?: TSNS2.SubClass[];
+        subClass?: TSNS2.SubClass;
+        subClasses?: TSNS2.SubClass[];
+        subStruct?: TSNS2.SubStruct;
+        nullableSubStruct?: TSNS2.SubStruct;
         str: string;
         int: number;
         strArray?: string[];
@@ -15,8 +17,6 @@ declare namespace Ajax {
     interface JSend {
         status?: string;
         data?: any;
-        code?: string;
-        message?: string;
     }
 }
 declare namespace TypeSharp.Test {
@@ -28,6 +28,11 @@ declare namespace TypeSharp.Test {
 }
 declare namespace TSNS2 {
     interface SubClass {
+        name?: string;
+        value?: string;
+        members?: string[];
+    }
+    interface SubStruct {
         name?: string;
         value?: string;
         members?: string[];

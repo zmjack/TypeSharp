@@ -83,7 +83,8 @@ namespace TypeSharp
                 cache.Value.TsProperties.Update();
             }
 
-            var typeGroups = TsTypes.Values.Select(x => x.Value).Where(x => !x.Declare).GroupBy(x => x.Namespace);
+            // Struct & Struct? should map to the same type, so 'Distinct' is required.
+            var typeGroups = TsTypes.Values.Select(x => x.Value).Distinct().Where(x => !x.Declare).GroupBy(x => x.Namespace);
             if (typeGroups.Any()) code.AppendLine();
             foreach (var typeGroup in typeGroups)
             {

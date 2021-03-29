@@ -72,15 +72,5 @@ namespace TypeSharp.Test
             Assert.Equal(expectedCode, tscode);
         }
 
-        [Fact]
-        public void GenericJSendTest()
-        {
-            var builder = new TypeScriptModelBuilder();
-            builder.CacheType(typeof(JSend<>));
-            var tscode = builder.Compile();
-            var expectedCode = GetExpectedCode("GenericJSendTest");
-            Assert.Equal(expectedCode, tscode);
-        }
-
     }
 }

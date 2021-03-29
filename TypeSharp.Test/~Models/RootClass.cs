@@ -9,8 +9,10 @@ namespace TypeSharp.Test
         public const string CONST_STRING = "const_string";
         public const int CONST_INTEGER = int.MaxValue;
         public EState State { get; set; }
-        public SubClass Sub { get; set; }
-        public SubClass[] Subs { get; set; }
+        public SubClass SubClass { get; set; }
+        public SubClass[] SubClasses { get; set; }
+        public SubStruct SubStruct { get; set; }
+        public SubStruct? NullableSubStruct { get; set; }
 
         [Required]
         public string Str { get; set; }
