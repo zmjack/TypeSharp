@@ -9,59 +9,47 @@ using System.Linq;
 
 namespace TypeSharp.Cli
 {
-    [Command("TSGenerator", "tsg", Description = "Generate TypeScript model from CSharp class.")]
-    public class TypeScriptGeneratorCommand : ICommand
+    [Command("TSGenerator", Abbreviation = "tsg", Description = "Generate TypeScript model from CSharp class.")]
+    public class TypeScriptGeneratorCommand : Command
     {
         private static readonly string TargetBinFolder = Path.GetFullPath($"{Program.ProjectInfo.ProjectRoot}/bin/Debug/{Program.ProjectInfo.TargetFramework}");
 
-        public void PrintUsage()
-        {
-            Console.WriteLine($@"
-Usage: dotnet ts (tsg|tsgenerator) [Options]
+        public TypeScriptGeneratorCommand(CmdContainer container, string[] args) : base(container, args) { }
 
-Options:
-  {"-o|--out",20}{"\t"}Specify the output directory or file path.
-  {"-i|--include",20}{"\t"}Specify the include other types, such as 'Ajax.JSend,JSend.dll'.
-  {"-r|--relative",20}{"\t"}Treat a specified type as a defined type.
-  {"-n|--names",20}{"\t"}Include original names of properties.
-");
-        }
+        [CmdProperty("out", Abbreviation = "o", Description = "Specify the output directory path.")]
+        public string OutFolder { get; set; } = ".";
 
-        public void Run(string[] args)
-        {
-            var conArgs = new ConArgs(args, "-");
-            if (conArgs["-h"].Concat(conArgs["--help"]).Any())
-            {
-                PrintUsage();
-                return;
-            }
+        [CmdProperty("include", Abbreviation = "i", Description = "Specify the include other types, such as 'Ajax.JSend,JSend'.")]
+        public string[] Includes { get; set; } = new string[0];
 
-            var outFolder = conArgs["-o"].Concat(conArgs["--out"]).FirstOrDefault() ?? ".";
-            var includes = conArgs["-i"].Concat(conArgs["--include"]).ToArray();
-            var relatives = conArgs["-r"].Concat(conArgs["--relative"]).ToArray();
-            var outputNames = conArgs["-n"].Concat(conArgs["--names"]).Any();
+        [CmdProperty("relative", Abbreviation = "r", Description = "Treat a specified type as a defined type.")]
+        public string[] Relatives { get; set; } = new string[0];
 
-            GenerateTypeScript(outFolder, includes, relatives, outputNames);
-        }
+        [CmdProperty("names", Abbreviation = "n", Description = "Include original names of properties.")]
+        public bool GenerateNames { get; set; } = false;
 
-        private static void GenerateTypeScript(string outParam, string[] includes, string[] relatives, bool outputNames)
+        public override void Run()
         {
             var targetAssemblyName = Program.ProjectInfo.AssemblyName;
             var assemblyContext = new AssemblyContext($"{TargetBinFolder}/{targetAssemblyName}.dll", DotNetFramework.Parse(Program.ProjectInfo.TargetFramework));
 
             string outFile;
-            if (outParam.Last().For(c => c == '/' || c == '\\'))
+            if (Directory.Exists(OutFolder))
+            {
+                outFile = Path.GetFullPath($"{OutFolder}{targetAssemblyName}.api.ts");
+            }
+            else if (OutFolder.Last().For(c => c == '/' || c == '\\'))
             {
                 // if Directory
-                if (!Directory.Exists(outParam)) Directory.CreateDirectory(outParam);
-                outFile = Path.GetFullPath($"{outParam}{targetAssemblyName}.ts");
+                if (!Directory.Exists(OutFolder)) Directory.CreateDirectory(OutFolder);
+                outFile = Path.GetFullPath($"{OutFolder}{targetAssemblyName}.api.ts");
             }
             else
             {
                 // if File
-                var dir = Path.GetDirectoryName(outParam);
+                var dir = Path.GetDirectoryName(OutFolder);
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-                outFile = Path.GetFullPath(outParam);
+                outFile = Path.GetFullPath(OutFolder);
             }
 
             var builder = new TypeScriptModelBuilder();
@@ -69,10 +57,10 @@ Options:
             var modelTypes = assemblyContext.RootAssembly.GetTypesWhichMarkedAs(markAttr);
             builder.CacheTypes(modelTypes);
 
-            var includeTypes = includes.Select(include => assemblyContext.GetType(include)).ToArray();
+            var includeTypes = Includes.Select(include => assemblyContext.GetType(include)).ToArray();
             builder.CacheTypes(includeTypes);
 
-            foreach (var relative in relatives)
+            foreach (var relative in Relatives)
             {
                 if (relative.Count(";") == 1)
                 {
@@ -84,7 +72,7 @@ Options:
 
             builder.WriteTo(outFile, new CompileOptions
             {
-                OutputNames = outputNames,
+                OutputNames = GenerateNames,
             });
 
             Console.WriteLine($"File saved: {outFile}");
