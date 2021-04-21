@@ -8,18 +8,17 @@ namespace TypeSharp.Cli
     public class Program
     {
         public static readonly string CLI_VERSION = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-        public static CmdContainer CommandContainer;
-        public static ProjectInfo ProjectInfo => CommandContainer.ProjectInfo;
+        public static CmdContainer CmdContainer;
 
         static void Main(string[] args)
         {
-            CommandContainer = new CmdContainer("ts", ProjectInfo.GetCurrent());
-            CommandContainer.CacheCommands(Assembly.GetExecutingAssembly());
+            CmdContainer = new CmdContainer("ts", ProjectInfo.GetCurrent());
+            CmdContainer.CacheCommands(Assembly.GetExecutingAssembly());
 
             PrintWelcome();
 
-            CommandContainer.PrintProjectInfo();
-            CommandContainer.Run(args);
+            CmdContainer.PrintProjectInfo();
+            CmdContainer.Run(args);
         }
 
         public static void PrintWelcome()

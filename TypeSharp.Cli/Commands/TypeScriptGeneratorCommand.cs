@@ -1,5 +1,4 @@
 ﻿using DotNetCli;
-using Ink;
 using NStandard;
 using NStandard.Reference;
 using NStandard.Runtime;
@@ -12,12 +11,13 @@ namespace TypeSharp.Cli
     [Command("TSGenerator", Abbreviation = "tsg", Description = "Generate TypeScript model from CSharp class.")]
     public class TypeScriptGeneratorCommand : Command
     {
-        private static readonly string TargetBinFolder = Path.GetFullPath($"{Program.ProjectInfo.ProjectRoot}/bin/Debug/{Program.ProjectInfo.TargetFramework}");
+        private static ProjectInfo Project => Program.CmdContainer.ProjectInfo;
+        private static readonly string TargetBinFolder = Path.GetFullPath($"{Project.ProjectRoot}/bin/Debug/{Project.TargetFramework}");
 
         public TypeScriptGeneratorCommand(CmdContainer container, string[] args) : base(container, args) { }
 
         [CmdProperty("out", Abbreviation = "o", Description = "Specify the output directory path.")]
-        public string OutFolder { get; set; } = ".";
+        public string Out { get; set; } = ".";
 
         [CmdProperty("include", Abbreviation = "i", Description = "Specify the include other types, such as 'Ajax.JSend,JSend'.")]
         public string[] Includes { get; set; } = new string[0];
@@ -30,26 +30,22 @@ namespace TypeSharp.Cli
 
         public override void Run()
         {
-            var targetAssemblyName = Program.ProjectInfo.AssemblyName;
-            var assemblyContext = new AssemblyContext($"{TargetBinFolder}/{targetAssemblyName}.dll", DotNetFramework.Parse(Program.ProjectInfo.TargetFramework));
+            var targetAssemblyName = Project.AssemblyName;
+            var assemblyContext = new AssemblyContext($"{TargetBinFolder}/{targetAssemblyName}.dll", DotNetFramework.Parse(Project.TargetFramework));
 
             string outFile;
-            if (Directory.Exists(OutFolder))
+            // if Directory
+            if (Directory.Exists(Out) || Path.GetExtension(Out) == "" || Out.Last().For(c => c == '/' || c == '\\'))
             {
-                outFile = Path.GetFullPath($"{OutFolder}{targetAssemblyName}.api.ts");
+                if (!Directory.Exists(Out)) Directory.CreateDirectory(Out);
+                outFile = Path.GetFullPath(Path.Combine(Out, $"{targetAssemblyName}.ts"));
             }
-            else if (OutFolder.Last().For(c => c == '/' || c == '\\'))
-            {
-                // if Directory
-                if (!Directory.Exists(OutFolder)) Directory.CreateDirectory(OutFolder);
-                outFile = Path.GetFullPath($"{OutFolder}{targetAssemblyName}.api.ts");
-            }
+            // if File
             else
             {
-                // if File
-                var dir = Path.GetDirectoryName(OutFolder);
+                var dir = Path.GetDirectoryName(Out);
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-                outFile = Path.GetFullPath(OutFolder);
+                outFile = Path.GetFullPath(Out);
             }
 
             var builder = new TypeScriptModelBuilder();
