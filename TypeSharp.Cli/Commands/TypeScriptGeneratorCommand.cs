@@ -56,7 +56,7 @@ namespace TypeSharp.Cli
             foreach (var include in Includes)
             {
                 var type = assemblyContext.GetType(include);
-                if (type == null) throw new ArgumentException($"Can not find type({type.FullName}).");
+                if (type == null) throw new ArgumentException($"Can not find type({include}).");
                 builder.CacheType(type);
             }
 
@@ -68,7 +68,7 @@ namespace TypeSharp.Cli
                     var type = assemblyContext.GetType(pair[0]);
                     var typescriptName = pair[1];
 
-                    if (type == null) throw new ArgumentException($"Can not find type for the specified string({pair[0]}).");
+                    if (type == null) throw new ArgumentException($"Can not find type for the specified string({relative}).");
                     builder.AddDeclaredType(type, typescriptName);
                 }
                 else throw new ArgumentException("Each parameter('Relative') must contain a semicolon(;).");
