@@ -53,17 +53,25 @@ namespace TypeSharp.Cli
             var modelTypes = assemblyContext.RootAssembly.GetTypesWhichMarkedAs(markAttr);
             builder.CacheTypes(modelTypes);
 
-            var includeTypes = Includes.Select(include => assemblyContext.GetType(include)).ToArray();
-            builder.CacheTypes(includeTypes);
+            foreach (var include in Includes)
+            {
+                var type = assemblyContext.GetType(include);
+                if (type == null) throw new ArgumentException($"Can not find type({type.FullName}).");
+                builder.CacheType(type);
+            }
 
             foreach (var relative in Relatives)
             {
                 if (relative.Count(";") == 1)
                 {
                     var pair = relative.Split(";");
-                    builder.AddDeclaredType(assemblyContext.GetType(pair[0]), pair[1]);
+                    var type = assemblyContext.GetType(pair[0]);
+                    var typescriptName = pair[1];
+
+                    if (type == null) throw new ArgumentException($"Can not find type for the specified string({pair[0]}).");
+                    builder.AddDeclaredType(type, typescriptName);
                 }
-                else Console.Error.WriteLine("The 'relative' parameter must contain a semicolon(;).");
+                else throw new ArgumentException("Each parameter('Relative') must contain a semicolon(;).");
             }
 
             builder.WriteTo(outFile, new CompileOptions
