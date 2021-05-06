@@ -25,44 +25,34 @@ namespace TypeSharp
                     {
                         if (DeclaredTypes.ContainsKey(type)) return new TsType(TsTypes, type, false) { TypeName = DeclaredTypes[type], Declare = true };
 
-                        switch (type)
+                        return type switch
                         {
-                            case Type _ when type == typeof(bool): return new TsType(TsTypes, type, false) { TypeName = "boolean", Declare = true };
-
-                            case Type _ when type == typeof(string): return new TsType(TsTypes, type, false) { TypeName = "string", Declare = true };
-                            case Type _ when type == typeof(Guid): return new TsType(TsTypes, type, false) { TypeName = "string", Declare = true };
-
-                            case Type _ when type == typeof(byte): return new TsType(TsTypes, type, false) { TypeName = "number", Declare = true };
-                            case Type _ when type == typeof(sbyte): return new TsType(TsTypes, type, false) { TypeName = "number", Declare = true };
-                            case Type _ when type == typeof(char): return new TsType(TsTypes, type, false) { TypeName = "number", Declare = true };
-                            case Type _ when type == typeof(short): return new TsType(TsTypes, type, false) { TypeName = "number", Declare = true };
-                            case Type _ when type == typeof(ushort): return new TsType(TsTypes, type, false) { TypeName = "number", Declare = true };
-                            case Type _ when type == typeof(int): return new TsType(TsTypes, type, false) { TypeName = "number", Declare = true };
-                            case Type _ when type == typeof(uint): return new TsType(TsTypes, type, false) { TypeName = "number", Declare = true };
-                            case Type _ when type == typeof(long): return new TsType(TsTypes, type, false) { TypeName = "number", Declare = true };
-                            case Type _ when type == typeof(ulong): return new TsType(TsTypes, type, false) { TypeName = "number", Declare = true };
-                            case Type _ when type == typeof(float): return new TsType(TsTypes, type, false) { TypeName = "number", Declare = true };
-                            case Type _ when type == typeof(double): return new TsType(TsTypes, type, false) { TypeName = "number", Declare = true };
-                            case Type _ when type == typeof(decimal): return new TsType(TsTypes, type, false) { TypeName = "number", Declare = true };
-
-                            case Type _ when type == typeof(DateTime): return new TsType(TsTypes, type, false) { TypeName = "Date", Declare = true };
-                            case Type _ when type == typeof(DateTimeOffset): return new TsType(TsTypes, type, false) { TypeName = "Date", Declare = true };
-
-                            case Type _ when type == typeof(object): return new TsType(TsTypes, type, false) { TypeName = "any", Declare = true };
-
-                            case Type _ when type.IsArray: return ParseType(typeof(IEnumerable<>).MakeGenericType(type.GetElementType()));
-                            case Type _ when type.IsImplement(typeof(IEnumerable<>)): return ParseType(typeof(IEnumerable<>).MakeGenericType(type.GetGenericArguments()[0]));
-
-                            case Type _ when type.IsImplement(typeof(IDictionary<,>)): return new TsType(TsTypes, type, false) { TypeName = "any", Declare = true };
-
-                            case Type _ when type.IsType(typeof(Nullable<>)): return TsTypes[type.GenericTypeArguments[0]].Value;
-
-                            case Type _ when type.IsEnum: return ParseEnum(type);
-
-                            case Type _ when type.IsClass || type.IsValueType: return ParseType(type);
-
-                            default: throw new NotSupportedException($"{type.FullName} is not supported.");
-                        }
+                            Type when type == typeof(bool) => new TsType(TsTypes, type, false) { TypeName = "boolean", Declare = true },
+                            Type when type == typeof(string) => new TsType(TsTypes, type, false) { TypeName = "string", Declare = true },
+                            Type when type == typeof(Guid) => new TsType(TsTypes, type, false) { TypeName = "string", Declare = true },
+                            Type when type == typeof(byte) => new TsType(TsTypes, type, false) { TypeName = "number", Declare = true },
+                            Type when type == typeof(sbyte) => new TsType(TsTypes, type, false) { TypeName = "number", Declare = true },
+                            Type when type == typeof(char) => new TsType(TsTypes, type, false) { TypeName = "number", Declare = true },
+                            Type when type == typeof(short) => new TsType(TsTypes, type, false) { TypeName = "number", Declare = true },
+                            Type when type == typeof(ushort) => new TsType(TsTypes, type, false) { TypeName = "number", Declare = true },
+                            Type when type == typeof(int) => new TsType(TsTypes, type, false) { TypeName = "number", Declare = true },
+                            Type when type == typeof(uint) => new TsType(TsTypes, type, false) { TypeName = "number", Declare = true },
+                            Type when type == typeof(long) => new TsType(TsTypes, type, false) { TypeName = "number", Declare = true },
+                            Type when type == typeof(ulong) => new TsType(TsTypes, type, false) { TypeName = "number", Declare = true },
+                            Type when type == typeof(float) => new TsType(TsTypes, type, false) { TypeName = "number", Declare = true },
+                            Type when type == typeof(double) => new TsType(TsTypes, type, false) { TypeName = "number", Declare = true },
+                            Type when type == typeof(decimal) => new TsType(TsTypes, type, false) { TypeName = "number", Declare = true },
+                            Type when type == typeof(DateTime) => new TsType(TsTypes, type, false) { TypeName = "Date", Declare = true },
+                            Type when type == typeof(DateTimeOffset) => new TsType(TsTypes, type, false) { TypeName = "Date", Declare = true },
+                            Type when type == typeof(object) => new TsType(TsTypes, type, false) { TypeName = "any", Declare = true },
+                            Type when type.IsArray => ParseType(typeof(IEnumerable<>).MakeGenericType(type.GetElementType())),
+                            Type when type.IsType(typeof(IEnumerable<>)) || type.IsImplement(typeof(IEnumerable<>)) => ParseType(typeof(IEnumerable<>).MakeGenericType(type.GetGenericArguments()[0])),
+                            Type when type.IsType(typeof(IDictionary<,>)) || type.IsImplement(typeof(IDictionary<,>)) => new TsType(TsTypes, type, false) { TypeName = "any", Declare = true },
+                            Type when type.IsType(typeof(Nullable<>)) => TsTypes[type.GenericTypeArguments[0]].Value,
+                            Type when type.IsEnum => ParseEnum(type),
+                            Type when type.IsClass || type.IsValueType => ParseType(type),
+                            _ => throw new NotSupportedException($"{type.FullName} is not supported."),
+                        };
                     };
                 },
             };

@@ -19,7 +19,8 @@ namespace TypeSharp
                 {
                     if (cacheProperties)
                     {
-                        var allProps = clrType.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+                        var allProps = clrType.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                            .Where(x => !x.GetCustomAttributes().Any(attr => attr.GetType().FullName == $"{nameof(TypeSharp)}.{nameof(TypeScriptIgnoreAttribute)}"));
                         var declaredProps = allProps.Where(x => x.DeclaringType == clrType);
                         var duplicateNames = allProps.Select(x => x.Name).Intersect(declaredProps.Select(x => x.Name)).ToArray();
                         var props = allProps.Where(x => !duplicateNames.Contains(x.Name)).Concat(declaredProps);
