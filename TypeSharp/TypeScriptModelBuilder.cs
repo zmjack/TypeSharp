@@ -23,31 +23,43 @@ namespace TypeSharp
                 {
                     return () =>
                     {
-                        if (DeclaredTypes.ContainsKey(type)) return new TsType(TsTypes, type, false) { TypeName = DeclaredTypes[type], Declare = true };
+                        if (DeclaredTypes.ContainsKey(type))
+                        {
+                            return new TsType(this, type, false) { TypeName = DeclaredTypes[type], Declare = true };
+                        }
+
+                        if (type.IsGenericType)
+                        {
+                            var typeDefinition = type.GetGenericTypeDefinition();
+                            if (DeclaredTypes.ContainsKey(typeDefinition))
+                            {
+                                return new TsType(this, type, false) { TypeName = DeclaredTypes[typeDefinition], Declare = true };
+                            }
+                        }
 
                         return type switch
                         {
-                            Type when type == typeof(bool) => new TsType(TsTypes, type, false) { TypeName = "boolean", Declare = true },
-                            Type when type == typeof(string) => new TsType(TsTypes, type, false) { TypeName = "string", Declare = true },
-                            Type when type == typeof(Guid) => new TsType(TsTypes, type, false) { TypeName = "string", Declare = true },
-                            Type when type == typeof(byte) => new TsType(TsTypes, type, false) { TypeName = "number", Declare = true },
-                            Type when type == typeof(sbyte) => new TsType(TsTypes, type, false) { TypeName = "number", Declare = true },
-                            Type when type == typeof(char) => new TsType(TsTypes, type, false) { TypeName = "number", Declare = true },
-                            Type when type == typeof(short) => new TsType(TsTypes, type, false) { TypeName = "number", Declare = true },
-                            Type when type == typeof(ushort) => new TsType(TsTypes, type, false) { TypeName = "number", Declare = true },
-                            Type when type == typeof(int) => new TsType(TsTypes, type, false) { TypeName = "number", Declare = true },
-                            Type when type == typeof(uint) => new TsType(TsTypes, type, false) { TypeName = "number", Declare = true },
-                            Type when type == typeof(long) => new TsType(TsTypes, type, false) { TypeName = "number", Declare = true },
-                            Type when type == typeof(ulong) => new TsType(TsTypes, type, false) { TypeName = "number", Declare = true },
-                            Type when type == typeof(float) => new TsType(TsTypes, type, false) { TypeName = "number", Declare = true },
-                            Type when type == typeof(double) => new TsType(TsTypes, type, false) { TypeName = "number", Declare = true },
-                            Type when type == typeof(decimal) => new TsType(TsTypes, type, false) { TypeName = "number", Declare = true },
-                            Type when type == typeof(DateTime) => new TsType(TsTypes, type, false) { TypeName = "Date", Declare = true },
-                            Type when type == typeof(DateTimeOffset) => new TsType(TsTypes, type, false) { TypeName = "Date", Declare = true },
-                            Type when type == typeof(object) => new TsType(TsTypes, type, false) { TypeName = "any", Declare = true },
+                            Type when type == typeof(bool) => new TsType(this, type, false) { TypeName = "boolean", Declare = true },
+                            Type when type == typeof(string) => new TsType(this, type, false) { TypeName = "string", Declare = true },
+                            Type when type == typeof(Guid) => new TsType(this, type, false) { TypeName = "string", Declare = true },
+                            Type when type == typeof(byte) => new TsType(this, type, false) { TypeName = "number", Declare = true },
+                            Type when type == typeof(sbyte) => new TsType(this, type, false) { TypeName = "number", Declare = true },
+                            Type when type == typeof(char) => new TsType(this, type, false) { TypeName = "number", Declare = true },
+                            Type when type == typeof(short) => new TsType(this, type, false) { TypeName = "number", Declare = true },
+                            Type when type == typeof(ushort) => new TsType(this, type, false) { TypeName = "number", Declare = true },
+                            Type when type == typeof(int) => new TsType(this, type, false) { TypeName = "number", Declare = true },
+                            Type when type == typeof(uint) => new TsType(this, type, false) { TypeName = "number", Declare = true },
+                            Type when type == typeof(long) => new TsType(this, type, false) { TypeName = "number", Declare = true },
+                            Type when type == typeof(ulong) => new TsType(this, type, false) { TypeName = "number", Declare = true },
+                            Type when type == typeof(float) => new TsType(this, type, false) { TypeName = "number", Declare = true },
+                            Type when type == typeof(double) => new TsType(this, type, false) { TypeName = "number", Declare = true },
+                            Type when type == typeof(decimal) => new TsType(this, type, false) { TypeName = "number", Declare = true },
+                            Type when type == typeof(DateTime) => new TsType(this, type, false) { TypeName = "Date", Declare = true },
+                            Type when type == typeof(DateTimeOffset) => new TsType(this, type, false) { TypeName = "Date", Declare = true },
+                            Type when type == typeof(object) => new TsType(this, type, false) { TypeName = "any", Declare = true },
                             Type when type.IsArray => ParseType(typeof(IEnumerable<>).MakeGenericType(type.GetElementType())),
                             Type when type.IsType(typeof(IEnumerable<>)) || type.IsImplement(typeof(IEnumerable<>)) => ParseType(typeof(IEnumerable<>).MakeGenericType(type.GetGenericArguments()[0])),
-                            Type when type.IsType(typeof(IDictionary<,>)) || type.IsImplement(typeof(IDictionary<,>)) => new TsType(TsTypes, type, false) { TypeName = "any", Declare = true },
+                            Type when type.IsType(typeof(IDictionary<,>)) || type.IsImplement(typeof(IDictionary<,>)) => new TsType(this, type, false) { TypeName = "any", Declare = true },
                             Type when type.IsType(typeof(Nullable<>)) => TsTypes[type.GenericTypeArguments[0]].Value,
                             Type when type.IsEnum => ParseEnum(type),
                             Type when type.IsClass || type.IsValueType => ParseType(type),
@@ -173,7 +185,7 @@ namespace TypeSharp
 
         private TsType ParseEnum(Type type)
         {
-            return new TsType(TsTypes, type, false)
+            return new TsType(this, type, false)
             {
                 Namespace = GetTsNamespace(type),
                 TypeName = type.Name,
@@ -201,7 +213,7 @@ namespace TypeSharp
 
                 if (tsNamespace == "System.Collections.Generic" && pureName == "IEnumerable")
                 {
-                    return new TsType(TsTypes, type, true)
+                    return new TsType(this, type, true)
                     {
                         TypeName = $"{generics}[]",
                         Declare = true,
@@ -210,7 +222,7 @@ namespace TypeSharp
 
                 if (type.IsGenericTypeDefinition)
                 {
-                    return new TsType(TsTypes, type, true)
+                    return new TsType(this, type, true)
                     {
                         Namespace = tsNamespace,
                         TypeName = typeName,
@@ -219,7 +231,7 @@ namespace TypeSharp
                 else
                 {
                     _ = TsTypes[type.GetGenericTypeDefinition()];
-                    return new TsType(TsTypes, type, true)
+                    return new TsType(this, type, true)
                     {
                         Namespace = tsNamespace,
                         TypeName = typeName,
@@ -229,7 +241,7 @@ namespace TypeSharp
             }
             else
             {
-                return new TsType(TsTypes, type, true)
+                return new TsType(this, type, true)
                 {
                     Namespace = tsNamespace,
                     TypeName = type.Name,

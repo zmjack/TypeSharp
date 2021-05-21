@@ -9,8 +9,30 @@ namespace TypeSharp
 {
     public class TsType
     {
-        public TsType(CacheSet<Type, TsType> tsTypes, Type clrType, bool cacheProperties)
+        /// <summary>
+        /// Hint: If Namespace is null, the properties should be null.
+        /// </summary>
+        public string Namespace { get; set; }
+
+        public string TypeName { get; set; }
+
+        public string PureName => TypeName.ExtractFirst(new Regex(@"^([^<]+)"));
+
+        public Type ClrType { get; private set; }
+
+        public TsTypeClass TypeClass => ClrType.IsEnum ? TsTypeClass.Enum : TsTypeClass.Interface;
+
+        public Cache<TsProperty[]> TsProperties { get; private set; }
+
+        public TsEnumValue[] TsEnumValues { get; set; }
+
+        public bool Declare { get; set; }
+
+        public string ReferenceName => Namespace is null ? TypeName : $"{Namespace}.{TypeName}";
+
+        public TsType(TypeScriptModelBuilder builder, Type clrType, bool cacheProperties)
         {
+            var tsTypes = builder.TsTypes;
             ClrType = clrType;
 
             TsProperties = new Cache<TsProperty[]>
@@ -63,6 +85,7 @@ namespace TypeSharp
                             {
                                 var propType = prop.PropertyType;
                                 var required = prop.HasAttributeViaName("System.ComponentModel.DataAnnotations.RequiredAttribute");
+
                                 return new TsProperty
                                 {
                                     ClrName = prop.Name,
@@ -78,25 +101,5 @@ namespace TypeSharp
             };
         }
 
-        /// <summary>
-        /// Hint: If Namespace is null, the properties should be null.
-        /// </summary>
-        public string Namespace { get; set; }
-
-        public string TypeName { get; set; }
-
-        public string PureName => TypeName.ExtractFirst(new Regex(@"^([^<]+)"));
-
-        public Type ClrType { get; private set; }
-
-        public TsTypeClass TypeClass => ClrType.IsEnum ? TsTypeClass.Enum : TsTypeClass.Interface;
-
-        public Cache<TsProperty[]> TsProperties { get; private set; }
-
-        public TsEnumValue[] TsEnumValues { get; set; }
-
-        public bool Declare { get; set; }
-
-        public string ReferenceName => Namespace is null ? TypeName : $"{Namespace}.{TypeName}";
     }
 }

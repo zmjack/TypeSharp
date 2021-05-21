@@ -12,11 +12,11 @@ namespace TypeSharp
 {
     public class TypeScriptApiBuilder
     {
-        private readonly TypeScriptModelBuilder ModelBuilder = new TypeScriptModelBuilder();
+        private readonly TypeScriptModelBuilder ModelBuilder = new();
         private CacheSet<Type, TsType> TsTypes => ModelBuilder.TsTypes;
         private readonly string RootUri;
 
-        public HashSet<Type> TypeList = new HashSet<Type>();
+        public HashSet<Type> TypeList = new();
 
         public TypeScriptApiBuilder(string rootUri)
         {

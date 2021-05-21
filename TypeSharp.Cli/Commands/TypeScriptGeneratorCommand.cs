@@ -65,7 +65,7 @@ namespace TypeSharp.Cli
                 if (relative.Count(";") == 1)
                 {
                     var pair = relative.Split(";");
-                    var type = assemblyContext.GetType(pair[0]);
+                    var type = assemblyContext.GetType(pair[0]) ?? Type.GetType(pair[0]);
                     var typescriptName = pair[1];
 
                     if (type == null) throw new ArgumentException($"Can not find type for the specified string({relative}).");
