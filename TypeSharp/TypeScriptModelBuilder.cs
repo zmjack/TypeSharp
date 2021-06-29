@@ -37,6 +37,8 @@ namespace TypeSharp
                             }
                         }
 
+                        Console.WriteLine($"Cache: {type.FullName}");
+
                         return type switch
                         {
                             Type when type == typeof(bool) => new TsType(this, type, false) { TypeName = "boolean", Declare = true },

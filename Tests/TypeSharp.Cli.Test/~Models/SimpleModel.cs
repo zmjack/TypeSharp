@@ -12,5 +12,7 @@ namespace TypeSharp.Test
 
         public Lazy<int> LazyInt32 { get; set; }
         public Lazy<long> LazyInt64 { get; set; }
+
+        public DateTime? DateTimeValue { get; set; }
     }
 }
