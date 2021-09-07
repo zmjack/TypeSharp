@@ -162,9 +162,8 @@ namespace TypeSharp
             if (attr?.Namespace is null)
             {
                 var dType = type.DeclaringType;
-                if (dType is null)
-                    return type.Namespace;
-                else return $"{GetTsNamespace(dType)}.{type.Name}";
+                if (dType is null) return type.Namespace;
+                else return $"{GetTsNamespace(dType)}.{dType.Name}";
             }
             else return attr.Namespace;
         }

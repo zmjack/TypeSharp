@@ -65,5 +65,17 @@ namespace TypeSharp.Test
             Assert.Equal(expectedCode, tscode);
         }
 
+        [Fact]
+        public void NestedTest()
+        {
+            var types = Assembly.GetExecutingAssembly().GetTypesWhichMarkedAs<TypeScriptModelAttribute>();
+            var builder = new TypeScriptModelBuilder();
+            builder.CacheType<WapperClass>();
+
+            var tscode = builder.Compile();
+            var expectedCode = $"{TestUtil.DeclareContent}\r\n\r\n{File.ReadAllText($"{nameof(SimpleTest)}.ts")}";
+            Assert.Equal(expectedCode, tscode);
+        }
+
     }
 }
