@@ -18,6 +18,7 @@ declare namespace TypeSharp.Test {{
         value?: number;
         lazyInt32?: number;
         lazyInt64?: any;
+        dateTimeValue?: Date;
     }}
 }}
 ", content);

@@ -66,14 +66,15 @@ namespace TypeSharp.Test
         }
 
         [Fact]
-        public void NestedTest()
+        public void SuperTest()
         {
             var types = Assembly.GetExecutingAssembly().GetTypesWhichMarkedAs<TypeScriptModelAttribute>();
             var builder = new TypeScriptModelBuilder();
-            builder.CacheType<WapperClass>();
+            builder.CacheType<SuperClass>();
+            builder.CacheType<ChildClass>();
 
             var tscode = builder.Compile();
-            var expectedCode = $"{TestUtil.DeclareContent}\r\n\r\n{File.ReadAllText($"{nameof(SimpleTest)}.ts")}";
+            var expectedCode = $"{TestUtil.DeclareContent}\r\n\r\n{File.ReadAllText($"{nameof(SuperTest)}.ts")}";
             Assert.Equal(expectedCode, tscode);
         }
 
