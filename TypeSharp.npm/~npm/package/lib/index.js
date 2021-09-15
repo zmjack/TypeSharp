@@ -3,5 +3,5 @@ exports.__esModule = true;
 exports.version = exports.ApiHelper = void 0;
 var ApiHelper_1 = require("./ApiHelper");
 exports.ApiHelper = ApiHelper_1.ApiHelper;
-var version = "0.1.1";
+var version = "0.2.0";
 exports.version = version;

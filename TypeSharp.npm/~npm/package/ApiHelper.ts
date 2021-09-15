@@ -50,9 +50,11 @@ export class ApiHelper {
         return new Promise<void>((resolve, reject) => {
             axiosResponse
                 .then(response => {
-                    ApiHelper.save(response);
                     var status = this.handler?.beforeResolve?.call(this, response);
-                    if (status !== false) resolve(response.data);
+                    if (status !== false) {
+                        ApiHelper.save(response);
+                        resolve(response.data);
+                    }
                 })
                 .catch(reason => {
                     var status = this.handler?.beforeReject?.call(this, reason);

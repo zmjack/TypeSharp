@@ -47,10 +47,11 @@ var ApiHelper = /** @class */ (function () {
             axiosResponse
                 .then(function (response) {
                 var _a, _b;
-                ApiHelper.save(response);
                 var status = (_b = (_a = _this.handler) === null || _a === void 0 ? void 0 : _a.beforeResolve) === null || _b === void 0 ? void 0 : _b.call(_this, response);
-                if (status !== false)
+                if (status !== false) {
+                    ApiHelper.save(response);
                     resolve(response.data);
+                }
             })["catch"](function (reason) {
                 var _a, _b;
                 var status = (_b = (_a = _this.handler) === null || _a === void 0 ? void 0 : _a.beforeReject) === null || _b === void 0 ? void 0 : _b.call(_this, reason);
