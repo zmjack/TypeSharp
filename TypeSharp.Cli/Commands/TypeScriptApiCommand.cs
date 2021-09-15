@@ -28,6 +28,9 @@ namespace TypeSharp.Cli
         [CmdProperty("uri", Abbreviation = "u", Description = "Specify the root uri of apis.")]
         public string Uri { get; set; } = "";
 
+        [CmdProperty("package", Abbreviation = "p", Description = "Specify the PackageName for code.")]
+        public string PackageName { get; set; } = "type-sharp";
+
         public override void Run()
         {
             var targetAssemblyName = Project.AssemblyName;
@@ -70,7 +73,7 @@ namespace TypeSharp.Cli
                 else throw new ArgumentException("Each parameter('Relative') must contain a semicolon(;).");
             }
 
-            builder.WriteTo(outFile);
+            builder.WriteTo(outFile, PackageName);
 
             Console.WriteLine($"File saved: {outFile}");
         }

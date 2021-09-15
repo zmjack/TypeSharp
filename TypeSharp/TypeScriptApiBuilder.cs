@@ -23,14 +23,14 @@ namespace TypeSharp
             RootUri = rootUri;
         }
 
-        public void WriteTo(string path) => File.WriteAllText(path, Compile());
+        public void WriteTo(string path, string tsPackageName = "type-sharp") => File.WriteAllText(path, Compile(tsPackageName));
 
-        public string Compile()
+        public string Compile(string tsPackageName = "type-sharp")
         {
             var exports = new List<string>();
             var code = new StringBuilder();
             code.AppendLine(Declare.Info);
-            code.AppendLine("import { ApiHelper } from \"type-sharp\"");
+            code.AppendLine($"import {{ ApiHelper }} from \"{tsPackageName}\";");
 
             var groups = TypeList.Select(type => TsTypes[type].Value).GroupBy(x => x.Namespace).ToArray();
             if (groups.Any()) code.AppendLine();

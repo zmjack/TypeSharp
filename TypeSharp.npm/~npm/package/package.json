@@ -1,0 +1,14 @@
+{
+  "name": "type-sharp",
+  "version": "0.1.0",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "files": [
+    "lib"
+  ],
+  "dependencies": {
+    "@types/node": "^13.9.0",
+    "axios": "^0.21.4",
+    "es6-promise": "^4.2.8"
+  }
+}

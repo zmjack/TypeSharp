@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "react@17.0.2",
+      "destination": "wwwroot/react/",
+      "files": [
+        "umd/react.production.min.js"
+      ]
+    },
+    {
+      "library": "react-dom@17.0.2",
+      "destination": "wwwroot/lib/react-dom/",
+      "files": [
+        "umd/react-dom.production.min.js"
+      ]
+    },
+    {
+      "library": "axios@0.21.4",
+      "destination": "wwwroot/lib/axios/",
+      "files": [
+        "axios.min.js"
+      ]
+    }
+  ]
+}

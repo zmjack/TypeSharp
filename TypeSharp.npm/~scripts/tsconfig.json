@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "jsx": "react",
+    "noImplicitAny": true,
+    "noEmitOnError": true,
+    "removeComments": false,
+    "sourceMap": true,
+    "target": "ES2015",
+    "module": "commonjs",
+    "esModuleInterop": true
+  },
+  "exclude": [
+    "obj",
+    "bin",
+    "node_modules",
+    "wwwroot"
+  ]
+}
