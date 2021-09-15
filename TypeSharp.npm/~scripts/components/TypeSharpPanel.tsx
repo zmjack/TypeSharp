@@ -14,9 +14,11 @@ export class TypeSharpPanel extends React.Component<TypeSharpPanelProps, TypeSha
     private api = new HomeApi(new ApiHelper({
         beforeResolve: response => {
             var data = response.data;
-            if (data?.toString() == '[object Blob]')
+
+            if (data?.toString() == '[object Blob]') {
                 this.setState({ content: `[Download file]` });
-            else this.setState({ content: `${data.toString()} ${data}` });
+            }
+            else this.setState({ content: data });
         },
         beforeReject: reason => {
             this.setState({ content: `${reason}` });
@@ -33,7 +35,7 @@ export class TypeSharpPanel extends React.Component<TypeSharpPanelProps, TypeSha
     render() {
         return <div>
             <div>
-                <button type="button" onClick={() => this.api.getContent().then(content => this.setState({ content }))}>GetContent</button>
+                <button type="button" onClick={() => this.api.getContent()}>GetContent</button>
                 <button type="button" onClick={() => this.api.getContent500()}>GetContent500</button>
 
                 <button type="button" onClick={() => this.api.getFile()}>GetFile</button>
@@ -43,6 +45,6 @@ export class TypeSharpPanel extends React.Component<TypeSharpPanelProps, TypeSha
             <div>
                 content: {this.state.content}
             </div>
-        </div>
+        </div >
     }
 }
