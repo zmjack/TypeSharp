@@ -1,4 +1,4 @@
-import { ApiHelper } from "type-sharp"
+import { ApiHelper } from "type-sharp";
 
 export class SimpleApi {
     constructor(public api: ApiHelper = ApiHelper.default) { }
