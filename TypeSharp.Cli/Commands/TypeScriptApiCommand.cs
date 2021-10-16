@@ -1,6 +1,5 @@
 ﻿using DotNetCli;
 using NStandard;
-using NStandard.Reference;
 using NStandard.Runtime;
 using System;
 using System.IO;
@@ -34,7 +33,8 @@ namespace TypeSharp.Cli
         public override void Run()
         {
             var targetAssemblyName = Project.AssemblyName;
-            var assemblyContext = new AssemblyContext($"{TargetBinFolder}/{targetAssemblyName}.dll", DotNetFramework.Parse(Project.TargetFramework));
+            var assemblyContext = new AssemblyContext(DotNetFramework.Parse(Project.TargetFramework), Project.Sdk);
+            assemblyContext.LoadMain($"{TargetBinFolder}/{targetAssemblyName}.dll");
 
             string outFile;
             // if Directory
@@ -53,7 +53,7 @@ namespace TypeSharp.Cli
 
             var builder = new TypeScriptApiBuilder(Uri);
             var markAttr = assemblyContext.GetType($"{nameof(TypeSharp)}.{nameof(TypeScriptApiAttribute)},{nameof(TypeSharp)}");
-            var modelTypes = assemblyContext.RootAssembly.GetTypesWhichMarkedAs(markAttr);
+            var modelTypes = assemblyContext.MainAssembly.GetTypesWhichMarkedAs(markAttr);
             builder.CacheTypes(modelTypes);
 
             foreach (var include in Includes)
