@@ -5,6 +5,7 @@
         subClasses?: TSNS2.SubClass[];
         subStruct?: TSNS2.SubStruct;
         nullableSubStruct?: TSNS2.SubStruct;
+        array?: any[];
         str: string;
         int: number;
         strArray?: string[];

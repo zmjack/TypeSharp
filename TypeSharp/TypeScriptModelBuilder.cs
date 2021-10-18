@@ -58,6 +58,7 @@ namespace TypeSharp
                             Type when type == typeof(decimal) => new TsType(this, type, false) { TypeName = "number", Declare = true },
                             Type when type == typeof(DateTime) => new TsType(this, type, false) { TypeName = "Date", Declare = true },
                             Type when type == typeof(DateTimeOffset) => new TsType(this, type, false) { TypeName = "Date", Declare = true },
+                            Type when type == typeof(Array) => new TsType(this, type, false) { TypeName = "any[]", Declare = true },
                             Type when type == typeof(object) => new TsType(this, type, false) { TypeName = "any", Declare = true },
                             Type when type.IsArray => ParseType(typeof(IEnumerable<>).MakeGenericType(type.GetElementType())),
                             Type when type.IsType(typeof(IEnumerable<>)) || type.IsImplement(typeof(IEnumerable<>)) => ParseType(typeof(IEnumerable<>).MakeGenericType(type.GetGenericArguments()[0])),

@@ -13,6 +13,7 @@ namespace TypeSharp.Test
         public SubClass[] SubClasses { get; set; }
         public SubStruct SubStruct { get; set; }
         public SubStruct? NullableSubStruct { get; set; }
+        public Array Array { get; set; }
 
         [Required]
         public string Str { get; set; }
