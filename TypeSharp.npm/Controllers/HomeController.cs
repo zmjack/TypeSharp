@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using TypeSharp.npm.Models;
+using Ajax;
 
 namespace TypeSharp.npm.Controllers
 {
@@ -35,10 +36,15 @@ namespace TypeSharp.npm.Controllers
 
         [ApiReturnFile]
         public IActionResult GetFile() => File("File Content".Bytes(), "text/plain");
+
         [ApiReturnFile]
         public IActionResult GetFile404() => NotFound();
+
         [ApiReturnFile]
         public IActionResult GetFile500() => throw new Exception();
+
+        [ApiReturnFile]
+        public JSend GetJSendError() => JSend.Error("JSend error.");
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

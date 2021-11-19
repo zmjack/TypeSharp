@@ -61,8 +61,14 @@ namespace TypeSharp
                             Type when type == typeof(Array) => new TsType(this, type, false) { TypeName = "any[]", Declare = true },
                             Type when type == typeof(object) => new TsType(this, type, false) { TypeName = "any", Declare = true },
                             Type when type.IsArray => ParseType(typeof(IEnumerable<>).MakeGenericType(type.GetElementType())),
+                            Type when type.IsType(typeof(IDictionary<,>)) || type.IsImplement(typeof(IDictionary<,>)) => Any.Create(() =>
+                            {
+                                var genericTypes = type.GetGenericArguments();
+                                var keyType = TsTypes[genericTypes[0]];
+                                var valueType = TsTypes[genericTypes[1]];
+                                return new TsType(this, type, false) { TypeName = $"{{ [key: {keyType.Value.TypeName}] : {valueType.Value.TypeName} }}", Declare = true };
+                            }),
                             Type when type.IsType(typeof(IEnumerable<>)) || type.IsImplement(typeof(IEnumerable<>)) => ParseType(typeof(IEnumerable<>).MakeGenericType(type.GetGenericArguments()[0])),
-                            Type when type.IsType(typeof(IDictionary<,>)) || type.IsImplement(typeof(IDictionary<,>)) => new TsType(this, type, false) { TypeName = "any", Declare = true },
                             Type when type.IsType(typeof(Nullable<>)) => TsTypes[type.GenericTypeArguments[0]].Value,
                             Type when type.IsEnum => ParseEnum(type),
                             Type when type.IsClass || type.IsValueType => ParseType(type),

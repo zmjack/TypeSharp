@@ -1,0 +1,27 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <title>@ViewBag.Title</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
+
+    <!-- Custom styles for this template -->
+    <link href="~/css/app.css" rel="stylesheet" />
+    <link href="~/css/antd.css" rel="stylesheet" />
+        
+    @{#if DEBUG}
+    <script src="~/lib/react/react.development.js"></script>
+    <script src="~/lib/react/react-dom.development.js"></script>
+    @{#else}
+    <script src="~/lib/react/react.production.min.js"></script>
+    <script src="~/lib/react/react-dom.production.min.js"></script>
+    @{#endif}
+</head>
+<body>
+    @RenderBody()
+</body>
+</html>

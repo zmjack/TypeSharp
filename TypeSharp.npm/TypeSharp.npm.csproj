@@ -20,6 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="JSend" Version="1.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\TypeSharp\TypeSharp.csproj" />
   </ItemGroup>
 
