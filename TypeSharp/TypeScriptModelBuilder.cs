@@ -66,7 +66,7 @@ namespace TypeSharp
                                 var genericTypes = type.GetGenericArguments();
                                 var keyType = TsTypes[genericTypes[0]];
                                 var valueType = TsTypes[genericTypes[1]];
-                                return new TsType(this, type, false) { TypeName = $"{{ [key: {keyType.Value.TypeName}] : {valueType.Value.TypeName} }}", Declare = true };
+                                return new TsType(this, type, false) { TypeName = $"{{ [key: {keyType.Value.TypeName}]: {valueType.Value.TypeName} }}", Declare = true };
                             }),
                             Type when type.IsType(typeof(IEnumerable<>)) || type.IsImplement(typeof(IEnumerable<>)) => ParseType(typeof(IEnumerable<>).MakeGenericType(type.GetGenericArguments()[0])),
                             Type when type.IsType(typeof(Nullable<>)) => TsTypes[type.GenericTypeArguments[0]].Value,

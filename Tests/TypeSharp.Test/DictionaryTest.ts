@@ -1,5 +1,6 @@
 ﻿declare namespace TypeSharp.Test {
     interface DictionaryClass {
-        dict?: { [key: string] : number };
+        dict1?: { [key: string]: number };
+        dict2?: { [key: string]: { [key: string]: number } };
     }
 }
