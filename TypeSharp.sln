@@ -25,7 +25,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeSharp.Cli", "TypeSharp.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeSharp.npm", "TypeSharp.npm\TypeSharp.npm.csproj", "{0A4A69D2-B63A-47EC-8AE4-BF452EEBCE3A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeSharp.React", "TypeSharp.React\TypeSharp.React.csproj", "{0887D4A4-86C2-456D-8B7E-D569B4E63CF5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeSharp.React", "TypeSharp.React\TypeSharp.React.csproj", "{0887D4A4-86C2-456D-8B7E-D569B4E63CF5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Obsolete", "Obsolete", "{D5F87DCC-C39F-4220-963B-198AE873BEA8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -126,6 +128,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{5C5A1EDE-6F1F-4BC1-A73F-9935D0CCEDDB} = {D5F87DCC-C39F-4220-963B-198AE873BEA8}
 		{7FBB07D9-F7D3-432D-88D8-CC854C1B5DB0} = {F9B21760-A8A1-4E48-BDE7-6829BABC532B}
 		{9B1999EA-AA21-4AD8-A15C-70905553DF83} = {F9B21760-A8A1-4E48-BDE7-6829BABC532B}
 	EndGlobalSection

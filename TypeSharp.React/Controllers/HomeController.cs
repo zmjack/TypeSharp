@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Ajax;
+using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using TypeSharp.React.Models;
 
 namespace TypeSharp.React.Controllers
 {
+    [TypeScriptApi]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -21,6 +23,11 @@ namespace TypeSharp.React.Controllers
         public IActionResult Privacy()
         {
             return View();
+        }
+
+        public JSend SimpleJSend()
+        {
+            return JSend.Success();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

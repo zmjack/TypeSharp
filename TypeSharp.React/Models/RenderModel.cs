@@ -1,5 +1,6 @@
 ﻿namespace TypeSharp.React.Models
 {
+    [TypeScriptModel]
     public class RenderModel
     {
         public string Area { get; set; }

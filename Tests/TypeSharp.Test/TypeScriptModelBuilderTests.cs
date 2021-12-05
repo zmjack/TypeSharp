@@ -46,16 +46,6 @@ namespace TypeSharp.Test
         }
 
         [Fact]
-        public void LiveAccountTest()
-        {
-            var builder = new TypeScriptModelBuilder();
-            builder.CacheType(typeof(LiveAccount.LiveUser));
-            var tscode = builder.Compile();
-            var expectedCode = $"{TestUtil.DeclareContent}\r\n\r\n{File.ReadAllText($"{nameof(LiveAccountTest)}.ts")}";
-            Assert.Equal(expectedCode, tscode);
-        }
-
-        [Fact]
         public void JSendTest()
         {
             var builder = new TypeScriptModelBuilder();
