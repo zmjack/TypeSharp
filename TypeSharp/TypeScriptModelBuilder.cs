@@ -39,7 +39,8 @@ namespace TypeSharp
 
                         Console.WriteLine($"Cache: {type.FullName}");
 
-                        if (type.FullName.StartsWith("System.ValueTuple"))
+                        // If type is generic, the full name is null.
+                        if (type.FullName?.StartsWith("System.ValueTuple") ?? false)
                         {
                             var gtypes = type.GetGenericArguments();
                             var length = gtypes.Length;

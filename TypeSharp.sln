@@ -29,8 +29,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeSharp.React", "TypeShar
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Obsolete", "Obsolete", "{D5F87DCC-C39F-4220-963B-198AE873BEA8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeSharp.Cli.NET31", "TypeSharp.Cli.NET31\TypeSharp.Cli.NET31.csproj", "{1EFBC51A-EA60-4F45-AD0D-724C6A790FD1}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -125,18 +123,6 @@ Global
 		{0887D4A4-86C2-456D-8B7E-D569B4E63CF5}.Release|x64.Build.0 = Release|Any CPU
 		{0887D4A4-86C2-456D-8B7E-D569B4E63CF5}.Release|x86.ActiveCfg = Release|Any CPU
 		{0887D4A4-86C2-456D-8B7E-D569B4E63CF5}.Release|x86.Build.0 = Release|Any CPU
-		{1EFBC51A-EA60-4F45-AD0D-724C6A790FD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1EFBC51A-EA60-4F45-AD0D-724C6A790FD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1EFBC51A-EA60-4F45-AD0D-724C6A790FD1}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{1EFBC51A-EA60-4F45-AD0D-724C6A790FD1}.Debug|x64.Build.0 = Debug|Any CPU
-		{1EFBC51A-EA60-4F45-AD0D-724C6A790FD1}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{1EFBC51A-EA60-4F45-AD0D-724C6A790FD1}.Debug|x86.Build.0 = Debug|Any CPU
-		{1EFBC51A-EA60-4F45-AD0D-724C6A790FD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1EFBC51A-EA60-4F45-AD0D-724C6A790FD1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1EFBC51A-EA60-4F45-AD0D-724C6A790FD1}.Release|x64.ActiveCfg = Release|Any CPU
-		{1EFBC51A-EA60-4F45-AD0D-724C6A790FD1}.Release|x64.Build.0 = Release|Any CPU
-		{1EFBC51A-EA60-4F45-AD0D-724C6A790FD1}.Release|x86.ActiveCfg = Release|Any CPU
-		{1EFBC51A-EA60-4F45-AD0D-724C6A790FD1}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

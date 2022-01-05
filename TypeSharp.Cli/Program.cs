@@ -1,22 +1,21 @@
 ﻿using DotNetCli;
 using NStandard;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 
 namespace TypeSharp.Cli
 {
     public class Program
     {
-        public static readonly string CLI_VERSION = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-        public static CmdContainer CmdContainer;
+        public static readonly Assembly ThisAssembly = Assembly.GetExecutingAssembly();
+        public static readonly string CLI_VERSION = ThisAssembly.GetName().Version.ToString();
+        public static CmdContainer CmdContainer { get; } = new("ts", ThisAssembly, ProjectInfo.GetFromDirectory(Directory.GetCurrentDirectory()));
 
         static void Main(string[] args)
         {
-            CmdContainer = new CmdContainer("ts", ProjectInfo.GetCurrent());
-            CmdContainer.CacheCommands(Assembly.GetExecutingAssembly());
-
             PrintWelcome();
-
             CmdContainer.PrintProjectInfo();
             CmdContainer.Run(args);
         }

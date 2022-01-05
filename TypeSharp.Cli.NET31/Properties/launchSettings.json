@@ -1,7 +1,0 @@
-{
-  "profiles": {
-    "TypeSharp.Cli": {
-      "commandName": "Project"
-    }
-  }
-}

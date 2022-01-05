@@ -10,19 +10,16 @@ namespace TypeSharp.Cli
     [Command("TSApi", Abbreviation = "tsapi", Description = "Generate TypeScript api class from CSharp class.")]
     public class TypeScriptApiCommand : Command
     {
-        private static ProjectInfo Project => Program.CmdContainer.ProjectInfo;
-        private static readonly string TargetBinFolder = Path.GetFullPath($"{Project.ProjectRoot}/bin/Debug/{Project.TargetFramework}");
-
         public TypeScriptApiCommand(CmdContainer container, string[] args) : base(container, args) { }
 
         [CmdProperty("out", Abbreviation = "o", Description = "Specify the output directory path. (default: Typings)")]
         public string Out { get; set; } = ".";
 
         [CmdProperty("include", Abbreviation = "i", Description = "Specify the include other types, such as 'Ajax.JSend,JSend'.")]
-        public string[] Includes { get; set; } = new string[0];
+        public string[] Includes { get; set; } = Array.Empty<string>();
 
         [CmdProperty("relative", Abbreviation = "r", Description = "Treat a specified type as a defined type.")]
-        public string[] Relatives { get; set; } = new string[0];
+        public string[] Relatives { get; set; } = Array.Empty<string>();
 
         [CmdProperty("uri", Abbreviation = "u", Description = "Specify the root uri of apis.")]
         public string Uri { get; set; } = "";
@@ -32,9 +29,13 @@ namespace TypeSharp.Cli
 
         public override void Run()
         {
-            var targetAssemblyName = Project.AssemblyName;
-            var assemblyContext = new AssemblyContext(DotNetFramework.Parse(Project.TargetFramework), Project.Sdk);
-            assemblyContext.LoadMain($"{TargetBinFolder}/{targetAssemblyName}.dll");
+            if (Program.CmdContainer.ProjectInfo is null) throw new InvalidOperationException("No project information.");
+
+            var project = Program.CmdContainer.ProjectInfo.Value;
+            var targetBinFolder = Path.GetFullPath($"{project.ProjectRoot}/bin/Debug/{project.TargetFramework}");
+            var targetAssemblyName = project.AssemblyName;
+            var assemblyContext = new AssemblyContext(DotNetFramework.Parse(project.TargetFramework), project.Sdk);
+            assemblyContext.LoadMain($"{targetBinFolder}/{targetAssemblyName}.dll");
 
             string outFile;
             // if Directory
