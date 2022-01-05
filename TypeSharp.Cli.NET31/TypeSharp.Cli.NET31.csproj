@@ -9,7 +9,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <AssemblyName>dotnet-ts</AssemblyName>
     <Company>nstandard.net</Company>
@@ -19,7 +19,7 @@
     <Copyright>Copyright © nstandard.net 2019-2021</Copyright>
     <PackageProjectUrl>https://github.com/zmjack/TypeSharp</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>
-    <Version>6.0.2</Version>
+    <Version>3.1.18</Version>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageType>DotnetCliTool</PackageType>
