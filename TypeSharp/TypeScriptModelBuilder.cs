@@ -39,6 +39,25 @@ namespace TypeSharp
 
                         Console.WriteLine($"Cache: {type.FullName}");
 
+                        if (type.FullName.StartsWith("System.ValueTuple"))
+                        {
+                            var gtypes = type.GetGenericArguments();
+                            var length = gtypes.Length;
+                            //TODO: to supoort more items
+                            if (length > 7) throw new NotSupportedException($"ValueType supports a maximum of 7 parameters.");
+
+                            var sb = new StringBuilder();
+                            sb.Append("{ ");
+                            for (int i = 0; i < length; i++)
+                            {
+                                sb.Append($"Item{i + 1}: {TsTypes[gtypes[i]].Value.TypeName}");
+                                if (i != length - 1) sb.Append(", ");
+                            }
+                            sb.Append(" }");
+
+                            return new TsType(this, type, false) { TypeName = sb.ToString(), Declare = true };
+                        }
+
                         return type switch
                         {
                             Type when type == typeof(bool) => new TsType(this, type, false) { TypeName = "boolean", Declare = true },
@@ -66,7 +85,8 @@ namespace TypeSharp
                                 var genericTypes = type.GetGenericArguments();
                                 var keyType = TsTypes[genericTypes[0]];
                                 var valueType = TsTypes[genericTypes[1]];
-                                return new TsType(this, type, false) { TypeName = $"{{ [key: {keyType.Value.TypeName}]: {valueType.Value.TypeName} }}", Declare = true };
+                                //TODO: Type name need to be simplified.
+                                return new TsType(this, type, false) { TypeName = $"{{ [key: {keyType.Value.ReferenceName}]: {valueType.Value.ReferenceName} }}", Declare = true };
                             }),
                             Type when type.IsType(typeof(IEnumerable<>)) || type.IsImplement(typeof(IEnumerable<>)) => ParseType(typeof(IEnumerable<>).MakeGenericType(type.GetGenericArguments()[0])),
                             Type when type.IsType(typeof(Nullable<>)) => TsTypes[type.GenericTypeArguments[0]].Value,

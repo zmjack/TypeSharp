@@ -79,5 +79,16 @@ namespace TypeSharp.Test
             Assert.Equal(expectedCode, tscode);
         }
 
+        [Fact]
+        public void ValueTypeTest()
+        {
+            var builder = new TypeScriptModelBuilder();
+            builder.CacheType<ValueTypeClass>();
+
+            var tscode = builder.Compile();
+            var expectedCode = $"{TestUtil.DeclareContent}\r\n\r\n{File.ReadAllText($"{nameof(DictionaryTest)}.ts")}";
+            Assert.Equal(expectedCode, tscode);
+        }
+
     }
 }
