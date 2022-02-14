@@ -86,7 +86,7 @@ namespace TypeSharp.Test
             builder.CacheType<ValueTypeClass>();
 
             var tscode = builder.Compile();
-            var expectedCode = $"{TestUtil.DeclareContent}\r\n\r\n{File.ReadAllText($"{nameof(DictionaryTest)}.ts")}";
+            var expectedCode = $"{TestUtil.DeclareContent}\r\n\r\n{File.ReadAllText($"{nameof(ValueTypeTest)}.ts")}";
             Assert.Equal(expectedCode, tscode);
         }
 

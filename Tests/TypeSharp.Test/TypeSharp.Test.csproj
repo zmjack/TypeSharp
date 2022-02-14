@@ -24,6 +24,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="ValueTypeTest.ts">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Code</SubType>
+    </None>
     <None Update="DictionaryTest.ts">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Code</SubType>

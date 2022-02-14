@@ -1,5 +1,3 @@
-using System;
-
 namespace TypeSharp.npm.Models
 {
     public class ErrorViewModel

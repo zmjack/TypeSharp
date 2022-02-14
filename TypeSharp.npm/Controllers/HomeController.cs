@@ -1,13 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Ajax;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NStandard;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using TypeSharp.npm.Models;
-using Ajax;
 
 namespace TypeSharp.npm.Controllers
 {

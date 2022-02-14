@@ -26,9 +26,9 @@ namespace TypeSharp.Cli
 
         public override void Run()
         {
-            if (Program.CmdContainer.ProjectInfo is null) throw new InvalidOperationException("No project information.");
+            if (Container.ProjectInfo is null) throw new InvalidOperationException("No project information.");
 
-            var project = Program.CmdContainer.ProjectInfo.Value;
+            var project = Container.ProjectInfo.Value;
             var targetBinFolder = Path.GetFullPath($"{project.ProjectRoot}/bin/Debug/{project.TargetFramework}");
             var targetAssemblyName = project.AssemblyName;
             var assemblyContext = new AssemblyContext(DotNetFramework.Parse(project.TargetFramework), project.Sdk);

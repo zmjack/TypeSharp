@@ -1,3 +1,4 @@
+using DotNetCli;
 using System.IO;
 using Xunit;
 
@@ -5,11 +6,12 @@ namespace TypeSharp.Cli.Test
 {
     public class UnitTest1
     {
+        private static CmdContainer CmdContainer { get; } = new("ts", Program.ThisAssembly, ProjectInfo.GetFromDirectory(Path.Combine(Directory.GetCurrentDirectory(), "../../..")));
+
         [Fact]
         public void Test1()
         {
-            var container = Program.CmdContainer;
-            container.Run(new[] { "tsg", "-r", "System.Lazy`1[System.Int32];number", "-r", "System.Lazy`1;any" });
+            CmdContainer.Run(new[] { "tsg", "-r", "System.Lazy`1[System.Int32];number", "-r", "System.Lazy`1;any" });
             var content = File.ReadAllText("TypeSharp.Cli.Test.ts");
             Assert.Equal($@"{TestUtil.DeclareContent}
 
@@ -27,8 +29,7 @@ declare namespace TypeSharp.Test {{
         [Fact]
         public void Test2()
         {
-            var container = Program.CmdContainer;
-            container.Run(new[] { "tsg", "-r", "System.Lazy`1[System.Int32];number", "-r", "System.Lazy`1;any" });
+            CmdContainer.Run(new[] { "tsg", "-r", "System.Lazy`1[System.Int32];number", "-r", "System.Lazy`1;any" });
             var content = File.ReadAllText("TypeSharp.Cli.Test.ts");
             Assert.Equal($@"{TestUtil.DeclareContent}
 

@@ -1,5 +1,4 @@
-﻿using DotNetCli;
-using System;
+﻿using System;
 using System.Reflection;
 
 namespace TypeSharp.Cli.Test
