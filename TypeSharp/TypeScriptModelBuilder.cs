@@ -76,6 +76,9 @@ namespace TypeSharp
                             Type when type == typeof(float) => new TsType(this, type, false) { TypeName = "number", Declare = true },
                             Type when type == typeof(double) => new TsType(this, type, false) { TypeName = "number", Declare = true },
                             Type when type == typeof(decimal) => new TsType(this, type, false) { TypeName = "number", Declare = true },
+#if NET6_0_OR_GREATER
+                            Type when type == typeof(DateOnly) => new TsType(this, type, false) { TypeName = "Date", Declare = true },
+#endif
                             Type when type == typeof(DateTime) => new TsType(this, type, false) { TypeName = "Date", Declare = true },
                             Type when type == typeof(DateTimeOffset) => new TsType(this, type, false) { TypeName = "Date", Declare = true },
                             Type when type == typeof(Array) => new TsType(this, type, false) { TypeName = "any[]", Declare = true },
