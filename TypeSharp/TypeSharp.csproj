@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net6</TargetFrameworks>
-    <Version>1.4.2</Version>
+    <Version>1.4.3</Version>
     <Authors>zmjack</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NStandard" Version="0.10.0" />
+    <PackageReference Include="NStandard" Version="0.10.1" />
   </ItemGroup>
 
 </Project>
