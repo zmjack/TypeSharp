@@ -15,11 +15,14 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.0" />
-    <PackageReference Include="TypeSharp" Version="1.4.2" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="scripts\typings\%40auto\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TypeSharp\TypeSharp.csproj" />
   </ItemGroup>
 
 </Project>
