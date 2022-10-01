@@ -21,11 +21,14 @@ namespace TypeSharp.Cli
         [CmdProperty("relative", Abbreviation = "r", Description = "Treat a specified type as a defined type.")]
         public string[] Relatives { get; set; } = Array.Empty<string>();
 
-        [CmdProperty("uri", Abbreviation = "u", Description = "Specify the root uri of apis.")]
-        public string Uri { get; set; } = "";
+        [CmdProperty("default-pattern", Abbreviation = "pattern", Description = "Specify the root uri of apis.")]
+        public string DefaultPattern { get; set; } = "";
 
         [CmdProperty("package", Abbreviation = "p", Description = "Specify the PackageName for code.")]
         public string PackageName { get; set; } = "type-sharp";
+
+        [CmdProperty("verbose", Abbreviation = "verb", Description = "Output more information for building.")]
+        public bool Verbose { get; set; } = false;
 
         public override void Run()
         {
@@ -52,7 +55,11 @@ namespace TypeSharp.Cli
                 outFile = Path.GetFullPath(Out);
             }
 
-            var builder = new TypeScriptApiBuilder(Uri);
+            var builder = new TypeScriptApiBuilder(new ApiBuilderOptions
+            {
+                DefaultPattern = DefaultPattern,
+                Verbose = Verbose,
+            });
             var markAttr = assemblyContext.GetType($"{nameof(TypeSharp)}.{nameof(TypeScriptApiAttribute)},{nameof(TypeSharp)}");
             var modelTypes = assemblyContext.MainAssembly.GetTypesWhichMarkedAs(markAttr);
             builder.CacheTypes(modelTypes);

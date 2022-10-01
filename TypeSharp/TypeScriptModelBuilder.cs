@@ -15,8 +15,11 @@ namespace TypeSharp
         public CacheSet<Type, TsType> TsTypes { get; private set; }
         public Dictionary<Type, string> DeclaredTypes { get; private set; } = new Dictionary<Type, string>();
 
-        public TypeScriptModelBuilder()
+        private readonly ModelBuilderOptions _options;
+        public TypeScriptModelBuilder(ModelBuilderOptions options = null)
         {
+            _options = options ??= ModelBuilderOptions.Default;
+
             TsTypes = new CacheSet<Type, TsType>
             {
                 CacheMethodBuilder = type =>
@@ -37,7 +40,10 @@ namespace TypeSharp
                             }
                         }
 
-                        Console.WriteLine($"Cache: {type.FullName}");
+                        if (_options.Verbose)
+                        {
+                            Console.WriteLine($"[Type] Cache: {type.FullName}");
+                        }
 
                         // If type is generic, the full name is null.
                         if (type.FullName?.StartsWith("System.ValueTuple") ?? false)
@@ -95,7 +101,7 @@ namespace TypeSharp
                             Type when type.IsType(typeof(IEnumerable<>)) || type.IsImplement(typeof(IEnumerable<>)) => ParseType(typeof(IEnumerable<>).MakeGenericType(type.GetGenericArguments()[0])),
                             Type when type.IsType(typeof(Nullable<>)) => TsTypes[type.GenericTypeArguments[0]].Value,
                             Type when type.IsEnum => ParseEnum(type),
-                            Type when type.IsClass || type.IsValueType => ParseType(type),
+                            Type when type.IsClass || type.IsValueType || type.IsInterface => ParseType(type),
                             _ => throw new NotSupportedException($"{type.FullName} is not supported."),
                         };
                     };
@@ -104,12 +110,12 @@ namespace TypeSharp
         }
         public Dictionary<FieldInfo, TsConst> TsConsts { get; private set; } = new Dictionary<FieldInfo, TsConst>();
 
-        public void WriteTo(string path, CompileOptions options = null) => File.WriteAllText(path, Compile(options));
+        public void WriteTo(string path, BuildOptions options = null) => File.WriteAllText(path, Compile(options));
 
-        public string Compile(CompileOptions options = null)
+        public string Compile(BuildOptions options = null)
         {
             var code = new StringBuilder();
-            code.AppendLine(Declare.Info);
+            code.AppendLine(BuildOptions.VersionDeclaring);
 
             #region Compile Types
             for (int skipCount = 0; skipCount < TsTypes.Count; skipCount++)
@@ -135,7 +141,7 @@ namespace TypeSharp
                             {
                                 var typeString = tsProperty.PropertyTypeDefinition ?? tsProperty.PropertyType.ReferenceName;
                                 typeString = typeString.RegexReplace(new Regex($@"(?<![\w\d\._]){tsNamespace}\."), "");
-                                code.AppendLine($"{" ".Repeat(8)}{tsProperty.PropertyName}{(tsProperty.Required ? "" : "?")}: {typeString};");
+                                code.AppendLine($"{" ".Repeat(8)}{tsProperty.Property}{(tsProperty.Required ? "" : "?")}: {typeString};");
                             }
                             code.AppendLine($"{" ".Repeat(4)}}}");
 
@@ -144,7 +150,7 @@ namespace TypeSharp
                                 code.AppendLine($"{" ".Repeat(4)}export const enum {tsType.PureName}_names {{");
                                 foreach (var tsProperty in tsType.TsProperties.Value)
                                 {
-                                    code.AppendLine($"{" ".Repeat(8)}{tsProperty.PropertyName} = '{tsProperty.ClrName}',");
+                                    code.AppendLine($"{" ".Repeat(8)}{tsProperty.Property} = '{tsProperty.ClrName}',");
                                 }
                                 code.AppendLine($"{" ".Repeat(4)}}}");
                             }
@@ -281,11 +287,19 @@ namespace TypeSharp
             }
         }
 
-        public void CacheTypes(params Type[] types) => types.Each(type => CacheType(type));
+        public void CacheTypes(params Type[] types) => types.Each(CacheType);
         public void CacheType<TType>() => CacheType(typeof(TType));
-        public void CacheType(Type type) => _ = TsTypes[type];
+        public void CacheType(Type type)
+        {
+            if (type is null) throw new ArgumentNullException(nameof(type));
+            _ = TsTypes[type];
+        }
 
-        public void AddDeclaredType(Type type, string typeName) => DeclaredTypes.Add(type, typeName);
+        public void AddDeclaredType(Type type, string typeName)
+        {
+            if (type is null) throw new ArgumentNullException(nameof(type));
+            DeclaredTypes.Add(type, typeName);
+        }
 
     }
 }

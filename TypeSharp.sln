@@ -29,6 +29,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeSharp.React", "TypeShar
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Obsolete", "Obsolete", "{D5F87DCC-C39F-4220-963B-198AE873BEA8}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeSharp20 - NotRelease", "TypeSharp20\TypeSharp20 - NotRelease.csproj", "{E1FF78CB-8EB3-4D1E-AF4D-4C166F5FAEEA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -123,6 +125,18 @@ Global
 		{0887D4A4-86C2-456D-8B7E-D569B4E63CF5}.Release|x64.Build.0 = Release|Any CPU
 		{0887D4A4-86C2-456D-8B7E-D569B4E63CF5}.Release|x86.ActiveCfg = Release|Any CPU
 		{0887D4A4-86C2-456D-8B7E-D569B4E63CF5}.Release|x86.Build.0 = Release|Any CPU
+		{E1FF78CB-8EB3-4D1E-AF4D-4C166F5FAEEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1FF78CB-8EB3-4D1E-AF4D-4C166F5FAEEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1FF78CB-8EB3-4D1E-AF4D-4C166F5FAEEA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E1FF78CB-8EB3-4D1E-AF4D-4C166F5FAEEA}.Debug|x64.Build.0 = Debug|Any CPU
+		{E1FF78CB-8EB3-4D1E-AF4D-4C166F5FAEEA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E1FF78CB-8EB3-4D1E-AF4D-4C166F5FAEEA}.Debug|x86.Build.0 = Debug|Any CPU
+		{E1FF78CB-8EB3-4D1E-AF4D-4C166F5FAEEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1FF78CB-8EB3-4D1E-AF4D-4C166F5FAEEA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1FF78CB-8EB3-4D1E-AF4D-4C166F5FAEEA}.Release|x64.ActiveCfg = Release|Any CPU
+		{E1FF78CB-8EB3-4D1E-AF4D-4C166F5FAEEA}.Release|x64.Build.0 = Release|Any CPU
+		{E1FF78CB-8EB3-4D1E-AF4D-4C166F5FAEEA}.Release|x86.ActiveCfg = Release|Any CPU
+		{E1FF78CB-8EB3-4D1E-AF4D-4C166F5FAEEA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

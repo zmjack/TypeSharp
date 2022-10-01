@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
@@ -24,36 +24,32 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="ValueTypeTest.ts">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <SubType>Code</SubType>
-    </None>
-    <None Update="DictionaryTest.ts">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <SubType>Code</SubType>
-    </None>
-    <None Update="ApiBuildTest.ts">
+    <None Update="~ApiTests\ApiTests.BuildTest.cs.ts">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="GenericTest1.ts">
+    <None Update="~ModelTests\ModelTests.DictionaryTest.cs.ts">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <SubType>Code</SubType>
     </None>
-    <None Update="JSendTest.ts">
+    <None Update="~ModelTests\ModelTests.GenericTest1.cs.ts">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <SubType>Code</SubType>
     </None>
-    <None Update="SuperTest.ts">
+    <None Update="~ModelTests\ModelTests.GenericTest2.cs.ts">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <SubType>Code</SubType>
     </None>
-    <None Update="SimpleTest.ts">
+    <None Update="~ModelTests\ModelTests.InterfaceTest.cs.ts">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <SubType>Code</SubType>
     </None>
-    <None Update="GenericTest2.ts">
+    <None Update="~ModelTests\ModelTests.JSendTest.cs.ts">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <SubType>Code</SubType>
+    </None>
+    <None Update="~ModelTests\ModelTests.SimpleTest.cs.ts">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="~ModelTests\ModelTests.SuperTest.cs.ts">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="~ModelTests\ModelTests.ValueTypeTest.cs.ts">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

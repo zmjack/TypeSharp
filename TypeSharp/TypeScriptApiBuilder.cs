@@ -12,15 +12,16 @@ namespace TypeSharp
 {
     public class TypeScriptApiBuilder
     {
+        private readonly Regex ControllerRegex = new(@"^(\w+?)(?:Controller)?$", RegexOptions.Singleline);
         private readonly TypeScriptModelBuilder ModelBuilder = new();
         private CacheSet<Type, TsType> TsTypes => ModelBuilder.TsTypes;
-        private readonly string RootUri;
-
         public HashSet<Type> TypeList = new();
 
-        public TypeScriptApiBuilder(string rootUri)
+        private readonly ApiBuilderOptions _options;
+
+        public TypeScriptApiBuilder(ApiBuilderOptions options = null)
         {
-            RootUri = rootUri;
+            _options = options ??= ApiBuilderOptions.Default;
         }
 
         public void WriteTo(string path, string tsPackageName = "type-sharp") => File.WriteAllText(path, Compile(tsPackageName));
@@ -29,7 +30,8 @@ namespace TypeSharp
         {
             var exports = new List<string>();
             var code = new StringBuilder();
-            code.AppendLine(Declare.Info);
+            code.AppendLine(BuildOptions.VersionDeclaring);
+            code.AppendLine();
             code.AppendLine($"import {{ ApiHelper }} from \"{tsPackageName}\";");
 
             var groups = TypeList.Select(type => TsTypes[type].Value).GroupBy(x => x.Namespace).ToArray();
@@ -39,7 +41,7 @@ namespace TypeSharp
                 var ns = group.Key;
                 foreach (var type in group)
                 {
-                    var typeName = GetTypeName(type.ClrType).ExtractFirst(new Regex(@"^(\w+?)(?:Controller)?$"), "$1Api");
+                    var typeName = GetTypeName(type.ClrType).ExtractFirst(ControllerRegex, "$1Api");
                     code.AppendLine($@"export class {typeName} {{");
                     code.AppendLine($@"    constructor(public api: ApiHelper = ApiHelper.default) {{ }}");
 
@@ -67,7 +69,7 @@ namespace TypeSharp
 
                         var returnTsType = TsTypes[returnClrType].Value;
                         var methodRouteTemplate = GetRouteTemplate(type.ClrType);
-                        var controller = type.ClrType.Name.ExtractFirst(new Regex(@"^(\w+?)(?:Controller)?$"));
+                        var controller = type.ClrType.Name.ExtractFirst(ControllerRegex);
                         var action = method.Name;
                         var verb = GetMethodVerbs(method) switch
                         {
@@ -81,10 +83,8 @@ namespace TypeSharp
                             _ => "get",
                         };
 
-                        var route = (methodRouteTemplate ?? classRouteTemplate)?
-                            .RegexReplace(new Regex(@"[\{\[]controller[\}\]]|[\{\[]controller\s*=[^\}\]]+[\}\]]"), controller)
-                            .RegexReplace(new Regex(@"[\{\[]action[\}\]]|[\{\[]action\s*=[^\}\]]+[\}\]]"), action)
-                            ?? $"{controller}/{action}";
+
+                        var routePattern = methodRouteTemplate ?? classRouteTemplate ?? _options.DefaultPattern;
                         var parameters = method.GetParameters();
                         var parametersDeclare = parameters.Select(x => $"{x.Name}: {TsTypes[x.ParameterType].Value.ReferenceName}").Join(", ");
 
@@ -92,8 +92,10 @@ namespace TypeSharp
                         var formParameters = parameters.Where(x => x.HasAttributeViaName("Microsoft.AspNetCore.Mvc.FromFormAttribute"));
                         var queryParameters = parameters.Except(bodyParameters).Except(formParameters);
                         var queryParametersDeclare = queryParameters.Any() ? $" {queryParameters.Select(x => x.Name).Join(", ")} " : "";
-                        var uri = $"{RootUri}/{route}";
-
+                        var uri = routePattern?
+                            .RegexReplace(new Regex(@"[\{\[]controller[\}\]]|[\{\[]controller\s*=[^\}\]]+[\}\]]"), controller)
+                            .RegexReplace(new Regex(@"[\{\[]action[\}\]]|[\{\[]action\s*=[^\}\]]+[\}\]]"), action)
+                            ?? $"{controller}/{action}";
 
                         var returnFileAttr = method.GetCustomAttributes().FirstOrDefault(x => x.GetType().FullName == typeof(ApiReturnFileAttribute).FullName);
                         if (returnFileAttr == null)
@@ -136,14 +138,14 @@ namespace TypeSharp
             return code.ToString();
         }
 
-        private string GetRouteTemplate(ICustomAttributeProvider provider)
+        private static string GetRouteTemplate(ICustomAttributeProvider provider)
         {
             var attr = provider.GetAttributeViaName("Microsoft.AspNetCore.Mvc.RouteAttribute");
             var template = attr?.GetReflector().DeclaredProperty<string>("Template")?.Value;
             return template;
         }
 
-        private string[] GetMethodVerbs(MethodInfo provider)
+        private static string[] GetMethodVerbs(MethodInfo provider)
         {
             var verbDefines = new[]
             {
@@ -161,7 +163,7 @@ namespace TypeSharp
             return verbs;
         }
 
-        private string GetTypeName(Type type)
+        private static string GetTypeName(Type type)
         {
             var attr = type.GetCustomAttribute<TypeScriptApiAttribute>();
             return attr?.TypeName ?? type.Name;

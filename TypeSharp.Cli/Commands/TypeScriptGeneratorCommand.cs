@@ -24,6 +24,9 @@ namespace TypeSharp.Cli
         [CmdProperty("names", Abbreviation = "n", Description = "Include original names of properties.")]
         public bool GenerateNames { get; set; } = false;
 
+        [CmdProperty("verbose", Abbreviation = "verb", Description = "Output more information for building.")]
+        public bool Verbose { get; set; } = false;
+
         public override void Run()
         {
             if (Container.ProjectInfo is null) throw new InvalidOperationException("No project information.");
@@ -49,7 +52,10 @@ namespace TypeSharp.Cli
                 outFile = Path.GetFullPath(Out);
             }
 
-            var builder = new TypeScriptModelBuilder();
+            var builder = new TypeScriptModelBuilder(new ModelBuilderOptions
+            {
+                Verbose = Verbose,
+            });
             var markAttr = assemblyContext.GetType($"{nameof(TypeSharp)}.{nameof(TypeScriptModelAttribute)},{nameof(TypeSharp)}");
             var modelTypes = assemblyContext.MainAssembly.GetTypesWhichMarkedAs(markAttr);
             builder.CacheTypes(modelTypes);
@@ -75,7 +81,7 @@ namespace TypeSharp.Cli
                 else throw new ArgumentException("Each parameter('Relative') must contain a semicolon(;).");
             }
 
-            builder.WriteTo(outFile, new CompileOptions
+            builder.WriteTo(outFile, new BuildOptions
             {
                 OutputNames = GenerateNames,
             });

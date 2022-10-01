@@ -1,6 +1,7 @@
 ﻿using NStandard;
 using NStandard.Caching;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -42,7 +43,17 @@ namespace TypeSharp
                     if (cacheProperties)
                     {
                         var chain = clrType.GetExtendChain();
-                        var props = clrType.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                        var props = clrType
+                            .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                            .Where(x => !x.GetCustomAttributes().Any(attr => attr.GetType().FullName == $"{nameof(TypeSharp)}.{nameof(TypeScriptIgnoreAttribute)}"))
+                            .GroupBy(x => x.Name)
+                            .Select(g =>
+                            {
+                                if (g.Skip(1).Any()) return g.OrderBy(x => chain.IndexOf(x.DeclaringType)).First();
+                                else return g.First();
+                            }).ToArray();
+                        var methods = clrType
+                            .GetMethods(BindingFlags.Instance | BindingFlags.Public)
                             .Where(x => !x.GetCustomAttributes().Any(attr => attr.GetType().FullName == $"{nameof(TypeSharp)}.{nameof(TypeScriptIgnoreAttribute)}"))
                             .GroupBy(x => x.Name)
                             .Select(g =>
@@ -51,56 +62,60 @@ namespace TypeSharp
                                 else return g.First();
                             }).ToArray();
 
+                        var list = new List<TsProperty>();
                         if (clrType.IsGenericType)
                         {
                             if (clrType.IsGenericTypeDefinition)
                             {
-                                return props.Select(prop =>
+                                foreach (var prop in props)
                                 {
                                     var propType = prop.PropertyType;
                                     var required = prop.HasAttributeViaName("System.ComponentModel.DataAnnotations.RequiredAttribute");
+
                                     if (propType.IsGenericParameter)
                                     {
-                                        return new TsProperty
+                                        list.Add(new TsProperty
                                         {
                                             ClrName = prop.Name,
-                                            PropertyName = StringEx.CamelCase(prop.Name),
+                                            Property = StringEx.CamelCase(prop.Name),
                                             PropertyTypeDefinition = propType.Name,
                                             Required = required,
-                                        };
+                                        });
                                     }
                                     else
                                     {
-                                        return new TsProperty
+                                        list.Add(new TsProperty
                                         {
                                             ClrName = prop.Name,
-                                            PropertyName = StringEx.CamelCase(prop.Name),
+                                            Property = StringEx.CamelCase(prop.Name),
                                             PropertyType = tsTypes[propType].Value,
                                             Required = required,
-                                        };
+                                        });
                                     }
-                                }).ToArray();
+                                }
                             }
-                            else return new TsProperty[0];
+                            else return Array.Empty<TsProperty>();
                         }
                         else
                         {
-                            return props.Select(prop =>
+                            foreach (var prop in props)
                             {
                                 var propType = prop.PropertyType;
                                 var required = prop.HasAttributeViaName("System.ComponentModel.DataAnnotations.RequiredAttribute");
 
-                                return new TsProperty
+                                list.Add(new TsProperty
                                 {
                                     ClrName = prop.Name,
-                                    PropertyName = StringEx.CamelCase(prop.Name),
+                                    Property = StringEx.CamelCase(prop.Name),
                                     PropertyType = tsTypes[propType].Value,
                                     Required = required,
-                                };
-                            }).ToArray();
+                                });
+                            }
                         }
+
+                        return list.ToArray();
                     }
-                    else return new TsProperty[0];
+                    else return Array.Empty<TsProperty>();
                 },
             };
         }
