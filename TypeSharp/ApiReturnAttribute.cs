@@ -4,11 +4,11 @@ namespace TypeSharp
 {
     public class ApiReturnAttribute : Attribute
     {
-        public Type ReturnType { get; set; }
+        public Type[] PossibleTypes { get; set; }
 
-        public ApiReturnAttribute(Type returnType)
+        public ApiReturnAttribute(params Type[] possibleTypes)
         {
-            ReturnType = returnType;
+            PossibleTypes = possibleTypes;
         }
     }
 

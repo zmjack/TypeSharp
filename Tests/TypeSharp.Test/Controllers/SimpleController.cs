@@ -46,5 +46,12 @@ namespace TypeSharp.Test.Controllers
             return NotFound();
         }
 
+        [HttpGet]
+        [ApiReturn(typeof(int), typeof(string), null)]
+        public IActionResult ReturnStringOrNumber()
+        {
+            return NotFound();
+        }
+
     }
 }

@@ -24,7 +24,37 @@ namespace TypeSharp
             _options = options ??= ApiBuilderOptions.Default;
         }
 
+        private class Verb
+        {
+            public string Name { get; set; }
+            public string Attribute { get; set; }
+
+            public Verb(string name, string attribute)
+            {
+                Name = name;
+                Attribute = attribute;
+            }
+        }
+
+        private static readonly Verb[] Verbs = new[]
+        {
+            new Verb("get", "Microsoft.AspNetCore.Mvc.HttpGetAttribute"),
+            new Verb("post", "Microsoft.AspNetCore.Mvc.HttpPostAttribute"),
+            new Verb("put", "Microsoft.AspNetCore.Mvc.HttpPutAttribute"),
+            new Verb("delete", "Microsoft.AspNetCore.Mvc.HttpDeleteAttribute"),
+            new Verb("options", "Microsoft.AspNetCore.Mvc.HttpOptionsAttribute"),
+            new Verb("head", "Microsoft.AspNetCore.Mvc.HttpHeadAttribute"),
+            new Verb("patch", "Microsoft.AspNetCore.Mvc.HttpPatchAttribute"),
+        };
+        private static Verb DefaultVerb => Verbs[0];
+
         public void WriteTo(string path, string tsPackageName = "type-sharp") => File.WriteAllText(path, Compile(tsPackageName));
+
+        private string GetTypeScriptTypeName(Type clrType)
+        {
+            if (clrType is null) return "null";
+            else return TsTypes[clrType].Value.ReferenceName;
+        }
 
         public string Compile(string tsPackageName = "type-sharp")
         {
@@ -49,40 +79,42 @@ namespace TypeSharp
                     var methods = type.ClrType.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
                     foreach (var method in methods)
                     {
-                        Type returnClrType;
+                        Type[] clrTypes;
 
-                        var returnAttr = method.GetCustomAttributes()
+                        var apiReturnAttr = method.GetCustomAttributes()
                             .FirstOrDefault(x => x.GetType().FullName == typeof(ApiReturnAttribute).FullName)?
                             .For(x =>
                             {
                                 var eobj = x.ToExpandoObject() as IDictionary<string, object>;
-                                return new ApiReturnAttribute(eobj[nameof(ApiReturnAttribute.ReturnType)] as Type);
+                                return new ApiReturnAttribute(eobj[nameof(ApiReturnAttribute.PossibleTypes)] as Type[]);
                             });
-                        if (returnAttr != null) returnClrType = returnAttr.ReturnType;
+
+                        if (apiReturnAttr is not null) clrTypes = apiReturnAttr.PossibleTypes;
                         else
                         {
                             var returnType = method.ReturnType;
                             if (returnType.FullName.StartsWith("Microsoft.AspNetCore.Mvc"))
-                                returnClrType = typeof(object);
-                            else returnClrType = returnType;
+                                clrTypes = new[] { typeof(object) };
+                            else clrTypes = new[] { returnType };
                         }
 
-                        var returnTsType = TsTypes[returnClrType].Value;
+                        var tsGenericTypeBuilder = new StringBuilder();
+                        var clrTypesEnumerator = clrTypes.AsEnumerable().GetEnumerator();
+                        if (clrTypesEnumerator.MoveNext())
+                        {
+                            tsGenericTypeBuilder.Append(GetTypeScriptTypeName(clrTypesEnumerator.Current));
+                            while (clrTypesEnumerator.MoveNext())
+                            {
+                                tsGenericTypeBuilder.Append($" | {GetTypeScriptTypeName(clrTypesEnumerator.Current)}");
+                            }
+                        }
+                        var returnTypeString = tsGenericTypeBuilder.ToString();
+
                         var methodRouteTemplate = GetRouteTemplate(type.ClrType);
                         var controller = type.ClrType.Name.ExtractFirst(ControllerRegex);
                         var action = method.Name;
-                        var verb = GetMethodVerbs(method) switch
-                        {
-                            string[] verbs when verbs.Contains("get") => "get",
-                            string[] verbs when verbs.Contains("post") => "post",
-                            string[] verbs when verbs.Contains("put") => "put",
-                            string[] verbs when verbs.Contains("delete") => "delete",
-                            string[] verbs when verbs.Contains("options") => "options",
-                            string[] verbs when verbs.Contains("head") => "head",
-                            string[] verbs when verbs.Contains("patch") => "patch",
-                            _ => "get",
-                        };
-
+                        var verbs = GetMethodVerbs(method);
+                        var verb = GetMethodVerbs(method).FirstOrDefault() ?? DefaultVerb;
 
                         var routePattern = methodRouteTemplate ?? classRouteTemplate ?? _options.DefaultPattern;
                         var parameters = method.GetParameters();
@@ -98,33 +130,34 @@ namespace TypeSharp
                             ?? $"{controller}/{action}";
 
                         var returnFileAttr = method.GetCustomAttributes().FirstOrDefault(x => x.GetType().FullName == typeof(ApiReturnFileAttribute).FullName);
+                        var verbName = verb.Name;
                         if (returnFileAttr == null)
                         {
-                            if (new[] { "post", "put", "patch" }.Contains(verb))
+                            if (verbName is "post" or "put" or "patch")
                             {
-                                code.AppendLine($"{" ".Repeat(4)}{StringEx.CamelCase(method.Name)}({parametersDeclare}): Promise<{returnTsType.ReferenceName}> {{" +
-                                    $" return this.api.{verb}('{uri}', {bodyParameters.FirstOrDefault()?.Name ?? "{}"}, {{{queryParametersDeclare}}});" +
+                                code.AppendLine($"{" ".Repeat(4)}{StringEx.CamelCase(method.Name)}({parametersDeclare}): Promise<{returnTypeString}> {{" +
+                                    $" return this.api.{verbName}('{uri}', {bodyParameters.FirstOrDefault()?.Name ?? "{}"}, {{{queryParametersDeclare}}});" +
                                     $" }}");
                             }
                             else
                             {
-                                code.AppendLine($"{" ".Repeat(4)}{StringEx.CamelCase(method.Name)}({parametersDeclare}): Promise<{returnTsType.ReferenceName}> {{" +
-                                    $" return this.api.{verb}('{uri}', {{{queryParametersDeclare}}});" +
+                                code.AppendLine($"{" ".Repeat(4)}{StringEx.CamelCase(method.Name)}({parametersDeclare}): Promise<{returnTypeString}> {{" +
+                                    $" return this.api.{verbName}('{uri}', {{{queryParametersDeclare}}});" +
                                     $" }}");
                             }
                         }
                         else
                         {
-                            if (new[] { "post" }.Contains(verb))
+                            if (verbName is "post")
                             {
                                 code.AppendLine($"{" ".Repeat(4)}{StringEx.CamelCase(method.Name)}({parametersDeclare}): Promise<void> {{" +
-                                    $" return this.api.{verb}_save('{uri}', {bodyParameters.FirstOrDefault()?.Name ?? "{}"}, {{{queryParametersDeclare}}});" +
+                                    $" return this.api.{verbName}_save('{uri}', {bodyParameters.FirstOrDefault()?.Name ?? "{}"}, {{{queryParametersDeclare}}});" +
                                     $" }}");
                             }
-                            else if (new[] { "get" }.Contains(verb))
+                            else if (verbName is "get")
                             {
                                 code.AppendLine($"{" ".Repeat(4)}{StringEx.CamelCase(method.Name)}({parametersDeclare}): Promise<void> {{" +
-                                    $" return this.api.{verb}_save('{uri}', {{{queryParametersDeclare}}});" +
+                                    $" return this.api.{verbName}_save('{uri}', {{{queryParametersDeclare}}});" +
                                     $" }}");
                             }
                             else throw new NotSupportedException($"Only GET and POST is supported with {nameof(ApiReturnFileAttribute)}.");
@@ -145,21 +178,10 @@ namespace TypeSharp
             return template;
         }
 
-        private static string[] GetMethodVerbs(MethodInfo provider)
+        private static Verb[] GetMethodVerbs(MethodInfo provider)
         {
-            var verbDefines = new[]
-            {
-                (Verb: "get", Attr: "Microsoft.AspNetCore.Mvc.HttpGetAttribute"),
-                (Verb: "post", Attr: "Microsoft.AspNetCore.Mvc.HttpPostAttribute"),
-                (Verb: "put", Attr: "Microsoft.AspNetCore.Mvc.HttpPutAttribute"),
-                (Verb: "delete", Attr: "Microsoft.AspNetCore.Mvc.HttpDeleteAttribute"),
-                (Verb: "options", Attr: "Microsoft.AspNetCore.Mvc.HttpOptionsAttribute"),
-                (Verb: "head", Attr: "Microsoft.AspNetCore.Mvc.HttpHeadAttribute"),
-                (Verb: "patch", Attr: "Microsoft.AspNetCore.Mvc.HttpPatchAttribute"),
-            };
-
             var attrs = provider.GetCustomAttributes();
-            var verbs = verbDefines.Where(define => attrs.Any(x => x.GetType().FullName == define.Attr)).Select(x => x.Verb).ToArray();
+            var verbs = Verbs.Where(verb => attrs.Any(x => x.GetType().FullName == verb.Attribute)).ToArray();
             return verbs;
         }
 
