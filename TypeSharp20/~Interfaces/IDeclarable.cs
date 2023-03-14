@@ -4,7 +4,8 @@ using System.Text;
 
 namespace TypeSharp
 {
-    public class TsFunction
+    public interface IDeclarable
     {
+        bool Declare { get; set; }
     }
 }

@@ -49,8 +49,8 @@ C# model to the TypeScript model compiler.
 
    ```C#
    var builder = new TypeScriptModelBuilder();
-   builder.CacheType<Cls>(new TypeScriptModelAttribute { Namespace = "App" });
-   var tscode = builderCompile();
+   builder.CacheType<Cls>();
+   var tscode = builder.Compile();
    ```
 
    If **TypeScriptModelAttribute** not set. the namespace is same as the class **Namespace**。

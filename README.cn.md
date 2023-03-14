@@ -49,8 +49,8 @@ C# 模型到 TypeScript 模型转换工具。
 
    ```C#
    var builder = new TypeScriptModelBuilder();
-   builder.CacheType<Cls>(new TypeScriptModelAttribute { Namespace = "App" });
-   var tscode = builderCompile();
+   builder.CacheType<Cls>();
+   var tscode = builder.Compile();
    ```
 
    **TypeScriptModelAttribute** 如果不指定 **Namespace**，则使用当前类所属 **Namespace**。

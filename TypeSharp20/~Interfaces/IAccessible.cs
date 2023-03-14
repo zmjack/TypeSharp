@@ -4,8 +4,8 @@ using System.Text;
 
 namespace TypeSharp
 {
-    public class TsClass : INameable
+    public interface IAccessible
     {
-        public string Name { get; set; }
+        Access Access { get; }
     }
 }

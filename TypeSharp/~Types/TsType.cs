@@ -4,7 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace TypeSharp
 {
@@ -30,6 +32,8 @@ namespace TypeSharp
         public bool Declare { get; set; }
 
         public string ReferenceName => Namespace is null ? TypeName : $"{Namespace}.{TypeName}";
+
+        public string[] PossibleValues { get; set; }
 
         public TsType(TypeScriptModelBuilder builder, Type clrType, bool cacheProperties)
         {
@@ -62,6 +66,39 @@ namespace TypeSharp
                                 else return g.First();
                             }).ToArray();
 
+                        static bool IsRequired(PropertyInfo property)
+                        {
+                            var attributes = property.GetCustomAttributes(true);
+                            var required = (
+                                from x in attributes
+                                let attributeType = x.GetType()
+                                where attributeType.FullName == "System.ComponentModel.DataAnnotations.RequiredAttribute"
+                                    || attributeType == typeof(TypeScriptRequiredAttribute)
+                                select x
+                            ).Any();
+                            return required;
+                        }
+
+                        //TODO: not supported.
+                        static string[] GetPossibleValues(PropertyInfo property)
+                        {
+                            var attributes = property.GetCustomAttributes(true);
+                            var possibleValuesList = (
+                                from x in attributes
+                                let attributeType = x.GetType()
+                                where attributeType == typeof(TypeScriptPossibleValuesAttribute)
+                                select (x as TypeScriptPossibleValuesAttribute).PossibleValues
+                            ).ToArray();
+
+                            var list = new List<string>();
+                            foreach (var possibleValue in Any.Flat<string>(possibleValuesList))
+                            {
+                                list.Add(possibleValue);
+                            }
+
+                            return list.ToArray();
+                        }
+
                         var list = new List<TsProperty>();
                         if (clrType.IsGenericType)
                         {
@@ -70,7 +107,7 @@ namespace TypeSharp
                                 foreach (var prop in props)
                                 {
                                     var propType = prop.PropertyType;
-                                    var required = prop.HasAttributeViaName("System.ComponentModel.DataAnnotations.RequiredAttribute");
+                                    var required = IsRequired(prop);
 
                                     if (propType.IsGenericParameter)
                                     {
@@ -101,7 +138,7 @@ namespace TypeSharp
                             foreach (var prop in props)
                             {
                                 var propType = prop.PropertyType;
-                                var required = prop.HasAttributeViaName("System.ComponentModel.DataAnnotations.RequiredAttribute");
+                                var required = IsRequired(prop);
 
                                 list.Add(new TsProperty
                                 {

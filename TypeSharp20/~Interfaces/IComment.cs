@@ -4,8 +4,8 @@ using System.Text;
 
 namespace TypeSharp
 {
-    public interface INameable
+    public interface IComment
     {
-        public string Name { get; set; }
+        string Comment { get; set; }
     }
 }

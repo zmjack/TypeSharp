@@ -40,7 +40,7 @@ namespace TypeSharp.Antd.Test
             {
                 Filters =
                 {
-                    [nameof(Model.Name)] = (e, values) => e.XWhere(h =>
+                    [nameof(Model.Name)] = (e, values) => e.Filter(h =>
                     {
                         return h.Or(values, v => x => x.Name.Contains(v));
                     }),

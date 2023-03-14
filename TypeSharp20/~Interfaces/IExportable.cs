@@ -4,7 +4,8 @@ using System.Text;
 
 namespace TypeSharp
 {
-    public class TsInterface
+    public interface IExportable
     {
+        bool Export { get; set; }
     }
 }
