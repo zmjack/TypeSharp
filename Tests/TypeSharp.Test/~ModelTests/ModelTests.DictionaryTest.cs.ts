@@ -1,9 +1,9 @@
 ﻿declare namespace TypeSharp.Test.Models {
     interface DictionaryClass {
-        dict1?: { [key: string | number]: number };
-        dict2?: { [key: string | number]: { [key: string | number]: number } };
-        dict3?: { [key: string | number]: SuperClass };
-        dict4?: { [key: string | number]: SpecialNsClass };
+        dict1?: { [key: string]: number };
+        dict2?: { [key: string]: { [key: string]: number } };
+        dict3?: { [key: string]: SuperClass };
+        dict4?: { [key: string]: SpecialNsClass };
     }
     interface SuperClass {
         nested?: SuperClass.NestedClass;

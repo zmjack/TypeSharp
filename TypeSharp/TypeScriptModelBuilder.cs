@@ -96,7 +96,7 @@ namespace TypeSharp
                                 var keyType = TsTypes[genericTypes[0]];
                                 var valueType = TsTypes[genericTypes[1]];
                                 //TODO: Type name need to be simplified.
-                                return new TsType(this, type, false) { TypeName = $"{{ [key: string | number]: {valueType.Value.ReferenceName} }}", Declare = true };
+                                return new TsType(this, type, false) { TypeName = $"{{ [key: string]: {valueType.Value.ReferenceName} }}", Declare = true };
                             }),
                             Type when type.IsType(typeof(IEnumerable<>)) || type.IsImplement(typeof(IEnumerable<>)) => ParseType(typeof(IEnumerable<>).MakeGenericType(type.GetGenericArguments()[0])),
                             Type when type.IsType(typeof(Nullable<>)) => TsTypes[type.GenericTypeArguments[0]].Value,
