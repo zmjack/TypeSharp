@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TypeSharp.Definitions
 {
-    public class ScriptUnionType : ScriptType
+    public record ScriptUnionType : ScriptType
     {
         public UnionOperator Operator { get; set; }
         public ScriptType Left { get; set; }

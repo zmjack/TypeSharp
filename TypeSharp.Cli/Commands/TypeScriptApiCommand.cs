@@ -32,9 +32,9 @@ namespace TypeSharp.Cli
 
         public override void Run()
         {
-            if (Container.ProjectInfo is null) throw new InvalidOperationException("No project information.");
+            if (Container.Project is null) throw new InvalidOperationException("No project information.");
 
-            var project = Container.ProjectInfo.Value;
+            var project = Container.Project.Value;
             var targetBinFolder = Path.GetFullPath($"{project.ProjectRoot}/bin/Debug/{project.TargetFramework}");
             var targetAssemblyName = project.AssemblyName;
             var assemblyContext = new AssemblyContext(DotNetFramework.Parse(project.TargetFramework), project.Sdk);
@@ -42,7 +42,7 @@ namespace TypeSharp.Cli
 
             string outFile;
             // if Directory
-            if (Directory.Exists(Out) || Path.GetExtension(Out) == "" || Out.Last().For(c => c == '/' || c == '\\'))
+            if (Directory.Exists(Out) || Path.GetExtension(Out) == "" || Out.Last().Pipe(c => c == '/' || c == '\\'))
             {
                 if (!Directory.Exists(Out)) Directory.CreateDirectory(Out);
                 outFile = Path.GetFullPath(Path.Combine(Out, $"{targetAssemblyName}.api.ts"));

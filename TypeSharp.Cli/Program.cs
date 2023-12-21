@@ -14,7 +14,7 @@ namespace TypeSharp.Cli
 
         static void Main(string[] args)
         {
-            CmdContainer = new("ts", ThisAssembly, ProjectInfo.GetFromDirectory(Directory.GetCurrentDirectory()));
+            CmdContainer = new("ts", ThisAssembly, Project.GetFromDirectory(Directory.GetCurrentDirectory()));
 
             PrintWelcome();
             CmdContainer.PrintProjectInfo();

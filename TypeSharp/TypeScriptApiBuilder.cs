@@ -36,8 +36,8 @@ namespace TypeSharp
             }
         }
 
-        private static readonly Verb[] Verbs = new[]
-        {
+        private static readonly Verb[] Verbs =
+        [
             new Verb("get", "Microsoft.AspNetCore.Mvc.HttpGetAttribute"),
             new Verb("post", "Microsoft.AspNetCore.Mvc.HttpPostAttribute"),
             new Verb("put", "Microsoft.AspNetCore.Mvc.HttpPutAttribute"),
@@ -45,7 +45,7 @@ namespace TypeSharp
             new Verb("options", "Microsoft.AspNetCore.Mvc.HttpOptionsAttribute"),
             new Verb("head", "Microsoft.AspNetCore.Mvc.HttpHeadAttribute"),
             new Verb("patch", "Microsoft.AspNetCore.Mvc.HttpPatchAttribute"),
-        };
+        ];
         private static Verb DefaultVerb => Verbs[0];
 
         public void WriteTo(string path, string tsPackageName = "type-sharp") => File.WriteAllText(path, Compile(tsPackageName));
@@ -83,7 +83,7 @@ namespace TypeSharp
 
                         var apiReturnAttr = method.GetCustomAttributes()
                             .FirstOrDefault(x => x.GetType().FullName == typeof(ApiReturnAttribute).FullName)?
-                            .For(x =>
+                            .Pipe(x =>
                             {
                                 var eobj = x.ToExpandoObject() as IDictionary<string, object>;
                                 return new ApiReturnAttribute(eobj[nameof(ApiReturnAttribute.PossibleTypes)] as Type[]);
@@ -94,8 +94,8 @@ namespace TypeSharp
                         {
                             var returnType = method.ReturnType;
                             if (returnType.FullName.StartsWith("Microsoft.AspNetCore.Mvc"))
-                                clrTypes = new[] { typeof(object) };
-                            else clrTypes = new[] { returnType };
+                                clrTypes = [typeof(object)];
+                            else clrTypes = [returnType];
                         }
 
                         var tsGenericTypeBuilder = new StringBuilder();

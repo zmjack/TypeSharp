@@ -13,7 +13,7 @@ namespace TypeSharp.Definitions
         public string Name { get; set; }
         public virtual QualifiedName FullName => QualifiedName.Combine(Namespace, Name);
 
-        public ScriptGeneric[] GenericArguments { get; set; } = Array.Empty<ScriptGeneric>();
+        public ScriptType[] GenericArguments { get; set; } = Array.Empty<ScriptType>();
         public string Body { get; set; }
 
         public ScriptFunction(string name, ScriptType @return, ScriptParameter[] parameters, string body) : base(@return, parameters)

@@ -21,20 +21,20 @@ namespace TypeSharp.Antd.Test
                 PageSize = 2,
                 FilteredValues =
                 {
-                    [nameof(Model.Name)] = new[] { "A" },
+                    [nameof(Model.Name)] = ["A"],
                 },
                 SortKey = nameof(Model.Age),
                 SortOrder = "descend",
             };
 
             Model[] source =
-            {
+            [
                 new Model { Name = "A1", Age = 18 },
                 new Model { Name = "A2", Age = 19 },
                 new Model { Name = "A3", Age = 20 },
                 new Model { Name = "B1", Age = 22 },
                 new Model { Name = "B2", Age = 23 },
-            };
+            ];
 
             var handler = new TableFetchHandlerE<Model>(fetchParams)
             {

@@ -6,7 +6,7 @@ using TypeSharp.Interfaces;
 
 namespace TypeSharp.Definitions
 {
-    public partial class ScriptClass
+    public partial record ScriptClass
     {
         public class Getter : Function, INameable, IAccessible, IEncodable
         {

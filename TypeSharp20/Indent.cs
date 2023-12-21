@@ -7,29 +7,29 @@ namespace TypeSharp
 {
     public struct Indent
     {
-        public static readonly Indent Zero = new();
+        private static readonly MemoryCache _cache = new(new MemoryCacheOptions());
 
-        public static int Unit { get; set; } = 4;
+        public static readonly Indent Zero = new(4, 0);
 
-        private static readonly MemoryCache cache = new(new MemoryCacheOptions());
-
+        public int Space { get; set; } = 4;
         public int Value { get; set; }
 
-        public Indent(int value)
+        public Indent(int space, int value)
         {
+            Space = space;
             Value = value;
         }
 
         public override string ToString()
         {
-            var value = Value;
-            return cache.GetOrCreate(value, entry =>
+            var indent = Space * Value;
+            return _cache.GetOrCreate(indent, entry =>
             {
-                return " ".Repeat(value);
+                return " ".Repeat(indent);
             });
         }
 
-        public Indent Tab() => new(Value + Unit);
+        public Indent Tab() => new(Space, Value + 1);
 
     }
 }

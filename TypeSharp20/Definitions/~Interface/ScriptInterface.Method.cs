@@ -6,7 +6,7 @@ using TypeSharp.Interfaces;
 
 namespace TypeSharp.Definitions
 {
-    public partial class ScriptInterface
+    public partial record ScriptInterface
     {
         public class Method : ScriptMethod, IAccessible, INameable
         {

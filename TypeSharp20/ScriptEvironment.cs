@@ -5,8 +5,8 @@ using TypeSharp.Definitions;
 
 namespace TypeSharp
 {
-    public interface IGenericGenerable
+    public static class ScriptEnvironment
     {
-        ScriptType[] GenericArguments { get; set; }
+        public static readonly ScriptClass Global = new("global");
     }
 }

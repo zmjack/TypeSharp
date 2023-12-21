@@ -8,14 +8,14 @@ using TypeSharp.Interfaces;
 
 namespace TypeSharp.Definitions
 {
-    public partial class ScriptClass : IDeclarable, INameable, IGenericGenerable, IEncodable
+    public partial record ScriptClass : IDeclarable, INameable, IGenericGenerable, IEncodable
     {
+        public bool Declare { get; set; }
+
         public string Namespace { get; set; }
         public string Name { get; set; }
         public QualifiedName FullName => QualifiedName.Combine(Namespace, Name);
-        public ScriptGeneric[] GenericArguments { get; set; } = Array.Empty<ScriptGeneric>();
-
-        public bool Declare { get; set; }
+        public ScriptType[] GenericArguments { get; set; } = Array.Empty<ScriptType>();
 
         public ScriptClass InheritedClass { get; set; }
         public ScriptType[] ImplementedTypes { get; set; } = Array.Empty<ScriptType>();

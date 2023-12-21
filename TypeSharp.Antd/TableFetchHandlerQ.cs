@@ -1,5 +1,4 @@
 ﻿using LinqSharp;
-using LinqSharp.Pages;
 using NStandard;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +16,7 @@ namespace TypeSharp.Antd
             FetchParams = fetchParams;
         }
 
-        public PagedQueryable<TSource> Handle(IQueryable<TSource> source)
+        public IQueryablePage<TSource> Handle(IQueryable<TSource> source)
         {
             if (Filters != null)
             {
@@ -34,7 +33,7 @@ namespace TypeSharp.Antd
                     source = Orders[FetchParams.SortKey](new OrderHandlerQ<TSource>(source, FetchParams.ESortOrder));
             }
 
-            return source.SelectPage(FetchParams.Page.For(x => x < 1 ? 1 : x), FetchParams.PageSize.For(x => x < 1 ? 20 : x));
+            return source.Page(FetchParams.Page.Pipe(x => x < 1 ? 1 : x), FetchParams.PageSize.Pipe(x => x < 1 ? 20 : x));
         }
     }
 

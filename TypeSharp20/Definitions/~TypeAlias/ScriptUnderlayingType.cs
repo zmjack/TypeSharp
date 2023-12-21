@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TypeSharp.Definitions
 {
-    public enum ScriptTypeType
+    public enum ScriptUnderlayingType
     {
         None = 0,
 

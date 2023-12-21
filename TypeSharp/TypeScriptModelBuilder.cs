@@ -216,7 +216,7 @@ namespace TypeSharp
                     InnerNamespace = type.Name,
                     ConstName = field.Name,
                     ConstType = TsTypes[field.FieldType].Value,
-                    ConstValue = field.GetValue(null).For(v => v is string ? $"'{v}'" : v.ToString()),
+                    ConstValue = field.GetValue(null).Pipe(v => v is string ? $"'{v}'" : v.ToString()),
                 };
             }
         }
@@ -230,7 +230,7 @@ namespace TypeSharp
                 TsEnumValues = Enum.GetNames(type).Select(name => new TsEnumValue
                 {
                     Name = name,
-                    Value = (int)Enum.Parse(type, name),
+                    Value = (long)Convert.ChangeType(Enum.Parse(type, name), typeof(long)),
                 }).ToArray(),
             };
         }

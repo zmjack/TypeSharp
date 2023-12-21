@@ -6,7 +6,7 @@ using TypeSharp.Interfaces;
 
 namespace TypeSharp.Definitions
 {
-    public partial class ScriptInterface : IEncodable
+    public partial record ScriptInterface : IEncodable
     {
         public class Property : INameable
         {
