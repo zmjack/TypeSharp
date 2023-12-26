@@ -98,7 +98,8 @@ namespace TypeSharp
                                 //TODO: Type name need to be simplified.
                                 return new TsType(this, type, false) { TypeName = $"{{ [key: string]: {valueType.Value.ReferenceName} }}", Declare = true };
                             }),
-                            Type when type.IsType(typeof(IEnumerable<>)) || type.IsImplement(typeof(IEnumerable<>)) => ParseType(typeof(IEnumerable<>).MakeGenericType(type.GetGenericArguments()[0])),
+                            Type when type.IsType(typeof(IEnumerable<>)) => ParseType(typeof(IEnumerable<>).MakeGenericType(type.GetGenericArguments()[0])),
+                            Type when type.IsImplement(typeof(IEnumerable<>)) => ParseType(typeof(IEnumerable<>).MakeGenericType(type.GetInterface(typeof(IEnumerable<>).Name)).GetGenericArguments()[0]),
                             Type when type.IsType(typeof(Nullable<>)) => TsTypes[type.GenericTypeArguments[0]].Value,
                             Type when type.IsEnum => ParseEnum(type),
                             Type when type.IsClass || type.IsValueType || type.IsInterface => ParseType(type),
