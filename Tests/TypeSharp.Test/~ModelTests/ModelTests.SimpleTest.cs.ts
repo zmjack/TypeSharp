@@ -14,7 +14,7 @@
         dateTimeOffset?: Date;
     }
 }
-declare namespace Ajax {
+declare namespace fe {
     interface JSend {
         status?: string;
         data?: any;
@@ -48,7 +48,7 @@ namespace TSNS1 {
         export const CONST_INTEGER: number = 2147483647;
     }
 }
-namespace Ajax {
+namespace fe {
     export namespace JSend {
         export const Status_Success: string = 'success';
         export const Status_Fail: string = 'fail';
