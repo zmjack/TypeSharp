@@ -17,7 +17,7 @@ namespace TypeSharp.Test
             var types = Assembly.GetExecutingAssembly().GetTypesWhichMarkedAs<TypeScriptModelAttribute>();
             var builder = new TypeScriptModelBuilder();
             builder.CacheType<RootClass>();
-            builder.CacheType<JSend>();
+            builder.CacheType<JSend>("fe");
 
             var tscode = builder.Compile();
             TestUtil.Assert(tscode, nameof(ModelTests), nameof(SimpleTest));

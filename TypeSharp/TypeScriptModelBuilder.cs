@@ -13,7 +13,8 @@ namespace TypeSharp
     public class TypeScriptModelBuilder
     {
         public CacheSet<Type, TsType> TsTypes { get; private set; }
-        public Dictionary<Type, string> DeclaredTypes { get; private set; } = new Dictionary<Type, string>();
+        public Dictionary<Type, string> DeclaredTypes { get; private set; } = [];
+        public Dictionary<Type, string> Namespaces { get; private set; } = [];
 
         private readonly ModelBuilderOptions _options;
         public TypeScriptModelBuilder(ModelBuilderOptions options = null)
@@ -196,6 +197,8 @@ namespace TypeSharp
 
         private string GetTsNamespace(Type type)
         {
+            if (Namespaces.ContainsKey(type)) return Namespaces[type];
+
             var attr = type.GetCustomAttribute<TypeScriptModelAttribute>();
             if (attr?.Namespace is null)
             {
@@ -289,11 +292,17 @@ namespace TypeSharp
         }
 
         public void CacheTypes(params Type[] types) => types.Each(CacheType);
-        public void CacheType<TType>() => CacheType(typeof(TType));
+        public void CacheType<T>() => CacheType(typeof(T));
+        public void CacheType<T>(string @namespace) => CacheType(typeof(T), @namespace);
         public void CacheType(Type type)
         {
             if (type is null) throw new ArgumentNullException(nameof(type));
             _ = TsTypes[type];
+        }
+        public void CacheType(Type type, string @namespace)
+        {
+            Namespaces[type] = @namespace;
+            CacheType(type);
         }
 
         public void AddDeclaredType(Type type, string typeName)
