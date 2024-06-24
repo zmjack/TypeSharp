@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using NStandard;
 using System;
 using System.Diagnostics;
+using System.Text;
 using TypeSharp.npm.Models;
 
 namespace TypeSharp.npm.Controllers
@@ -32,7 +33,7 @@ namespace TypeSharp.npm.Controllers
         public string GetContent500() => throw new Exception();
 
         [ApiReturnFile]
-        public IActionResult GetFile() => File("File Content".Bytes(), "text/plain");
+        public IActionResult GetFile() => File("File Content".Pipe(Encoding.UTF8.GetBytes), "text/plain");
 
         [ApiReturnFile]
         public IActionResult GetFile404() => NotFound();

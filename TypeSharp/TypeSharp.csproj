@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net6.0;net7.0</TargetFrameworks>
-    <Version>1.5.6</Version>
+    <Version>1.6.0</Version>
     <Authors>zmjack</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <Description>C# model to the TypeScript model compiler.</Description>
-    <Copyright>Copyright © nstandard.net 2018-2022</Copyright>
+    <Copyright>Copyright © nstandard.net 2018</Copyright>
     <RepositoryUrl>https://github.com/zmjack/TypeSharp</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/zmjack/TypeSharp</PackageProjectUrl>
@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NStandard" Version="0.56.0" />
+    <PackageReference Include="NStandard" Version="0.70.0" />
   </ItemGroup>
 
 </Project>
