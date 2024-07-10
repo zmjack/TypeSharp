@@ -19,7 +19,7 @@
     <Copyright>Copyright © nstandard.net 2019</Copyright>
     <PackageProjectUrl>https://github.com/zmjack/TypeSharp</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>
-    <Version>7.0.6</Version>
+    <Version>7.0.7</Version>
     <PackageLicenseUrl></PackageLicenseUrl>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
     <PackageType>DotnetCliTool</PackageType>
@@ -41,8 +41,8 @@
 
   <ItemGroup>
     <PackageReference Include="DotNetCli" Version="0.3.2" />
-    <PackageReference Include="NStandard" Version="0.70.0" />
-    <PackageReference Include="NStandard.Runtime" Version="0.22.0" />
+    <PackageReference Include="NStandard" Version="0.74.0" />
+    <PackageReference Include="NStandard.Runtime" Version="1.8.0" />
   </ItemGroup>
 
   <ItemGroup>
