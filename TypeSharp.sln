@@ -29,7 +29,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeSharp.React", "TypeShar
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Obsolete", "Obsolete", "{D5F87DCC-C39F-4220-963B-198AE873BEA8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeSharp20 - NotRelease", "TypeSharp20\TypeSharp20 - NotRelease.csproj", "{E1FF78CB-8EB3-4D1E-AF4D-4C166F5FAEEA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeSharp20", "TypeSharp20\TypeSharp20.csproj", "{E1FF78CB-8EB3-4D1E-AF4D-4C166F5FAEEA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeSharp20.Test", "TypeSharp20.Test\TypeSharp20.Test.csproj", "{357F0967-6AC9-482C-804A-4B64285157E7}"
 EndProject

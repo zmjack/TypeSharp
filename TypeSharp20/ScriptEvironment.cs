@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TypeSharp.Definitions;
+﻿using TypeSharp.Infrastructures;
 
-namespace TypeSharp
+namespace TypeSharp;
+
+public static class ScriptEnvironment
 {
-    public static class ScriptEnvironment
-    {
-        public static readonly ScriptClass Global = new("global");
-    }
+    public static readonly ScriptClass Global = new("global");
 }
