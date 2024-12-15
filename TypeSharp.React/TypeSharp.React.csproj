@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-TypeSharp.React-02E31D21-2A1C-41E1-BCDF-3B06B3C77592</UserSecretsId>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+    <Configurations>Debug;Release;DebugAnalyzer</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

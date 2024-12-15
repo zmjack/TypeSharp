@@ -13,6 +13,7 @@
     <RepositoryUrl>https://github.com/zmjack/TypeSharp</RepositoryUrl>
     <PackageTags>TypeSharp</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Configurations>Debug;Release;DebugAnalyzer</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

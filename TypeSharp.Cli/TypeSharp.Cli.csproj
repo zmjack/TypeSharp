@@ -5,6 +5,7 @@
     <SccProvider>SAK</SccProvider>
     <SccAuxPath>SAK</SccAuxPath>
     <SccLocalPath>SAK</SccLocalPath>
+    <Configurations>Debug;Release;DebugAnalyzer</Configurations>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -36,6 +37,11 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile></DocumentationFile>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugAnalyzer|AnyCPU'">
+    <DocumentationFile />
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
 

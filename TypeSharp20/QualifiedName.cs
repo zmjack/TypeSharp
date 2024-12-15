@@ -23,7 +23,7 @@ public struct QualifiedName
         Value = sb.ToString();
     }
 
-    public string GetSimplifiedName(string ownerPrefix)
+    public string GetSimplifiedName(string? ownerPrefix)
     {
         var fullName = Value;
         if (ownerPrefix is null) return fullName;
@@ -41,5 +41,10 @@ public struct QualifiedName
     public override string ToString()
     {
         return Value;
+    }
+
+    public static implicit operator string(QualifiedName name)
+    {
+        return name.Value;
     }
 }

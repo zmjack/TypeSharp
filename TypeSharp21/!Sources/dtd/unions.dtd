@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!ELEMENT keyword EMPTY>
+<!ATTLIST keyword
+  name CDATA #REQUIRED
+  >
+
+<!ELEMENT class EMPTY>
+<!ATTLIST class
+  name CDATA #REQUIRED
+  >
+
+<!ELEMENT interface EMPTY>
+<!ATTLIST interface
+  name CDATA #REQUIRED
+  >
+
+<!ELEMENT type EMPTY>
+<!ATTLIST type
+  name CDATA #REQUIRED
+  >
+
+<!ELEMENT union ((keyword|class|interface|type)*)>
+<!ATTLIST union
+  type CDATA #REQUIRED
+  >
+
+<!ELEMENT typedef ((keyword|class|interface)*)>
+<!ATTLIST typedef
+  name CDATA #REQUIRED
+  >
+
+<!ELEMENT unions (typedef*,union*)>

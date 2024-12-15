@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using TypeSharp.Test.Models;
 
 namespace TypeSharp.Test.Models
 {

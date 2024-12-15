@@ -14,6 +14,7 @@
     <PackageIcon>typesharp.png</PackageIcon>
     <PackageId>TypeSharp</PackageId>
     <LangVersion>preview</LangVersion>
+    <Configurations>Debug;Release;DebugAnalyzer</Configurations>
   </PropertyGroup>
 
   <ItemGroup>

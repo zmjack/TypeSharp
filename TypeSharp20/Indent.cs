@@ -11,6 +11,11 @@ public struct Indent
     public int Space { get; set; } = 4;
     public int Value { get; set; }
 
+    public Indent(int space)
+    {
+        Space = space;
+    }
+
     public Indent(int space, int value)
     {
         Space = space;
@@ -23,7 +28,7 @@ public struct Indent
         return _cache.GetOrCreate(indent, entry =>
         {
             return " ".Repeat(indent);
-        });
+        })!;
     }
 
     public Indent Tab() => new(Space, Value + 1);

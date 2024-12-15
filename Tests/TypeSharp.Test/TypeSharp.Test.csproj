@@ -4,6 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <LangVersion>preview</LangVersion>
+    <Configurations>Debug;Release;DebugAnalyzer</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,31 +25,31 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="~ApiTests\ApiTests.BuildTest.cs.ts">
+    <None Update="BuildTest.cs.ts">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="~ModelTests\ModelTests.DictionaryTest.cs.ts">
+    <None Update="DictionaryTest.cs.ts">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="~ModelTests\ModelTests.GenericTest1.cs.ts">
+    <None Update="GenericTest1.cs.ts">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="~ModelTests\ModelTests.GenericTest2.cs.ts">
+    <None Update="GenericTest2.cs.ts">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="~ModelTests\ModelTests.InterfaceTest.cs.ts">
+    <None Update="InterfaceTest.cs.ts">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="~ModelTests\ModelTests.JSendTest.cs.ts">
+    <None Update="JSendTest.cs.ts">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="~ModelTests\ModelTests.SimpleTest.cs.ts">
+    <None Update="SimpleTest.cs.ts">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="~ModelTests\ModelTests.SuperTest.cs.ts">
+    <None Update="SuperTest.cs.ts">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="~ModelTests\ModelTests.ValueTypeTest.cs.ts">
+    <None Update="ValueTypeTest.cs.ts">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

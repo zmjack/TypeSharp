@@ -2,5 +2,5 @@
 
 public interface IEncodable
 {
-    string Encode(Indent indent, string ownerPrefix);
+    string Encode(Indent indent, string? ownerPrefix);
 }

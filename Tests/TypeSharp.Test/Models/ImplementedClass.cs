@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using TypeSharp.Test.Models.Interfaces;
 
 namespace TypeSharp.Test.Models

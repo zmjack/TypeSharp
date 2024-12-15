@@ -1,2 +1,2 @@
-﻿global using System.Linq;
-global using NStandard;
+﻿global using NStandard;
+global using System.Linq;

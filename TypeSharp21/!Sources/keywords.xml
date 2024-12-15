@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE keywords SYSTEM "dtd/keywords.dtd">
+
+<keywords>
+  <!-- builtin types -->
+  <keyword name="undefined" />
+  <keyword name="any" />
+  <keyword name="never" />
+  <keyword name="void" />
+  <keyword name="unknown" />
+  <keyword name="symbol" />
+
+  <!-- basic types -->
+  <keyword name="null" />
+  <keyword name="number" />
+  <keyword name="string" />
+  <keyword name="boolean" />
+
+  <!-- boolean -->
+  <keyword name="true" />
+  <keyword name="false" />
+  
+  <!-- modifiers -->
+  <keyword name="export" />
+  <keyword name="public" />
+  <keyword name="protected" />
+  <keyword name="private" />
+  <keyword name="declare" />
+</keywords>

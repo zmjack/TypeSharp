@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE unions SYSTEM "dtd/unions.dtd">
+
+<unions>
+  <!-- typedef -->
+  <typedef name="literal">
+    <keyword name="null" />
+    <class name="NumericLiteral" />
+    <class name="StringLiteral" />
+  </typedef>
+
+  <typedef name="general">
+    <keyword name="undefined" />
+    <keyword name="any" />
+    <keyword name="never" />
+    <keyword name="void" />
+    <keyword name="string" />
+    <keyword name="number" />
+    <keyword name="boolean" />
+    <class name="LiteralType" />
+    <class name="UnionType" />
+    <class name="IntersectionType" />
+    <class name="ParenthesizedType" />
+    <class name="TypeReference" />
+  </typedef>
+  <!-- /typedef -->
+
+  <union type="IGeneralType">
+    <type name="general" />
+  </union>
+
+  <!-- basic type -->
+  <union type="LiteralType.ILiteral">
+    <type name="literal" />
+  </union>
+
+  <!-- recombination type -->
+  <union type="UnionType.IType">
+    <keyword name="undefined" />
+    <keyword name="any" />
+    <keyword name="never" />
+    <keyword name="void" />
+    <class name="LiteralType" />
+    <class name="IntersectionType" />
+    <class name="ParenthesizedType" />
+    <class name="TypeReference" />
+  </union>
+
+  <union type="IntersectionType.IType">
+    <keyword name="undefined" />
+    <keyword name="any" />
+    <keyword name="never" />
+    <keyword name="void" />
+    <class name="LiteralType" />
+    <class name="ParenthesizedType" />
+    <class name="TypeReference" />
+  </union>
+
+  <!-- statement -->
+  <union type="IStatement">
+    <class name="Block" />
+    <class name="VariableStatement" />
+    <class name="InterfaceDeclaration" />
+  </union>
+
+  <!-- namespace -->
+  <union type="ModuleDeclaration.IModifier">
+    <keyword name="declare" />
+  </union>
+
+  <!-- variable -->
+  <union type="VariableDeclaration.IInitializer">
+    <type name="literal" />
+  </union>
+
+  <!-- getter -->
+  <union type="GetAccessor.IModifier">
+    <keyword name="public" />
+    <keyword name="protected" />
+    <keyword name="private" />
+  </union>
+
+  <!-- setter -->
+  <union type="SetAccessor.IModifier">
+    <keyword name="public" />
+    <keyword name="protected" />
+    <keyword name="private" />
+  </union>
+
+  <!-- interface -->
+  <union type="InterfaceDeclaration.IMember">
+    <class name="PropertySignature" />
+    <class name="GetAccessor" />
+    <class name="SetAccessor" />
+  </union>
+</unions>
