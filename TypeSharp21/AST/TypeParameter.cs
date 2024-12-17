@@ -1,4 +1,4 @@
-﻿namespace TypeSharp21.AST;
+﻿namespace TypeSharp.AST;
 
 public partial class TypeParameter : INode
 {
@@ -12,7 +12,7 @@ public partial class TypeParameter : INode
     public Identifier Name { get; set; }
     public IGeneralType? Constraint { get; set; }
 
-    public string GetText()
+    public string GetText(Indent indent = default)
     {
         if (Constraint is not null)
         {

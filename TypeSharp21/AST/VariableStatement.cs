@@ -1,4 +1,4 @@
-﻿namespace TypeSharp21.AST;
+﻿namespace TypeSharp.AST;
 
 public partial class VariableStatement : INode
 {
@@ -6,7 +6,7 @@ public partial class VariableStatement : INode
 
     public required VariableDeclarationList DeclarationList { get; set; }
 
-    public string GetText()
+    public string GetText(Indent indent = default)
     {
         return DeclarationList.GetText();
     }

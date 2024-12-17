@@ -1,9 +1,9 @@
 using NStandard;
-using TypeSharp21.AST;
+using TypeSharp.AST;
 
-namespace TypeSharp21.Test;
+namespace TypeSharp.Test;
 
-public class UnitTest1
+public class SourceFileTests
 {
     [Fact]
     public void Test1()
@@ -100,6 +100,58 @@ public class UnitTest1
                 name: T;
                 get age(): number;
                 set age(n: number);
+            }
+            """,
+            code
+        );
+    }
+
+    [Fact]
+    public void ClassTest()
+    {
+        var source = new SourceFile
+        {
+            Statements =
+            [
+                new ClassDeclaration("SimpleApi")
+                {
+                    Members =
+                    [
+                        new Constructor(
+                        [
+                            new Parameter("api", StringKeyword.Default),
+                        ])
+                        {
+                            Body = new(),
+                        },
+                        new MethodDeclaration("getUser",
+                        [
+                            new Parameter("group", StringKeyword.Default),
+                        ], StringKeyword.Default)
+                        {
+                            Body = new Block()
+                            {
+                                Statements =
+                                [
+                                    new ReturnStatement(new StringLiteral("123")),
+                                ],
+                            },
+                        }
+                    ],
+                }
+            ]
+        };
+
+        var code = source.GetText();
+        Assert.Equal(
+            """
+            class SimpleApi {
+                constructor(api: string)     {
+
+                }
+                getUser(group: string): string     {
+                    return "123";
+                }
             }
             """,
             code

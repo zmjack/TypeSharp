@@ -26,4 +26,5 @@
   <keyword name="protected" />
   <keyword name="private" />
   <keyword name="declare" />
+  <keyword name="async" />
 </keywords>

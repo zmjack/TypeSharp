@@ -18,7 +18,7 @@ public class UnionGenerator : ISourceGenerator
         var keywords = XmlUtil.GetKeywords(context);
         var unions = XmlUtil.GetUnions(context);
 
-        var indent = new Indent();
+        var indent = new Indent(0, 4);
         var codeBuilder = new StringBuilder();
         foreach (var union in unions)
         {

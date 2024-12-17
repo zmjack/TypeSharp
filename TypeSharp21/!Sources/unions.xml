@@ -22,11 +22,29 @@
     <class name="IntersectionType" />
     <class name="ParenthesizedType" />
     <class name="TypeReference" />
+    <class name="TypeLiteral" />
   </typedef>
   <!-- /typedef -->
 
+  <!-- common -->
   <union type="IGeneralType">
     <type name="general" />
+  </union>
+
+  <!-- statement -->
+  <union type="IStatement">
+    <class name="Block" />
+    <class name="VariableStatement" />
+    <class name="ReturnStatement" />
+    <class name="ModuleDeclaration" />
+    <class name="InterfaceDeclaration" />
+    <class name="ClassDeclaration" />
+    <class name="RawText" />
+  </union>
+
+  <union type="IExpression">
+    <type name="literal" />
+    <class name="CallExpression" />
   </union>
 
   <!-- basic type -->
@@ -54,13 +72,6 @@
     <class name="LiteralType" />
     <class name="ParenthesizedType" />
     <class name="TypeReference" />
-  </union>
-
-  <!-- statement -->
-  <union type="IStatement">
-    <class name="Block" />
-    <class name="VariableStatement" />
-    <class name="InterfaceDeclaration" />
   </union>
 
   <!-- namespace -->
@@ -93,4 +104,26 @@
     <class name="GetAccessor" />
     <class name="SetAccessor" />
   </union>
+
+  <!-- class -->
+  <union type="ClassDeclaration.IModifier">
+    <keyword name="export" />
+  </union>
+  <union type="ClassDeclaration.IMember">
+    <class name="Constructor" />
+    <class name="MethodDeclaration" />
+  </union>
+
+  <union type="MethodDeclaration.IModifier">
+    <keyword name="public" />
+    <keyword name="protected" />
+    <keyword name="private" />
+    <keyword name="async" />
+  </union>
+
+  <!-- type -->
+  <union type="TypeLiteral.IMember">
+    <class name="PropertySignature" />
+  </union>
+
 </unions>

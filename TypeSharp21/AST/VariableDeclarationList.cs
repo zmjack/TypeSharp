@@ -1,13 +1,13 @@
-﻿namespace TypeSharp21.AST;
+﻿namespace TypeSharp.AST;
 
 public class VariableDeclarationList : INode
 {
     public SyntaxKind Kind => SyntaxKind.VariableDeclarationList;
 
     public SyntaxFlags Flags { get; set; }
-    public List<VariableDeclaration> Declarations { get; set; } = [];
+    public VariableDeclaration[]? Declarations { get; set; }
 
-    public string GetText()
+    public string GetText(Indent indent = default)
     {
         var flag = Flags switch
         {
@@ -16,6 +16,6 @@ public class VariableDeclarationList : INode
             SyntaxFlags.Const => "const",
             _ => throw new NotImplementedException(),
         };
-        return $"{flag} {string.Join(", ", from d in Declarations select d.GetText())};";
+        return $"{flag} {string.Join(", ", from d in Declarations ?? [] select d.GetText())};";
     }
 }

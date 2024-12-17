@@ -19,7 +19,7 @@ public class KeywordGenerator : ISourceGenerator
         foreach (var keyword in keywords)
         {
             var codeBuilder = new StringBuilder();
-            typeWriter.WriteNamespaces(codeBuilder, new Indent(), Config.RootNamespace.Split('.'), indent =>
+            typeWriter.WriteNamespaces(codeBuilder, new Indent(0, 4), Config.RootNamespace.Split('.'), indent =>
             {
                 codeBuilder.AppendLine(
                     $"""
@@ -29,7 +29,7 @@ public class KeywordGenerator : ISourceGenerator
                     {indent}
                     {indent}    public SyntaxKind Kind => SyntaxKind.{keyword.ClassName};
                     {indent}
-                    {indent}    public string GetText()
+                    {indent}    public string GetText(Indent indent = default)
                     {indent}    {"{"}
                     {indent}        return "{keyword.Name}";
                     {indent}    {"}"}

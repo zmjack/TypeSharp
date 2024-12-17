@@ -1,4 +1,4 @@
-﻿namespace TypeSharp21.AST;
+﻿namespace TypeSharp.AST;
 
 public class ModuleBlock : INode
 {
@@ -6,11 +6,13 @@ public class ModuleBlock : INode
 
     public INode[]? Statements { get; set; }
 
-    public string GetText()
+    public string GetText(Indent indent = default)
     {
         return
-            $"""
-            {string.Join("\r\n", from s in Statements ?? [] select $"{new Indent(1)}{s.GetText()}")}
+            $"""            
+            {"{"}
+            {indent + 1}{string.Join($"\r\n{indent + 1}", from s in Statements ?? [] select s.GetText(indent + 1))}
+            {indent}{"}"}
             """;
     }
 }

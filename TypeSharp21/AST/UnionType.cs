@@ -1,4 +1,4 @@
-﻿namespace TypeSharp21.AST;
+﻿namespace TypeSharp.AST;
 
 public partial class UnionType : INode
 {
@@ -11,7 +11,7 @@ public partial class UnionType : INode
 
     public IType[] Types { get; set; }
 
-    public string GetText()
+    public string GetText(Indent indent = default)
     {
         return string.Join(" & ", from x in Types select x.GetText());
     }

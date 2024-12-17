@@ -1,4 +1,4 @@
-﻿namespace TypeSharp21.AST;
+﻿namespace TypeSharp.AST;
 
 [Flags]
 public enum SyntaxFlags

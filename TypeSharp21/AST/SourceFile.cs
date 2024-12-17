@@ -1,4 +1,4 @@
-﻿namespace TypeSharp21.AST;
+﻿namespace TypeSharp.AST;
 
 public class SourceFile : INode
 {
@@ -6,10 +6,15 @@ public class SourceFile : INode
 
     public string? FileName { get; set; }
 
-    public required INode[] Statements { get; set; }
+    /// <summary>
+    /// <inheritdoc cref="IStatement"/>
+    /// </summary>
+    public required IStatement[] Statements { get; set; }
 
-    public string GetText()
+    public string GetText(Indent indent = default)
     {
-        return string.Join("\r\n", from node in Statements select node.GetText());
+        if (indent.Space == 0) indent = new Indent(0, 2);
+
+        return string.Join("\r\n", from node in Statements select node.GetText(indent));
     }
 }

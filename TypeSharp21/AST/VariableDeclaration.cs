@@ -1,4 +1,4 @@
-﻿namespace TypeSharp21.AST;
+﻿namespace TypeSharp.AST;
 
 public partial class VariableDeclaration : INode
 {
@@ -18,7 +18,7 @@ public partial class VariableDeclaration : INode
     public IGeneralType Type { get; set; }
     public IInitializer? Initializer { get; set; }
 
-    public string GetText()
+    public string GetText(Indent indent = default)
     {
         if (Initializer is not null)
         {

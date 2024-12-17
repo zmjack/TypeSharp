@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TypeSharp21\TypeSharp21.csproj" />
+    <ProjectReference Include="..\TypeSharp21\TypeSharp3.csproj" />
   </ItemGroup>
 
   <ItemGroup>

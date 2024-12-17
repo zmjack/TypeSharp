@@ -1,4 +1,4 @@
-﻿namespace TypeSharp21.AST;
+﻿namespace TypeSharp.AST;
 
 public partial class ModuleDeclaration : INode
 {
@@ -6,6 +6,7 @@ public partial class ModuleDeclaration : INode
 
     public ModuleDeclaration(Identifier name)
     {
+        Modifiers = [];
         Name = name;
     }
 
@@ -13,13 +14,11 @@ public partial class ModuleDeclaration : INode
     public IModifier[]? Modifiers { get; set; }
     public required ModuleBlock Body { get; set; }
 
-    public string GetText()
+    public string GetText(Indent indent = default)
     {
         return
             $"""
-            {string.Join("", from m in Modifiers ?? [] select $"{m.GetText()} ")}namespace {Name.GetText()} {"{"}
-            {Body.GetText()}
-            {"}"}
+            {string.Join("", from m in Modifiers select $"{m.GetText()} ")}namespace {Name.GetText()} {Body.GetText(indent)}
             """;
     }
 }

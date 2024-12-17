@@ -1,4 +1,4 @@
-﻿namespace TypeSharp21.AST;
+﻿namespace TypeSharp.AST;
 
 public partial class Parameter : INode
 {
@@ -13,7 +13,7 @@ public partial class Parameter : INode
     public Identifier Name { get; set; }
     public IGeneralType Type { get; set; }
 
-    public string GetText()
+    public string GetText(Indent indent = default)
     {
         return $"{Name.GetText()}: {Type.GetText()}";
     }

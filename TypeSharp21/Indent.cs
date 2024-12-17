@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace TypeSharp.DevAnalyzer;
+namespace TypeSharp;
 
 [DebuggerDisplay("{IndentValue} = {Value} * {Space}")]
 public struct Indent

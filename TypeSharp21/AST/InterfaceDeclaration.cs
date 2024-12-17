@@ -1,4 +1,4 @@
-﻿namespace TypeSharp21.AST;
+﻿namespace TypeSharp.AST;
 
 public partial class InterfaceDeclaration : INode
 {
@@ -6,22 +6,23 @@ public partial class InterfaceDeclaration : INode
 
     public InterfaceDeclaration(Identifier name)
     {
+        Members = [];
         Name = name;
     }
 
     public Identifier Name { get; set; }
-    public IMember[]? Members { get; set; }
+    public IMember[] Members { get; set; }
     public TypeParameter[]? TypeParameters { get; set; }
 
-    public string GetText()
+    public string GetText(Indent indent = default)
     {
-        if (TypeParameters is not null && TypeParameters.Length > 0)
+        if (TypeParameters is not null && TypeParameters.Length != 0)
         {
             return
                 $"""
                 interface {Name.GetText()}<{string.Join(", ", from p in TypeParameters select p.GetText())}> {"{"}
-                {string.Join($"\r\n", from m in Members ?? [] select $"{new Indent(1)}{m.GetText()};")}
-                {"}"}
+                {indent + 1}{string.Join($"\r\n{indent + 1}", from m in Members select m.GetText(indent + 1))}
+                {indent}{"}"}
                 """;
         }
         else
@@ -29,8 +30,8 @@ public partial class InterfaceDeclaration : INode
             return
                 $"""
                 interface {Name.GetText()} {"{"}
-                {string.Join($"\r\n", from m in Members ?? [] select $"{new Indent(1)}{m.GetText()};")}
-                {"}"}
+                {indent + 1}{string.Join($"\r\n{indent + 1}", from m in Members select $"{m.GetText(indent + 1)};")}
+                {indent}{"}"}
                 """;
         }
     }

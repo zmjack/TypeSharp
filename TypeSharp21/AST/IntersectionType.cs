@@ -1,4 +1,4 @@
-﻿namespace TypeSharp21.AST;
+﻿namespace TypeSharp.AST;
 
 public partial class IntersectionType : INode
 {
@@ -11,8 +11,11 @@ public partial class IntersectionType : INode
 
     public IType[] Types { get; set; }
 
-    public string GetText()
+    public string GetText(Indent indent = default)
     {
-        return string.Join(" | ", from x in Types select x.GetText());
+        return
+            $"""
+            {string.Join(" | ", from x in Types select x.GetText())};
+            """;
     }
 }

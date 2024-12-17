@@ -1,4 +1,4 @@
-﻿namespace TypeSharp21.AST;
+﻿namespace TypeSharp.AST;
 
 public class Identifier : INode
 {
@@ -11,7 +11,7 @@ public class Identifier : INode
 
     public string EscapedText { get; }
 
-    public string GetText()
+    public string GetText(Indent indent = default)
     {
         return EscapedText;
     }

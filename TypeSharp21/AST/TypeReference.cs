@@ -1,4 +1,4 @@
-﻿namespace TypeSharp21.AST;
+﻿namespace TypeSharp.AST;
 
 public partial class TypeReference : INode
 {
@@ -13,7 +13,7 @@ public partial class TypeReference : INode
 
     public Identifier TypeName { get; set; }
 
-    public string GetText()
+    public string GetText(Indent indent = default)
     {
         return TypeName.GetText();
     }

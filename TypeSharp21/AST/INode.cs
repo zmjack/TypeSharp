@@ -1,7 +1,7 @@
-﻿namespace TypeSharp21.AST;
+﻿namespace TypeSharp.AST;
 
 public interface INode
 {
     SyntaxKind Kind { get; }
-    string GetText();
+    string GetText(Indent indent = default);
 }

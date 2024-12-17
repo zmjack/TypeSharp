@@ -1,4 +1,4 @@
-﻿namespace TypeSharp21.AST;
+﻿namespace TypeSharp.AST;
 
 public partial class GetAccessor : INode
 {
@@ -6,11 +6,13 @@ public partial class GetAccessor : INode
 
     public GetAccessor(Identifier name)
     {
+        Modifiers = [];
         Name = name;
     }
 
     public GetAccessor(Identifier name, IGeneralType type)
     {
+        Modifiers = [];
         Name = name;
         Type = type;
     }
@@ -28,12 +30,12 @@ public partial class GetAccessor : INode
         Type = type;
     }
 
-    public IModifier[]? Modifiers { get; set; }
+    public IModifier[] Modifiers { get; set; }
     public Identifier Name { get; set; }
     public IGeneralType? Type { get; set; }
 
-    public string GetText()
+    public string GetText(Indent indent = default)
     {
-        return $"{string.Join("", from m in Modifiers ?? [] select $"{m.GetText()} ")}get {Name.GetText()}(){(Type is not null ? $": {Type.GetText()}" : "")}";
+        return $"{string.Join("", from m in Modifiers select $"{m.GetText()} ")}get {Name.GetText()}(){(Type is not null ? $": {Type.GetText()}" : "")}";
     }
 }

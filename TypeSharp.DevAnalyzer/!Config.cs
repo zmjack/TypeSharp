@@ -2,7 +2,7 @@
 
 internal static class Config
 {
-    internal const string RootNamespace = "TypeSharp21.AST";
+    internal const string RootNamespace = "TypeSharp.AST";
 
     internal static void Debugger()
     {

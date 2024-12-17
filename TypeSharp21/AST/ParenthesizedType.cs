@@ -1,4 +1,4 @@
-﻿namespace TypeSharp21.AST;
+﻿namespace TypeSharp.AST;
 
 public partial class ParenthesizedType : INode
 {
@@ -11,7 +11,7 @@ public partial class ParenthesizedType : INode
 
     public IGeneralType Type { get; set; }
 
-    public string GetText()
+    public string GetText(Indent indent = default)
     {
         return $"({Type.GetText()})";
     }

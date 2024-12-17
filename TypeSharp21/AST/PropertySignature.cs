@@ -1,4 +1,4 @@
-﻿namespace TypeSharp21.AST;
+﻿namespace TypeSharp.AST;
 
 public partial class PropertySignature : INode, InterfaceDeclaration.IMember
 {
@@ -18,7 +18,7 @@ public partial class PropertySignature : INode, InterfaceDeclaration.IMember
     public Identifier Name { get; set; }
     public IGeneralType? Type { get; set; }
 
-    public string GetText()
+    public string GetText(Indent indent = default)
     {
         if (Type is not null)
         {

@@ -31,9 +31,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Obsolete", "Obsolete", "{D5
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TypeSharp20", "TypeSharp20\TypeSharp20.csproj", "{E1FF78CB-8EB3-4D1E-AF4D-4C166F5FAEEA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeSharp21", "TypeSharp21\TypeSharp21.csproj", "{F6374093-AE23-408A-818C-781B27548C00}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeSharp3", "TypeSharp21\TypeSharp3.csproj", "{F6374093-AE23-408A-818C-781B27548C00}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeSharp21.Test", "TypeSharp21.Test\TypeSharp21.Test.csproj", "{8D0611C7-F2C9-48AB-8E07-8AF382697DE6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeSharp3.Test", "TypeSharp21.Test\TypeSharp3.Test.csproj", "{8D0611C7-F2C9-48AB-8E07-8AF382697DE6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypeSharp.DevAnalyzer", "TypeSharp.DevAnalyzer\TypeSharp.DevAnalyzer.csproj", "{D7AE64EB-9364-4718-8601-A252E7F96043}"
 EndProject

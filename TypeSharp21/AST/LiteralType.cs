@@ -1,4 +1,4 @@
-﻿namespace TypeSharp21.AST;
+﻿namespace TypeSharp.AST;
 
 public partial class LiteralType : INode
 {
@@ -11,7 +11,7 @@ public partial class LiteralType : INode
 
     public ILiteral Literal { get; set; }
 
-    public string GetText()
+    public string GetText(Indent indent = default)
     {
         return Literal.GetText();
     }
