@@ -9,7 +9,15 @@
     <class name="StringLiteral" />
   </typedef>
 
-  <typedef name="general">
+  <typedef name="declaration">
+    <class name="ModuleDeclaration" />
+    <class name="InterfaceDeclaration" />
+    <class name="ClassDeclaration" />
+  </typedef>
+  <!-- /typedef -->
+
+  <!-- common -->
+  <union type="IGeneralType">
     <keyword name="undefined" />
     <keyword name="any" />
     <keyword name="never" />
@@ -23,22 +31,19 @@
     <class name="ParenthesizedType" />
     <class name="TypeReference" />
     <class name="TypeLiteral" />
-  </typedef>
-  <!-- /typedef -->
+  </union>
 
-  <!-- common -->
-  <union type="IGeneralType">
-    <type name="general" />
+  <union type="IDeclaration">
+    <type name="declaration" />
   </union>
 
   <!-- statement -->
   <union type="IStatement">
+    <type name="declaration" />
+    <interface name="IDeclaration" />
     <class name="Block" />
     <class name="VariableStatement" />
     <class name="ReturnStatement" />
-    <class name="ModuleDeclaration" />
-    <class name="InterfaceDeclaration" />
-    <class name="ClassDeclaration" />
     <class name="RawText" />
   </union>
 

@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <AdditionalFiles Include="!Sources\*.xml" />
+    <AdditionalFiles Include="!Source\*.xml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,10 +23,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="!Sources\dtd\keywords.dtd">
+    <None Update="!Source\dtd\keywords.dtd">
       <SubType>Designer</SubType>
     </None>
-    <None Update="!Sources\dtd\unions.dtd">
+    <None Update="!Source\dtd\unions.dtd">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>

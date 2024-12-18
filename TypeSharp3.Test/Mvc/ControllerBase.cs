@@ -1,5 +1,5 @@
 ﻿namespace Microsoft.AspNetCore.Mvc;
 
-internal class Controller
+public class ControllerBase
 {
 }

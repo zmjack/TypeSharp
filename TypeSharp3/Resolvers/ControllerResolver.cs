@@ -37,6 +37,12 @@ public partial class ControllerResolver : Resolver
     ];
     private static Verb DefaultVerb => _verbs[0];
     private static readonly string _fromBody = "Microsoft.AspNetCore.Mvc.FromBodyAttribute";
+    private static readonly string _fileResult = "Microsoft.AspNetCore.Mvc.FileResult";
+    private static readonly string[] _actionResults =
+    [
+        "Microsoft.AspNetCore.Mvc.IActionResult",
+        "Microsoft.AspNetCore.Mvc.ActionResult",
+    ];
 
     private static Verb[] GetMethodVerbs(MethodInfo method)
     {
@@ -92,11 +98,12 @@ public partial class ControllerResolver : Resolver
         return type.BaseType is not null && _controllers.Contains(type.BaseType.FullName);
     }
 
-    protected override bool TryResolve(Type type, out Lazy<IStatement>? statement)
+    public override bool TryResolve(Type type, out Lazy<IDeclaration>? declaration, out Lazy<IGeneralType>? general)
     {
         if (CanResolve(type))
         {
-            statement = new Lazy<IStatement>(() =>
+            general = new Lazy<IGeneralType>(() => new TypeReference(type.Name));
+            declaration = new Lazy<IDeclaration>(() =>
             {
                 var declaration = new ClassDeclaration(type.Name);
                 var members = new List<ClassDeclaration.IMember>();
@@ -131,11 +138,9 @@ public partial class ControllerResolver : Resolver
                         select name
                     ).FirstOrDefault();
 
-                    if (verb.Name is "get" or "post" or "put" or "patch")
+                    if (verb.Name is "get" or "post" or "put" or "delete" or "patch")
                     {
-                        var returnType = Parser.GetOrCreateGeneralType(method.ReturnType);
                         var rawBuilder = new StringBuilder();
-
                         rawBuilder.Append(
                             $"""
                             return await fetch(`{uri}{(string.IsNullOrEmpty(query) ? "" : $"?{query}")}`, {"{"}
@@ -160,22 +165,42 @@ public partial class ControllerResolver : Resolver
                                 """);
                         }
 
-                        if (returnType.Kind == SyntaxKind.VoidKeyword)
+                        IGeneralType returnType;
+                        var returnFullName = method.ReturnType.FullName;
+                        if (_actionResults.Any(name => returnFullName == name))
                         {
+                            returnType = TypeReference.Promise([AnyKeyword.Default]);
+                        }
+                        else if (returnFullName == _fileResult)
+                        {
+                            returnType = TypeReference.Promise([VoidKeyword.Default]);
                             rawBuilder.AppendLine(
                                 $"""
-                                  await response.json();
+                                  var filename = tsharp_get_filename(response.headers['content-disposition']);
+                                  tsharp_save_blob(await response.blob(), filename);
                                 """);
                         }
                         else
                         {
-                            rawBuilder.AppendLine(
-                                $"""
-                                  return await response.json() as {returnType.GetText()};
-                                """);
+                            var _returnType = TypeReference.Promise([Parser.GetOrCreateGeneralType(method.ReturnType)]);
+                            if (_returnType.TypeArguments[0].Kind == SyntaxKind.VoidKeyword)
+                            {
+                                rawBuilder.AppendLine(
+                                    $"""
+                                      // do nothing
+                                    """);
+                            }
+                            else
+                            {
+                                rawBuilder.AppendLine(
+                                    $"""
+                                      return await response.json() as {_returnType.GetText()};
+                                    """);
+                            }
+                            returnType = _returnType;
                         }
 
-                        rawBuilder.Append("}");
+                        rawBuilder.Append("});");
 
                         var methodDeclaration = new MethodDeclaration(
                             [AsyncKeyword.Default],
@@ -219,7 +244,8 @@ public partial class ControllerResolver : Resolver
             return true;
         }
 
-        statement = null;
+        general = null;
+        declaration = null;
         return false;
     }
 }
