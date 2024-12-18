@@ -185,7 +185,7 @@ public partial class ControllerResolver : Resolver
                             returnType = TypeReference.Promise([VoidKeyword.Default]);
                             rawBuilder.AppendLine(
                                 $"""
-                                  $ts_save(await response.blob(), $ts_hcd(response.headers['content-disposition']) ?? 'file');
+                                  $ts_save(await response.blob(), $ts_hcd(response.headers['Content-Disposition']) ?? 'file');
                                 """);
                         }
                         else
