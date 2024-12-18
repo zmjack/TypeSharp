@@ -7,20 +7,21 @@ namespace TypeSharp;
 public class Parser : IEnumerable<INode>
 {
     public bool CamelCase { get; private set; }
-    public bool IncludeSaveBlobCode { get; private set; }
+    public bool IncludeSaveCode { get; private set; }
+
     private readonly DefaultResolver _defaultResolver;
 
     public Parser()
     {
         CamelCase = false;
-        IncludeSaveBlobCode = false;
+        IncludeSaveCode = false;
         _defaultResolver = new DefaultResolver();
         _defaultResolver.SetParser(this);
     }
     public Parser(ParserOption option)
     {
         CamelCase = option.CamelCase;
-        IncludeSaveBlobCode = option.GenerateSaveFileCode;
+        IncludeSaveCode = option.GenerateSaveFileCode;
         _defaultResolver = new DefaultResolver();
         _defaultResolver.SetParser(this);
 
@@ -38,7 +39,7 @@ public class Parser : IEnumerable<INode>
     private readonly Dictionary<Type, Lazy<IGeneralType>> _generals = new()
     {
         [typeof(void)] = new(() => VoidKeyword.Default),
-        [typeof(string)] = new(() => StringKeyword.Default),
+        [typeof(string)] = new(() => new UnionType([StringKeyword.Default, UndefinedKeyword.Default])),
         [typeof(bool)] = new(() => BooleanKeyword.Default),
         [typeof(Guid)] = new(() => StringKeyword.Default),
         [typeof(byte)] = new(() => NumberKeyword.Default),
@@ -121,7 +122,7 @@ public class Parser : IEnumerable<INode>
         }
 
         var statements = new List<IStatement>();
-        if (IncludeSaveBlobCode)
+        if (IncludeSaveCode)
         {
             statements.Add(new RawText(
                 """

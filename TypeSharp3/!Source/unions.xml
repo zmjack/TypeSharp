@@ -57,28 +57,6 @@
     <type name="literal" />
   </union>
 
-  <!-- recombination type -->
-  <union type="UnionType.IType">
-    <keyword name="undefined" />
-    <keyword name="any" />
-    <keyword name="never" />
-    <keyword name="void" />
-    <class name="LiteralType" />
-    <class name="IntersectionType" />
-    <class name="ParenthesizedType" />
-    <class name="TypeReference" />
-  </union>
-
-  <union type="IntersectionType.IType">
-    <keyword name="undefined" />
-    <keyword name="any" />
-    <keyword name="never" />
-    <keyword name="void" />
-    <class name="LiteralType" />
-    <class name="ParenthesizedType" />
-    <class name="TypeReference" />
-  </union>
-
   <!-- namespace -->
   <union type="ModuleDeclaration.IModifier">
     <keyword name="declare" />

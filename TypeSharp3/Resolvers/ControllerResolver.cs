@@ -178,11 +178,11 @@ public partial class ControllerResolver : Resolver
                         var returnFullName = method.ReturnType.FullName;
                         if (_actionResults.Any(name => returnFullName == name))
                         {
-                            returnType = TypeReference.Promise([AnyKeyword.Default]);
+                            returnType = TypeReference.Promise(AnyKeyword.Default);
                         }
                         else if (returnFullName == _fileResult)
                         {
-                            returnType = TypeReference.Promise([VoidKeyword.Default]);
+                            returnType = TypeReference.Promise(VoidKeyword.Default);
                             rawBuilder.AppendLine(
                                 $"""
                                   $ts_save(await response.blob(), $ts_hcd(response.headers['Content-Disposition']) ?? 'file');
@@ -190,7 +190,7 @@ public partial class ControllerResolver : Resolver
                         }
                         else
                         {
-                            var _returnType = TypeReference.Promise([Parser.GetOrCreateGeneralType(method.ReturnType)]);
+                            var _returnType = TypeReference.Promise(Parser.GetOrCreateGeneralType(method.ReturnType));
                             if (_returnType.TypeArguments[0].Kind == SyntaxKind.VoidKeyword)
                             {
                                 rawBuilder.AppendLine(

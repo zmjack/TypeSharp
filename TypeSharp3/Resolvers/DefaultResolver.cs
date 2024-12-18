@@ -1,11 +1,78 @@
-﻿using TypeSharp.AST;
+﻿using System.Collections;
+using TypeSharp.AST;
 
 namespace TypeSharp.Resolvers;
 
 public class DefaultResolver : Resolver
 {
+    private IGeneralType Wrap(Type type, TypeReference typeReference)
+    {
+        if (type.IsClass)
+        {
+            return new UnionType([typeReference, UndefinedKeyword.Default]);
+        }
+        else
+        {
+            if (type.IsGenericType)
+            {
+                var genericType = type.GetGenericTypeDefinition();
+                if (genericType == typeof(Nullable<>))
+                {
+                    return new UnionType([typeReference, UndefinedKeyword.Default]);
+                }
+            }
+        }
+
+        return typeReference;
+    }
+
     public override bool TryResolve(Type type, out Lazy<IDeclaration>? declaration, out Lazy<IGeneralType>? general)
     {
+        Lazy<IGeneralType>? AsArray()
+        {
+            Type[] interfaces = [type, .. type.GetInterfaces()];
+            var enumerable1 = (
+                from x in interfaces
+                where x.IsGenericType
+                let e = x.IsGenericTypeDefinition ? x : x.GetGenericTypeDefinition()
+                where e == typeof(IEnumerable<>)
+                select x
+            ).FirstOrDefault();
+
+            if (type.IsArray)
+            {
+                return new Lazy<IGeneralType>(() =>
+                {
+                    var el = type.GetElementType()!;
+                    return TypeReference.Array(Parser.GetOrCreateGeneralType(el));
+                });
+            }
+            else if (type.IsGenericType)
+            {
+                return new Lazy<IGeneralType>(() =>
+                {
+                    var el = type.GetGenericArguments()[0];
+                    return TypeReference.Array(Parser.GetOrCreateGeneralType(el));
+                });
+            }
+            else if (interfaces.Any(x => x == typeof(IEnumerable)))
+            {
+                return new Lazy<IGeneralType>(() =>
+                {
+                    return TypeReference.Array(AnyKeyword.Default);
+                });
+            }
+            else return null;
+        }
+
+        var arr = AsArray();
+        if (arr is not null)
+        {
+            declaration = null;
+            general = arr;
+            return true;
+        }
+
         if (type.IsGenericType)
         {
             var typeName = type.Name[..type.Name.IndexOf('`')];
@@ -14,7 +81,7 @@ public class DefaultResolver : Resolver
             {
                 general = new Lazy<IGeneralType>(() =>
                 {
-                    return new TypeReference(typeName);
+                    return Wrap(type, new TypeReference(typeName));
                 });
                 declaration = new Lazy<IDeclaration>(() =>
                 {
@@ -45,12 +112,12 @@ public class DefaultResolver : Resolver
                 _ = Parser.GetOrCreateGeneralType(type.GetGenericTypeDefinition());
                 general = new Lazy<IGeneralType>(() =>
                 {
-                    return new TypeReference(typeName,
+                    return Wrap(type, new TypeReference(typeName,
                     [
                         ..
                         from arg in type.GenericTypeArguments
                         select Parser.GetOrCreateGeneralType(arg)
-                    ]);
+                    ]));
                 });
                 declaration = null;
             }
@@ -60,7 +127,10 @@ public class DefaultResolver : Resolver
         {
             var typeName = type.Name;
 
-            general = new Lazy<IGeneralType>(() => new TypeReference(typeName));
+            general = new Lazy<IGeneralType>(() =>
+            {
+                return Wrap(type, new TypeReference(typeName));
+            });
             declaration = new Lazy<IDeclaration>(() =>
             {
                 var @interface = new InterfaceDeclaration(typeName);

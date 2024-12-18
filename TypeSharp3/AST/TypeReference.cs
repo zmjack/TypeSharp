@@ -5,9 +5,13 @@ public partial class TypeReference : INode
     public SyntaxKind Kind => SyntaxKind.TypeReference;
 
     public static TypeReference Date { get; } = new TypeReference("Date");
-    public static TypeReference Promise(IGeneralType[] typeArguments)
+    public static TypeReference Promise(IGeneralType typeArgument)
     {
-        return new TypeReference(nameof(Promise), typeArguments);
+        return new TypeReference("Promise", [typeArgument]);
+    }
+    public static TypeReference Array(IGeneralType typeArgument)
+    {
+        return new TypeReference("Array", [typeArgument]);
     }
 
     public TypeReference(Identifier typeName)

@@ -7,7 +7,31 @@
     <Configurations>Debug;Release;DebugAnalyzer</Configurations>
     <RootNamespace>TypeSharp</RootNamespace>
     <LangVersion>preview</LangVersion>
+
+    <Version>3.0.0-alpha</Version>
+    <Authors>zmjack</Authors>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <Description>C# model to the TypeScript model compiler.</Description>
+    <Copyright>Copyright © nstandard.net 2018</Copyright>
+    <RepositoryUrl>https://github.com/zmjack/TypeSharp</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/zmjack/TypeSharp</PackageProjectUrl>
+    <PackageIcon>typesharp.png</PackageIcon>
+    <PackageId>TypeSharp</PackageId>
+    <Configurations>Debug;Release;DebugAnalyzer</Configurations>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\typesharp.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="..\LICENSE.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <AdditionalFiles Include="!Source\*.xml" />
@@ -19,7 +43,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TypeSharp.DevAnalyzer\TypeSharp.DevAnalyzer.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\TypeSharp.DevAnalyzer\TypeSharp.DevAnalyzer.csproj" />
   </ItemGroup>
 
   <ItemGroup>
