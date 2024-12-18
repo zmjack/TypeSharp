@@ -11,9 +11,9 @@ public partial class ClassDeclaration : INode
         Members = [];
     }
 
-    public ClassDeclaration(IModifier modifier, Identifier name)
+    public ClassDeclaration(IModifier[] modifiers, Identifier name)
     {
-        Modifiers = [modifier];
+        Modifiers = modifiers;
         Name = name;
         Members = [];
     }

@@ -8,17 +8,17 @@ public class DefaultResolver : Resolver
     {
         if (type.IsGenericType)
         {
+            var typeName = type.Name[..type.Name.IndexOf('`')];
+
             if (type.IsGenericTypeDefinition)
             {
                 general = new Lazy<IGeneralType>(() =>
                 {
-                    var name = type.Name[..type.Name.IndexOf('`')];
-                    return new TypeReference(name);
+                    return new TypeReference(typeName);
                 });
                 declaration = new Lazy<IDeclaration>(() =>
                 {
-                    var name = type.Name[..type.Name.IndexOf('`')];
-                    var @interface = new InterfaceDeclaration(name,
+                    var @interface = new InterfaceDeclaration(typeName,
                     [
                         ..
                         from g in type.GetGenericArguments()
@@ -29,8 +29,11 @@ public class DefaultResolver : Resolver
                     var props = type.GetProperties();
                     foreach (var prop in props)
                     {
+                        var propName = prop.Name;
+                        if (Parser.CamelCase) propName = StringEx.CamelCase(propName);
+
                         var general = Parser.GetOrCreateGeneralType(prop.PropertyType);
-                        members.Add(new PropertySignature(prop.Name, general));
+                        members.Add(new PropertySignature(propName, general));
                     }
                     @interface.Members = [.. members];
 
@@ -42,8 +45,7 @@ public class DefaultResolver : Resolver
                 _ = Parser.GetOrCreateGeneralType(type.GetGenericTypeDefinition());
                 general = new Lazy<IGeneralType>(() =>
                 {
-                    var name = type.Name[..type.Name.IndexOf('`')];
-                    return new TypeReference(name,
+                    return new TypeReference(typeName,
                     [
                         ..
                         from arg in type.GenericTypeArguments
@@ -54,25 +56,24 @@ public class DefaultResolver : Resolver
             }
             return true;
         }
-        else if (type.IsGenericParameter)
-        {
-            general = new Lazy<IGeneralType>(() => new TypeReference(type.Name));
-            declaration = null;
-            return true;
-        }
         else
         {
-            general = new Lazy<IGeneralType>(() => new TypeReference(type.Name));
+            var typeName = type.Name;
+
+            general = new Lazy<IGeneralType>(() => new TypeReference(typeName));
             declaration = new Lazy<IDeclaration>(() =>
             {
-                var @interface = new InterfaceDeclaration(type.Name);
+                var @interface = new InterfaceDeclaration(typeName);
                 var members = new List<InterfaceDeclaration.IMember>();
 
                 var props = type.GetProperties();
                 foreach (var prop in props)
                 {
+                    var propName = prop.Name;
+                    if (Parser.CamelCase) propName = StringEx.CamelCase(propName);
+
                     var general = Parser.GetOrCreateGeneralType(prop.PropertyType);
-                    members.Add(new PropertySignature(prop.Name, general));
+                    members.Add(new PropertySignature(propName, general));
                 }
                 @interface.Members = [.. members];
 

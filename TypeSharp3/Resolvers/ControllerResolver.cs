@@ -105,12 +105,15 @@ public partial class ControllerResolver : Resolver
             general = new Lazy<IGeneralType>(() => new TypeReference(type.Name));
             declaration = new Lazy<IDeclaration>(() =>
             {
-                var declaration = new ClassDeclaration(type.Name);
+                var declaration = new ClassDeclaration([ExportKeyword.Default], type.Name);
                 var members = new List<ClassDeclaration.IMember>();
 
                 var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
                 foreach (var method in methods)
                 {
+                    var methodName = method.Name;
+                    if (Parser.CamelCase) methodName = StringEx.CamelCase(methodName);
+
                     var methodParams = (
                         from p in method.GetParameters()
                         let attrs = p.GetCustomAttributes()
@@ -204,7 +207,7 @@ public partial class ControllerResolver : Resolver
 
                         var methodDeclaration = new MethodDeclaration(
                             [AsyncKeyword.Default],
-                            method.Name,
+                            methodName,
                             [.. from x in methodParams select x.Paramter],
                             returnType
                         )
@@ -222,7 +225,7 @@ public partial class ControllerResolver : Resolver
                     else
                     {
                         var methodDeclaration = new MethodDeclaration(
-                            method.Name,
+                            methodName,
                             [.. from x in methodParams select x.Paramter]
                         )
                         {

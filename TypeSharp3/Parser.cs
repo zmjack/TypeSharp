@@ -6,21 +6,21 @@ namespace TypeSharp;
 
 public class Parser : IEnumerable<INode>
 {
-    private readonly bool _camelCase;
-    private readonly bool _generateSaveFileCode;
+    public bool CamelCase { get; private set; }
+    public bool IncludeSaveBlobCode { get; private set; }
     private readonly DefaultResolver _defaultResolver;
 
     public Parser()
     {
-        _camelCase = false;
-        _generateSaveFileCode = false;
+        CamelCase = false;
+        IncludeSaveBlobCode = false;
         _defaultResolver = new DefaultResolver();
         _defaultResolver.SetParser(this);
     }
     public Parser(ParserOption option)
     {
-        _camelCase = option.CamelCase;
-        _generateSaveFileCode = option.GenerateSaveFileCode;
+        CamelCase = option.CamelCase;
+        IncludeSaveBlobCode = option.GenerateSaveFileCode;
         _defaultResolver = new DefaultResolver();
         _defaultResolver.SetParser(this);
 
@@ -121,7 +121,7 @@ public class Parser : IEnumerable<INode>
         }
 
         var statements = new List<IStatement>();
-        if (_generateSaveFileCode)
+        if (IncludeSaveBlobCode)
         {
             statements.Add(new RawText(
                 """
