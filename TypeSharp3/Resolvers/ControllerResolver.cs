@@ -19,7 +19,7 @@ public partial class ControllerResolver : Resolver
     [
         "Microsoft.AspNetCore.Mvc.RouteAttribute",
     ];
-    private static readonly string _defaultRouteTemplate = "[Controller]/{Action=Index}";
+    private static readonly string _defaultRouteTemplate = "[Controller]/{Action}";
     private static readonly string[] _controllers =
     [
         "Microsoft.AspNetCore.Mvc.Controller",
@@ -56,13 +56,13 @@ public partial class ControllerResolver : Resolver
         ];
         return verbs;
     }
-    private static string[] GetRouteTemplates(MethodInfo method)
+    private static string[] GetRouteTemplates(ICustomAttributeProvider method)
     {
-        var attrs = method.GetCustomAttributes();
+        var attrs = method.GetCustomAttributes(false);
         string[] templates =
         [
             ..
-            from attr in method.GetCustomAttributes()
+            from attr in method.GetCustomAttributes(false)
             where _routes.Contains(attr.GetType().FullName)
             let template_prop = attr.GetType().GetProperty("Template")
             where template_prop is not null
@@ -71,19 +71,25 @@ public partial class ControllerResolver : Resolver
         return templates;
     }
 
-    [GeneratedRegex(@"[\{\[][Cc]ontroller[\}\]]|[\{\[][Cc]ontroller\s*=[^\}\]]+[\}\]]")]
+    [GeneratedRegex(@"[\{\[][Cc]ontroller(?:\s*=[^\}\]]+)?[\}\]]")]
     private static partial Regex GetRouteControllerRegex();
 
-    [GeneratedRegex(@"[\{\[][Aa]ction[\}\]]|[\{\[][Aa]ction\s*=[^\}\]]+[\}\]]")]
+    [GeneratedRegex(@"[\{\[][Aa]ction(?:\s*=[^\}\]]+)?[\}\]]")]
     private static partial Regex GetRouteActionRegex();
 
     private string GetUri(MethodInfo method)
     {
         var templates = GetRouteTemplates(method);
-        var template = templates.Length != 0 ? templates.First() : _defaultRouteTemplate;
+        if (templates.Length == 0)
+        {
+            templates = GetRouteTemplates(method.DeclaringType!);
+        }
+        var template = templates.Length != 0
+            ? templates.First()
+            : _defaultRouteTemplate;
 
         var controller = method.DeclaringType!.Name;
-        if (controller.EndsWith("Controller")) controller = controller.Substring(0, controller.Length - 10);
+        if (controller.EndsWith("Controller")) controller = controller[..^10];
 
         var action = method.Name;
         var uri = template;
@@ -179,8 +185,7 @@ public partial class ControllerResolver : Resolver
                             returnType = TypeReference.Promise([VoidKeyword.Default]);
                             rawBuilder.AppendLine(
                                 $"""
-                                  var filename = tsharp_get_filename(response.headers['content-disposition']);
-                                  tsharp_save_blob(await response.blob(), filename);
+                                  $ts_save(await response.blob(), $ts_hcd(response.headers['content-disposition']) ?? 'file');
                                 """);
                         }
                         else

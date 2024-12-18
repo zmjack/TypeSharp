@@ -125,7 +125,7 @@ public class Parser : IEnumerable<INode>
         {
             statements.Add(new RawText(
                 """
-                function tsharp_get_filename(header: string, defaultName: string = 'file') {
+                function $ts_hcd(header: string) {
                   if (header == null) return defaultName;
                   var name = (regex: RegExp) => {
                     var match: RegExpExecArray;
@@ -133,11 +133,9 @@ public class Parser : IEnumerable<INode>
                       return decodeURI(match[1]);
                     else return null;
                   }
-                  return name(/(?:filename\*=UTF-8'')([^;$]+)/g)
-                    ?? name(/(?:filename=)([^;$]+)/g)
-                    ?? defaultName;
+                  return name(/(?:filename\*=UTF-8'')([^;$]+)/g) ?? name(/(?:filename=)([^;$]+)/g);
                 }
-                function tsharp_save_blob(blob: Blob, filename: string) {
+                function $ts_save(blob: Blob, filename: string) {
                   if (window.navigator['msSaveOrOpenBlob']) {
                     window.navigator['msSaveOrOpenBlob'](blob, filename);
                   } else {
