@@ -46,7 +46,7 @@ public class ControllerTests
         //    return Guid.Empty;
         //}
 
-        [HttpPost]
+        [HttpPut(Name = "userlogin")]
         public string[] Login([FromBody] LoginRequest<Guid> model)
         {
             return ["OK."];

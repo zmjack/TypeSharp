@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using TypeSharp.AST;
@@ -11,6 +12,12 @@ public partial class ControllerResolver : Resolver
     {
         public string Name { get; set; } = name;
         public string Attribute { get; set; } = attribute;
+    }
+    [DebuggerDisplay("{Verb}: {Name}")]
+    public struct Action(string verb, string name)
+    {
+        public string Verb { get; set; } = verb;
+        public string Name { get; set; } = name;
     }
 
     public string? BaseAddress { get; set; }
@@ -27,15 +34,14 @@ public partial class ControllerResolver : Resolver
     ];
     private static readonly Verb[] _verbs =
     [
-        new Verb("get", "Microsoft.AspNetCore.Mvc.HttpGetAttribute"),
-        new Verb("post", "Microsoft.AspNetCore.Mvc.HttpPostAttribute"),
-        new Verb("put", "Microsoft.AspNetCore.Mvc.HttpPutAttribute"),
-        new Verb("delete", "Microsoft.AspNetCore.Mvc.HttpDeleteAttribute"),
-        new Verb("options", "Microsoft.AspNetCore.Mvc.HttpOptionsAttribute"),
-        new Verb("head", "Microsoft.AspNetCore.Mvc.HttpHeadAttribute"),
-        new Verb("patch", "Microsoft.AspNetCore.Mvc.HttpPatchAttribute"),
+        new Verb("GET", "Microsoft.AspNetCore.Mvc.HttpGetAttribute"),
+        new Verb("POST", "Microsoft.AspNetCore.Mvc.HttpPostAttribute"),
+        new Verb("PUT", "Microsoft.AspNetCore.Mvc.HttpPutAttribute"),
+        new Verb("DELETE", "Microsoft.AspNetCore.Mvc.HttpDeleteAttribute"),
+        new Verb("OPTIONS", "Microsoft.AspNetCore.Mvc.HttpOptionsAttribute"),
+        new Verb("HEAD", "Microsoft.AspNetCore.Mvc.HttpHeadAttribute"),
+        new Verb("PATCH", "Microsoft.AspNetCore.Mvc.HttpPatchAttribute"),
     ];
-    private static Verb DefaultVerb => _verbs[0];
     private static readonly string _fromBody = "Microsoft.AspNetCore.Mvc.FromBodyAttribute";
     private static readonly string _fileResult = "Microsoft.AspNetCore.Mvc.FileResult";
     private static readonly string[] _actionResults =
@@ -44,17 +50,23 @@ public partial class ControllerResolver : Resolver
         "Microsoft.AspNetCore.Mvc.ActionResult",
     ];
 
-    private static Verb[] GetMethodVerbs(MethodInfo method)
+    private static Action[] GetActions(MethodInfo method)
     {
         var attrs = method.GetCustomAttributes();
-        Verb[] verbs =
+        Action[] actions =
         [
             ..
             from verb in _verbs
-            where attrs.Any(x => x.GetType().FullName == verb.Attribute)
-            select verb
+            let attr = attrs.FirstOrDefault(x => x.GetType().FullName == verb.Attribute)
+            where attr is not null
+            let name = attr.GetType().GetProperty("Name")?.GetValue(attr) as string ?? method.Name
+            select new Action(verb.Name, name)
         ];
-        return verbs;
+        if (actions.Length == 0)
+        {
+            actions = [new Action("GET", method.Name)];
+        }
+        return actions;
     }
     private static string[] GetRouteTemplates(ICustomAttributeProvider method)
     {
@@ -77,7 +89,7 @@ public partial class ControllerResolver : Resolver
     [GeneratedRegex(@"[\{\[][Aa]ction(?:\s*=[^\}\]]+)?[\}\]]")]
     private static partial Regex GetRouteActionRegex();
 
-    private string GetUri(MethodInfo method)
+    private string GetUri(MethodInfo method, Action action)
     {
         var templates = GetRouteTemplates(method);
         if (templates.Length == 0)
@@ -91,10 +103,9 @@ public partial class ControllerResolver : Resolver
         var controller = method.DeclaringType!.Name;
         if (controller.EndsWith("Controller")) controller = controller[..^10];
 
-        var action = method.Name;
         var uri = template;
         uri = GetRouteControllerRegex().Replace(uri, controller);
-        uri = GetRouteActionRegex().Replace(uri, action);
+        uri = GetRouteActionRegex().Replace(uri, action.Name);
 
         return BaseAddress is not null ? $"{BaseAddress}/{uri}" : uri;
     }
@@ -129,9 +140,9 @@ public partial class ControllerResolver : Resolver
                             Paramter = new Parameter(p.Name!, Parser.GetOrCreateGeneralType(p.ParameterType))
                         }
                     ).ToArray();
-                    var verbs = GetMethodVerbs(method);
-                    var verb = verbs.Length != 0 ? verbs.First() : DefaultVerb;
-                    var uri = GetUri(method);
+                    var actions = GetActions(method);
+                    var action = actions.First();
+                    var uri = GetUri(method, action);
 
                     var query = string.Join("&",
                         from p in methodParams
@@ -147,13 +158,13 @@ public partial class ControllerResolver : Resolver
                         select name
                     ).FirstOrDefault();
 
-                    if (verb.Name is "get" or "post" or "put" or "delete" or "patch")
+                    if (action.Verb is "GET" or "POST" or "PUT" or "DELETE" or "OPTIONS" or "HEAD" or "PATCH")
                     {
                         var rawBuilder = new StringBuilder();
                         rawBuilder.Append(
                             $"""
                             return await fetch(`{uri}{(string.IsNullOrEmpty(query) ? "" : $"?{query}")}`, {"{"}
-                              method: '{verb.Name.ToUpper()}'
+                              method: '{action.Verb}'
                             """);
 
                         if (body is not null)
