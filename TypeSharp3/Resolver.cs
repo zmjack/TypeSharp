@@ -1,4 +1,6 @@
-﻿namespace TypeSharp;
+﻿using TypeSharp.AST;
+
+namespace TypeSharp;
 
 public abstract class Resolver
 {

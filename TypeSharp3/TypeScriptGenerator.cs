@@ -43,7 +43,6 @@ public class TypeScriptGenerator : IEnumerable<INode>
         if (option.DetectionMode == DetectionMode.AutoDetect)
         {
             var assembly = Assembly.GetCallingAssembly()!;
-            Console.WriteLine(assembly);
             var types = assembly.GetTypes().Where(x => x.GetCustomAttribute<TypeScriptGeneratorAttribute>() is not null);
             foreach (var type in types)
             {
