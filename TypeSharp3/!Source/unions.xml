@@ -13,6 +13,7 @@
     <class name="ModuleDeclaration" />
     <class name="InterfaceDeclaration" />
     <class name="ClassDeclaration" />
+    <class name="EnumDeclaration" />
   </typedef>
   <!-- /typedef -->
 
@@ -35,6 +36,11 @@
 
   <union type="IDeclaration">
     <type name="declaration" />
+  </union>
+
+  <union type="IIdentifier">
+    <class name="Identifier"/>
+    <class name="QualifiedName"/>
   </union>
 
   <!-- statement -->
@@ -107,6 +113,11 @@
   <!-- type -->
   <union type="TypeLiteral.IMember">
     <class name="PropertySignature" />
+  </union>
+
+  <!-- enum -->
+  <union type="EnumMember.IInitializer">
+    <type name="literal" />
   </union>
 
 </unions>

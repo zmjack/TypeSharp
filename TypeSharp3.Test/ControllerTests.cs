@@ -8,10 +8,11 @@ public class ControllerTests
     [Fact]
     public void Test1()
     {
-        var parser = new Parser(new()
+        var parser = new TypeScriptGenerator(new()
         {
-            Nullable = true,
             CamelCase = true,
+            DetectionMode = DetectionMode.AutoDetect,
+            ModuleCode = ModuleCode.Nested,
             Resolvers =
             [
                 new ControllerResolver()
@@ -21,14 +22,21 @@ public class ControllerTests
             ],
         })
         {
-            typeof(LoginController),
         };
 
         var code = parser.GetCode();
     }
 
+    public enum HttpStatus
+    {
+        None,
+        OK = 200,
+        NotFound = 404,
+    }
+
     public class LoginRequest<T>
     {
+        public HttpStatus Status { get; set; }
         public T Id { get; set; }
         public string Token { get; set; }
     }
@@ -38,6 +46,7 @@ public class ControllerTests
         public int Age { get; set; }
     }
 
+    [TypeScriptGenerator]
     public class LoginController : Controller
     {
         //[HttpGet]

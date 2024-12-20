@@ -1,6 +1,6 @@
 ﻿namespace TypeSharp.AST;
 
-public class Identifier : INode
+public partial class Identifier : INode
 {
     public SyntaxKind Kind => SyntaxKind.Identifier;
 

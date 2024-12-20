@@ -4,29 +4,29 @@ public partial class TypeReference : INode
 {
     public SyntaxKind Kind => SyntaxKind.TypeReference;
 
-    public static TypeReference Date { get; } = new TypeReference("Date");
+    public static TypeReference Date { get; } = new TypeReference(new Identifier("Date"));
     public static TypeReference Promise(IGeneralType typeArgument)
     {
-        return new TypeReference("Promise", [typeArgument]);
+        return new TypeReference(new Identifier("Promise"), [typeArgument]);
     }
     public static TypeReference Array(IGeneralType typeArgument)
     {
-        return new TypeReference("Array", [typeArgument]);
+        return new TypeReference(new Identifier("Array"), [typeArgument]);
     }
 
-    public TypeReference(Identifier typeName)
+    public TypeReference(IIdentifier typeName)
     {
         TypeName = typeName;
         TypeArguments = [];
     }
 
-    public TypeReference(Identifier typeName, IGeneralType[] typeArguments)
+    public TypeReference(IIdentifier typeName, IGeneralType[] typeArguments)
     {
         TypeName = typeName;
         TypeArguments = typeArguments;
     }
 
-    public Identifier TypeName { get; set; }
+    public IIdentifier TypeName { get; set; }
     public IGeneralType[] TypeArguments { get; set; }
 
     public string GetText(Indent indent = default)

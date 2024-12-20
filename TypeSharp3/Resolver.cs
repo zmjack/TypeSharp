@@ -1,11 +1,9 @@
-﻿using TypeSharp.AST;
-
-namespace TypeSharp;
+﻿namespace TypeSharp;
 
 public abstract class Resolver
 {
-    private Parser? _parser;
-    protected Parser Parser
+    private TypeScriptGenerator? _parser;
+    protected TypeScriptGenerator Parser
     {
         get
         {
@@ -15,12 +13,12 @@ public abstract class Resolver
     }
 
     public Resolver() { }
-    protected Resolver(Parser parser)
+    protected Resolver(TypeScriptGenerator parser)
     {
         _parser = parser;
     }
 
-    internal void SetParser(Parser parser)
+    internal void SetParser(TypeScriptGenerator parser)
     {
         _parser = parser;
     }

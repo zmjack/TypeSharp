@@ -28,17 +28,8 @@ public class DefaultResolver : Resolver
 
     public override bool TryResolve(Type type, out Lazy<IDeclaration>? declaration, out Lazy<IGeneralType>? general)
     {
-        Lazy<IGeneralType>? AsArray()
+        Lazy<IGeneralType>? AsArrayOrDefault()
         {
-            Type[] interfaces = [type, .. type.GetInterfaces()];
-            var enumerable1 = (
-                from x in interfaces
-                where x.IsGenericType
-                let e = x.IsGenericTypeDefinition ? x : x.GetGenericTypeDefinition()
-                where e == typeof(IEnumerable<>)
-                select x
-            ).FirstOrDefault();
-
             if (type.IsArray)
             {
                 return new Lazy<IGeneralType>(() =>
@@ -47,25 +38,37 @@ public class DefaultResolver : Resolver
                     return TypeReference.Array(Parser.GetOrCreateGeneralType(el));
                 });
             }
-            else if (type.IsGenericType)
+            else
             {
-                return new Lazy<IGeneralType>(() =>
+                Type[] interfaces = [type, .. type.GetInterfaces()];
+                var enumerable1 = (
+                    from x in interfaces
+                    where x.IsGenericType
+                    let e = x.IsGenericTypeDefinition ? x : x.GetGenericTypeDefinition()
+                    where e == typeof(IEnumerable<>)
+                    select x
+                ).FirstOrDefault();
+
+                if (interfaces.Any(x => x == typeof(IEnumerable)))
                 {
-                    var el = type.GetGenericArguments()[0];
-                    return TypeReference.Array(Parser.GetOrCreateGeneralType(el));
-                });
-            }
-            else if (interfaces.Any(x => x == typeof(IEnumerable)))
-            {
-                return new Lazy<IGeneralType>(() =>
+                    return new Lazy<IGeneralType>(() =>
+                    {
+                        return TypeReference.Array(AnyKeyword.Default);
+                    });
+                }
+                else if (enumerable1 is not null)
                 {
-                    return TypeReference.Array(AnyKeyword.Default);
-                });
+                    return new Lazy<IGeneralType>(() =>
+                    {
+                        var el = type.GetGenericArguments()[0];
+                        return TypeReference.Array(Parser.GetOrCreateGeneralType(el));
+                    });
+                }
+                else return null;
             }
-            else return null;
         }
 
-        var arr = AsArray();
+        var arr = AsArrayOrDefault();
         if (arr is not null)
         {
             declaration = null;
@@ -73,15 +76,44 @@ public class DefaultResolver : Resolver
             return true;
         }
 
-        if (type.IsGenericType)
+        if (type.IsEnum)
+        {
+            var typeName = type.Name;
+            general = new Lazy<IGeneralType>(() =>
+            {
+                IIdentifier referenceName = Parser.ModuleCode != ModuleCode.None && type.Namespace is not null
+                    ? new QualifiedName($"{type.Namespace}.{typeName}")
+                    : new Identifier(typeName);
+                return Wrap(type, new TypeReference(referenceName));
+            });
+            declaration = new Lazy<IDeclaration>(() =>
+            {
+                var names = type.GetEnumNames();
+                var values = type.GetEnumValuesAsUnderlyingType().OfType<object>().Select(Convert.ToInt64);
+                var pairs = names.Zip(values);
+
+                var enumDeclaration = new EnumDeclaration(typeName,
+                [
+                    ..
+                    from item in pairs
+                    select new EnumMember(item.First, new NumericLiteral(item.Second))
+                ]);
+
+                return enumDeclaration;
+            });
+            return true;
+        }
+        else if (type.IsGenericType)
         {
             var typeName = type.Name[..type.Name.IndexOf('`')];
-
             if (type.IsGenericTypeDefinition)
             {
                 general = new Lazy<IGeneralType>(() =>
                 {
-                    return Wrap(type, new TypeReference(typeName));
+                    IIdentifier referenceName = Parser.ModuleCode != ModuleCode.None && type.Namespace is not null
+                        ? new QualifiedName($"{type.Namespace}.{typeName}")
+                        : new Identifier(typeName);
+                    return Wrap(type, new TypeReference(referenceName));
                 });
                 declaration = new Lazy<IDeclaration>(() =>
                 {
@@ -106,13 +138,17 @@ public class DefaultResolver : Resolver
 
                     return @interface;
                 });
+                return true;
             }
             else
             {
                 _ = Parser.GetOrCreateGeneralType(type.GetGenericTypeDefinition());
                 general = new Lazy<IGeneralType>(() =>
                 {
-                    return Wrap(type, new TypeReference(typeName,
+                    IIdentifier referenceName = Parser.ModuleCode != ModuleCode.None && type.Namespace is not null
+                        ? new QualifiedName($"{type.Namespace}.{typeName}")
+                        : new Identifier(typeName);
+                    return Wrap(type, new TypeReference(referenceName,
                     [
                         ..
                         from arg in type.GenericTypeArguments
@@ -120,16 +156,18 @@ public class DefaultResolver : Resolver
                     ]));
                 });
                 declaration = null;
+                return true;
             }
-            return true;
         }
         else
         {
             var typeName = type.Name;
-
             general = new Lazy<IGeneralType>(() =>
             {
-                return Wrap(type, new TypeReference(typeName));
+                IIdentifier referenceName = Parser.ModuleCode != ModuleCode.None && type.Namespace is not null
+                    ? new QualifiedName($"{type.Namespace}.{typeName}")
+                    : new Identifier(typeName);
+                return Wrap(type, new TypeReference(referenceName));
             });
             declaration = new Lazy<IDeclaration>(() =>
             {

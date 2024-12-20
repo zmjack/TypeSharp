@@ -119,10 +119,17 @@ public partial class ControllerResolver : Resolver
     {
         if (CanResolve(type))
         {
-            general = new Lazy<IGeneralType>(() => new TypeReference(type.Name));
+            var typeName = type.Name;
+            general = new Lazy<IGeneralType>(() =>
+            {
+                IIdentifier referenceName = Parser.ModuleCode != ModuleCode.None && type.Namespace is not null
+                    ? new QualifiedName($"{type.Namespace}.{typeName}")
+                    : new Identifier(typeName);
+                return new TypeReference(referenceName);
+            });
             declaration = new Lazy<IDeclaration>(() =>
             {
-                var declaration = new ClassDeclaration([ExportKeyword.Default], type.Name);
+                var declaration = new ClassDeclaration([ExportKeyword.Default], typeName);
                 var members = new List<ClassDeclaration.IMember>();
 
                 var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);

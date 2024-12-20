@@ -1,27 +1,33 @@
 ﻿using System.Collections;
+using System.Reflection;
 using TypeSharp.AST;
 using TypeSharp.Resolvers;
 
 namespace TypeSharp;
 
-public class Parser : IEnumerable<INode>
+public class TypeScriptGenerator : IEnumerable<INode>
 {
     public bool CamelCase { get; private set; }
     public IntegrationCodes IntegrationCodes { get; private set; }
+    public ModuleCode ModuleCode { get; private set; }
 
     private readonly DefaultResolver _defaultResolver;
 
-    public Parser()
+    public TypeScriptGenerator()
     {
         CamelCase = false;
         IntegrationCodes = IntegrationCodes.None;
+        ModuleCode = ModuleCode.None;
+
         _defaultResolver = new DefaultResolver();
         _defaultResolver.SetParser(this);
     }
-    public Parser(ParserOption option)
+    public TypeScriptGenerator(TypeScriptGeneratorOption option)
     {
         CamelCase = option.CamelCase;
         IntegrationCodes = option.IntegrationCodes;
+        ModuleCode = option.ModuleCode;
+
         _defaultResolver = new DefaultResolver();
         _defaultResolver.SetParser(this);
 
@@ -33,9 +39,20 @@ public class Parser : IEnumerable<INode>
                 _resolvers.Add(resolver);
             }
         }
+
+        if (option.DetectionMode == DetectionMode.AutoDetect)
+        {
+            var assembly = Assembly.GetCallingAssembly()!;
+            Console.WriteLine(assembly);
+            var types = assembly.GetTypes().Where(x => x.GetCustomAttribute<TypeScriptGeneratorAttribute>() is not null);
+            foreach (var type in types)
+            {
+                Add(type);
+            }
+        }
     }
 
-    private readonly Stack<Lazy<IDeclaration>> _heads = [];
+    private readonly Dictionary<Type, Lazy<IDeclaration>> _declarations = [];
     private readonly Dictionary<Type, Lazy<IGeneralType>> _generals = new()
     {
         [typeof(void)] = new(() => VoidKeyword.Default),
@@ -66,7 +83,7 @@ public class Parser : IEnumerable<INode>
     {
         if (type.IsGenericParameter)
         {
-            _generals.Add(type, new Lazy<IGeneralType>(() => new TypeReference(type.Name)));
+            _generals.Add(type, new Lazy<IGeneralType>(() => new TypeReference(new Identifier(type.Name))));
         }
         else
         {
@@ -77,7 +94,7 @@ public class Parser : IEnumerable<INode>
                 {
                     if (declaration is not null)
                     {
-                        AddDeclaration(declaration);
+                        _declarations.Add(type, declaration);
                     }
                     if (general is not null)
                     {
@@ -87,7 +104,7 @@ public class Parser : IEnumerable<INode>
                 }
             }
 
-            throw new InvalidOperationException($"Can not add type. ({type})");
+            throw new InvalidOperationException($"Can not resolve type. (Type: {type})");
         }
     }
 
@@ -111,14 +128,14 @@ public class Parser : IEnumerable<INode>
 
     public string GetCode()
     {
-        var uncreatedItems = _heads.Where(x => !x.IsValueCreated).ToArray();
+        var uncreatedItems = _declarations.Where(x => !x.Value.IsValueCreated).ToArray();
         while (uncreatedItems.Length > 0)
         {
             foreach (var item in uncreatedItems)
             {
-                var value = item.Value;
+                var value = item.Value.Value;
             }
-            uncreatedItems = _heads.Where(x => !x.IsValueCreated).ToArray();
+            uncreatedItems = _declarations.Where(x => !x.Value.IsValueCreated).ToArray();
         }
 
         var statements = new List<IStatement>
@@ -169,18 +186,67 @@ public class Parser : IEnumerable<INode>
                 ));
             }
         }
-        statements.AddRange(from inter in _heads select inter.Value);
+
+        var comparer = new NamespaceComparer();
+        if (ModuleCode == ModuleCode.None)
+        {
+            statements.AddRange((
+                from declaration in _declarations
+                let superNamespaces = declaration.Key.Namespace?.Split(' ') ?? []
+                select new
+                {
+                    Declaration = declaration,
+                    SuperNamespaces = superNamespaces,
+                })
+                .OrderBy(x => x.SuperNamespaces, comparer)
+                .ThenBy(x => x.Declaration.Key.Name)
+                .Select(x => x.Declaration.Value.Value)
+            );
+        }
+        else if (ModuleCode == ModuleCode.Nested)
+        {
+            var modules =
+                from pair in (
+                    from declaration in _declarations
+                    let superNamespaces = declaration.Key.Namespace?.Split(' ') ?? []
+                    select new
+                    {
+                        Declaration = declaration,
+                        SuperNamespaces = superNamespaces,
+                    })
+                    .OrderBy(x => x.SuperNamespaces, comparer)
+                    .ThenByDescending(x => x.Declaration.Value.Value.Kind)
+                    .ThenBy(x => x.Declaration.Key.Name)
+                group pair by pair.Declaration.Key.Namespace;
+
+            foreach (var module in modules)
+            {
+                if (module.Key is not null)
+                {
+                    statements.Add(new ModuleDeclaration(module.Key)
+                    {
+                        Body = new ModuleBlock()
+                        {
+                            Statements =
+                            [
+                                ..
+                                from pair in module select pair.Declaration.Value.Value
+                            ]
+                        }
+                    });
+                }
+                else
+                {
+                    statements.AddRange(from pair in module select pair.Declaration.Value.Value);
+                }
+            }
+        }
 
         var source = new SourceFile
         {
             Statements = [.. statements]
         };
         return source.GetText();
-    }
-
-    public void AddDeclaration(Lazy<IDeclaration> declaration)
-    {
-        _heads.Push(declaration);
     }
 
     public IEnumerator<INode> GetEnumerator()
