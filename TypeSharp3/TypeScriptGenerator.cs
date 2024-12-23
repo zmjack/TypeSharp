@@ -204,10 +204,32 @@ public class TypeScriptGenerator : IEnumerable<INode>
         }
         else if (ModuleCode == ModuleCode.Nested)
         {
+            IEnumerable<string> GetSuperNamespaces(Type type)
+            {
+                var namespaces = type.Namespace?.Split('.') ?? [];
+                foreach (var ns in namespaces)
+                {
+                    yield return ns;
+                }
+
+                var stack = new Stack<string>();
+                var current = type.DeclaringType;
+                while (current is not null)
+                {
+                    stack.Push(current.Name);
+                    current = current.DeclaringType;
+                }
+
+                foreach (var ns in stack)
+                {
+                    yield return ns;
+                }
+            }
+
             var modules =
                 from pair in (
                     from declaration in _declarations
-                    let superNamespaces = declaration.Key.Namespace?.Split(' ') ?? []
+                    let superNamespaces = GetSuperNamespaces(declaration.Key).ToArray()
                     select new
                     {
                         Declaration = declaration,
@@ -216,7 +238,7 @@ public class TypeScriptGenerator : IEnumerable<INode>
                     .OrderBy(x => x.SuperNamespaces, comparer)
                     .ThenByDescending(x => x.Declaration.Value.Value.Kind)
                     .ThenBy(x => x.Declaration.Key.Name)
-                group pair by pair.Declaration.Key.Namespace;
+                group pair by string.Join('.', pair.SuperNamespaces);
 
             foreach (var module in modules)
             {
