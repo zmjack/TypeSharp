@@ -81,9 +81,8 @@ public class DefaultResolver : Resolver
             var typeName = type.Name;
             general = new Lazy<IGeneralType>(() =>
             {
-                IIdentifier referenceName = Parser.ModuleCode != ModuleCode.None && type.Namespace is not null
-                    ? new QualifiedName($"{type.Namespace}.{typeName}")
-                    : new Identifier(typeName);
+                var useNamespace = Parser.ModuleCode != ModuleCode.None;
+                var referenceName = ClrTypeUtil.GetIdentifier(useNamespace, type, typeName);
                 return Wrap(type, new TypeReference(referenceName));
             });
             declaration = new Lazy<IDeclaration>(() =>
@@ -110,9 +109,8 @@ public class DefaultResolver : Resolver
             {
                 general = new Lazy<IGeneralType>(() =>
                 {
-                    IIdentifier referenceName = Parser.ModuleCode != ModuleCode.None && type.Namespace is not null
-                        ? new QualifiedName($"{type.Namespace}.{typeName}")
-                        : new Identifier(typeName);
+                    var useNamespace = Parser.ModuleCode != ModuleCode.None;
+                    var referenceName = ClrTypeUtil.GetIdentifier(useNamespace, type, typeName);
                     return Wrap(type, new TypeReference(referenceName));
                 });
                 declaration = new Lazy<IDeclaration>(() =>
@@ -145,9 +143,8 @@ public class DefaultResolver : Resolver
                 _ = Parser.GetOrCreateGeneralType(type.GetGenericTypeDefinition());
                 general = new Lazy<IGeneralType>(() =>
                 {
-                    IIdentifier referenceName = Parser.ModuleCode != ModuleCode.None && type.Namespace is not null
-                        ? new QualifiedName($"{type.Namespace}.{typeName}")
-                        : new Identifier(typeName);
+                    var useNamespace = Parser.ModuleCode != ModuleCode.None;
+                    var referenceName = ClrTypeUtil.GetIdentifier(useNamespace, type, typeName);
                     return Wrap(type, new TypeReference(referenceName,
                     [
                         ..
@@ -164,9 +161,8 @@ public class DefaultResolver : Resolver
             var typeName = type.Name;
             general = new Lazy<IGeneralType>(() =>
             {
-                IIdentifier referenceName = Parser.ModuleCode != ModuleCode.None && type.Namespace is not null
-                    ? new QualifiedName($"{type.Namespace}.{typeName}")
-                    : new Identifier(typeName);
+                var useNamespace = Parser.ModuleCode != ModuleCode.None;
+                var referenceName = ClrTypeUtil.GetIdentifier(useNamespace, type, typeName);
                 return Wrap(type, new TypeReference(referenceName));
             });
             declaration = new Lazy<IDeclaration>(() =>
