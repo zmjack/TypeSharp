@@ -13,6 +13,7 @@ public partial class ControllerResolver : Resolver
         public string Name { get; set; } = name;
         public string Attribute { get; set; } = attribute;
     }
+
     [DebuggerDisplay("{Verb}: {Name}")]
     public struct Action(string verb, string name)
     {
@@ -43,11 +44,16 @@ public partial class ControllerResolver : Resolver
         new Verb("PATCH", "Microsoft.AspNetCore.Mvc.HttpPatchAttribute"),
     ];
     private static readonly string _fromBody = "Microsoft.AspNetCore.Mvc.FromBodyAttribute";
-    private static readonly string _fileResult = "Microsoft.AspNetCore.Mvc.FileResult";
+    private static readonly string[] _fileResults =
+    [
+        "Microsoft.AspNetCore.Mvc.FileResult",
+        "Microsoft.AspNetCore.Mvc.FileContentResult"
+    ];
     private static readonly string[] _actionResults =
     [
         "Microsoft.AspNetCore.Mvc.IActionResult",
         "Microsoft.AspNetCore.Mvc.ActionResult",
+        "Microsoft.AspNetCore.Mvc.JsonResult",
     ];
 
     private static Action[] GetActions(MethodInfo method)
@@ -107,180 +113,203 @@ public partial class ControllerResolver : Resolver
         uri = GetRouteControllerRegex().Replace(uri, controller);
         uri = GetRouteActionRegex().Replace(uri, action.Name);
 
-        return BaseAddress is not null ? $"{BaseAddress}/{uri}" : uri;
+        if (BaseAddress is not null)
+        {
+            return uri.StartsWith('/') ? $"{BaseAddress}{uri}" : $"{BaseAddress}/{uri}";
+        }
+        else return uri;
     }
 
-    private bool CanResolve(Type type)
+    private static bool CanResolve(Type type)
     {
-        return type.BaseType is not null && _controllers.Contains(type.BaseType.FullName);
+        while (type.BaseType is not null)
+        {
+            if (_controllers.Contains(type.BaseType.FullName))
+            {
+                return true;
+            }
+            type = type.BaseType;
+        }
+        return false;
     }
 
     public override bool TryResolve(Type type, out Lazy<IDeclaration>? declaration, out Lazy<IGeneralType>? general)
     {
-        if (CanResolve(type))
+        if (!CanResolve(type))
         {
-            var typeName = type.Name;
-            general = new Lazy<IGeneralType>(() =>
+            general = null;
+            declaration = null;
+            return false;
+        }
+
+        var typeName = type.Name;
+        general = new Lazy<IGeneralType>(() =>
+        {
+            IIdentifier referenceName = Parser.ModuleCode != ModuleCode.None && type.Namespace is not null
+                ? new QualifiedName($"{type.Namespace}.{typeName}")
+                : new Identifier(typeName);
+            return new TypeReference(referenceName);
+        });
+        declaration = new Lazy<IDeclaration>(() =>
+        {
+            var declaration = new ClassDeclaration([ExportKeyword.Default], typeName);
+            var members = new List<ClassDeclaration.IMember>();
+
+            var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+            foreach (var method in methods)
             {
-                IIdentifier referenceName = Parser.ModuleCode != ModuleCode.None && type.Namespace is not null
-                    ? new QualifiedName($"{type.Namespace}.{typeName}")
-                    : new Identifier(typeName);
-                return new TypeReference(referenceName);
-            });
-            declaration = new Lazy<IDeclaration>(() =>
-            {
-                var declaration = new ClassDeclaration([ExportKeyword.Default], typeName);
-                var members = new List<ClassDeclaration.IMember>();
+                var methodName = method.Name;
+                if (Parser.CamelCase) methodName = StringEx.CamelCase(methodName);
 
-                var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-                foreach (var method in methods)
-                {
-                    var methodName = method.Name;
-                    if (Parser.CamelCase) methodName = StringEx.CamelCase(methodName);
-
-                    var methodParams = (
-                        from p in method.GetParameters()
-                        let attrs = p.GetCustomAttributes()
-                        select new
-                        {
-                            InBody = attrs.Any(x => x.GetType().FullName == _fromBody),
-                            Paramter = new Parameter(p.Name!, Parser.GetOrCreateGeneralType(p.ParameterType))
-                        }
-                    ).ToArray();
-                    var actions = GetActions(method);
-                    var action = actions.First();
-                    var uri = GetUri(method, action);
-
-                    var query = string.Join("&",
-                        from p in methodParams
-                        where !p.InBody
-                        let name = p.Paramter.Name.GetText()
-                        select $"{name}=${{{name}}}"
-                    );
-                    var body =
-                    (
-                        from p in methodParams
-                        where p.InBody
-                        let name = p.Paramter
-                        select name
-                    ).FirstOrDefault();
-
-                    if (action.Verb is "GET" or "POST" or "PUT" or "DELETE" or "OPTIONS" or "HEAD" or "PATCH")
+                var methodParams = (
+                    from p in method.GetParameters()
+                    let attrs = p.GetCustomAttributes()
+                    select new
                     {
-                        var rawBuilder = new StringBuilder();
+                        InBody = attrs.Any(x => x.GetType().FullName == _fromBody),
+                        Paramter = new Parameter(p.Name!, Parser.GetOrCreateGeneralType(p.ParameterType))
+                    }
+                ).ToArray();
+                var actions = GetActions(method);
+                var action = actions.First();
+                var uri = GetUri(method, action);
+
+                var query = string.Join("&",
+                    from p in methodParams
+                    where !p.InBody
+                    let name = p.Paramter.Name.GetText()
+                    select $"{name}=${{{name}}}"
+                );
+                var body =
+                (
+                    from p in methodParams
+                    where p.InBody
+                    let name = p.Paramter
+                    select name
+                ).FirstOrDefault();
+
+                if (action.Verb is "GET" or "POST" or "PUT" or "DELETE" or "OPTIONS" or "HEAD" or "PATCH")
+                {
+                    var rawBuilder = new StringBuilder();
+                    rawBuilder.Append(
+                        $"""
+                        return await fetch(`{uri}{(string.IsNullOrEmpty(query) ? "" : $"?{query}")}`, {"{"}
+                          method: '{action.Verb}'
+                        """);
+
+                    if (action.Verb is not "GET")
+                    {
                         rawBuilder.Append(
                             $"""
-                            return await fetch(`{uri}{(string.IsNullOrEmpty(query) ? "" : $"?{query}")}`, {"{"}
-                              method: '{action.Verb}'
+                            ,
+                              headers: new Headers({"{"}
+                                'Content-Type': 'application/json'
+                              {"}"})
                             """);
+                    }
 
-                        if (body is not null)
-                        {
-                            rawBuilder.AppendLine(
-                                $"""
-                                ,
-                                  body: JSON.stringify({body.Name.GetText()})
-                                {"}"}).then(async response => {"{"}
-                                """);
-                        }
-                        else
-                        {
-                            rawBuilder.AppendLine(
-                                $"""
-
-                                {"}"}).then(async response => {"{"}
-                                """);
-                        }
-
-                        TypeReference returnGeneralType;
-                        var returnType = method.ReturnType;
-                        if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>))
-                        {
-                            returnType = returnType.GetGenericArguments()[0];
-                        }
-                        else if (returnType == typeof(Task))
-                        {
-                            returnType = typeof(void);
-                        }
-
-                        var returnFullName = returnType.FullName;
-                        if (_actionResults.Any(name => returnFullName == name))
-                        {
-                            returnGeneralType = TypeReference.Promise(AnyKeyword.Default);
-                        }
-                        else if (returnFullName == _fileResult)
-                        {
-                            returnGeneralType = TypeReference.Promise(VoidKeyword.Default);
-                            rawBuilder.AppendLine(
-                                $"""
-                                  $ts_save(await response.blob(), $ts_hcd(response.headers['Content-Disposition']) ?? 'file');
-                                """);
-                        }
-                        else
-                        {
-                            returnGeneralType = TypeReference.Promise(Parser.GetOrCreateGeneralType(returnType));
-                            if ((returnGeneralType as TypeReference)!.TypeArguments[0].Kind == SyntaxKind.VoidKeyword)
-                            {
-                                rawBuilder.AppendLine(
-                                    $"""
-                                      // do nothing
-                                    """);
-                            }
-                            else
-                            {
-                                rawBuilder.AppendLine(
-                                    $"""
-                                      return await response.json() as {returnGeneralType.GetText()};
-                                    """);
-                            }
-                        }
-
-                        rawBuilder.Append("});");
-
-                        var methodDeclaration = new MethodDeclaration(
-                            [AsyncKeyword.Default],
-                            methodName,
-                            [.. from x in methodParams select x.Paramter],
-                            returnGeneralType
-                        )
-                        {
-                            Body = new Block()
-                            {
-                                Statements =
-                                [
-                                    new RawText(rawBuilder.ToString()),
-                                ],
-                            },
-                        };
-                        members.Add(methodDeclaration);
+                    if (body is not null)
+                    {
+                        rawBuilder.AppendLine(
+                            $"""
+                            ,
+                              body: JSON.stringify({body.Name.GetText()})
+                            {"}"}).then(async response => {"{"}
+                            """);
                     }
                     else
                     {
-                        var methodDeclaration = new MethodDeclaration(
-                            methodName,
-                            [.. from x in methodParams select x.Paramter]
-                        )
-                        {
-                            Body = new Block()
-                            {
-                                Statements =
-                                [
-                                    new ReturnStatement(new StringLiteral("undefined")),
-                                ],
-                            },
-                        };
-                        members.Add(methodDeclaration);
+                        rawBuilder.AppendLine(
+                            $"""
+
+                            {"}"}).then(async response => {"{"}
+                            """);
                     }
+
+                    TypeReference returnGeneralType;
+                    var returnType = method.ReturnType;
+                    if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>))
+                    {
+                        returnType = returnType.GetGenericArguments()[0];
+                    }
+                    else if (returnType == typeof(Task))
+                    {
+                        returnType = typeof(void);
+                    }
+
+                    var returnFullName = returnType.FullName;
+                    if (_actionResults.Contains(returnFullName))
+                    {
+                        returnGeneralType = TypeReference.Promise(AnyKeyword.Default);
+                    }
+                    else if (_fileResults.Contains(returnFullName))
+                    {
+                        returnGeneralType = TypeReference.Promise(VoidKeyword.Default);
+                        rawBuilder.AppendLine(
+                            $"""
+                              $ts_save(await response.blob(), $ts_hcd(response.headers['Content-Disposition']) ?? 'file');
+                            """);
+                    }
+                    else
+                    {
+                        returnGeneralType = TypeReference.Promise(Parser.GetOrCreateGeneralType(returnType));
+                        if (returnGeneralType.TypeArguments[0].Kind == SyntaxKind.VoidKeyword)
+                        {
+                            rawBuilder.AppendLine(
+                                $"""
+                                  // do nothing
+                                """);
+                        }
+                        else
+                        {
+                            rawBuilder.AppendLine(
+                                $"""
+                                  return await response.json() as {returnGeneralType.GetText()};
+                                """);
+                        }
+                    }
+
+                    rawBuilder.Append("});");
+
+                    var methodDeclaration = new MethodDeclaration(
+                        [AsyncKeyword.Default],
+                        methodName,
+                        [.. from x in methodParams select x.Paramter],
+                        returnGeneralType
+                    )
+                    {
+                        Body = new Block()
+                        {
+                            Statements =
+                            [
+                                new RawText(rawBuilder.ToString()),
+                            ],
+                        },
+                    };
+                    members.Add(methodDeclaration);
                 }
-                declaration.Members = [.. members];
+                else
+                {
+                    var methodDeclaration = new MethodDeclaration(
+                        methodName,
+                        [.. from x in methodParams select x.Paramter]
+                    )
+                    {
+                        Body = new Block()
+                        {
+                            Statements =
+                            [
+                                new ReturnStatement(new StringLiteral("undefined")),
+                            ],
+                        },
+                    };
+                    members.Add(methodDeclaration);
+                }
+            }
+            declaration.Members = [.. members];
 
-                return declaration;
-            });
-            return true;
-        }
-
-        general = null;
-        declaration = null;
-        return false;
+            return declaration;
+        });
+        return true;
     }
 }

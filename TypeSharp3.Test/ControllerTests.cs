@@ -38,15 +38,20 @@ public class ControllerTests
     {
         public HttpStatus Status { get; set; }
         public T Id { get; set; }
-        public string Token { get; set; }
+        public int? Token { get; set; }
+    }
+
+    [TypeScriptGenerator]
+    public class LabelValueNode<TValue>
+    {
+        public LabelValueNode<TValue>[] Children { get; set; }
     }
 
     public class UpdateAgeRequest
     {
-        public int Age { get; set; }
+        public int? Age { get; set; }
     }
 
-    [TypeScriptGenerator]
     public class LoginController : Controller
     {
         //[HttpGet]

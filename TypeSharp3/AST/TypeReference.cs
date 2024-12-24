@@ -1,5 +1,8 @@
-﻿namespace TypeSharp.AST;
+﻿using System.Diagnostics;
 
+namespace TypeSharp.AST;
+
+[DebuggerDisplay("{TypeName}")]
 public partial class TypeReference : INode
 {
     public SyntaxKind Kind => SyntaxKind.TypeReference;

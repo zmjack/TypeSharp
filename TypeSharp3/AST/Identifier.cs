@@ -1,5 +1,8 @@
-﻿namespace TypeSharp.AST;
+﻿using System.Diagnostics;
 
+namespace TypeSharp.AST;
+
+[DebuggerDisplay("{EscapedText}")]
 public partial class Identifier : INode
 {
     public SyntaxKind Kind => SyntaxKind.Identifier;

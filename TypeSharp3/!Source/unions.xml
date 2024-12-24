@@ -66,6 +66,7 @@
   <!-- namespace -->
   <union type="ModuleDeclaration.IModifier">
     <keyword name="declare" />
+    <keyword name="export" />
   </union>
 
   <!-- variable -->
@@ -88,6 +89,9 @@
   </union>
 
   <!-- interface -->
+  <union type="InterfaceDeclaration.IModifier">
+    <keyword name="export" />
+  </union>
   <union type="InterfaceDeclaration.IMember">
     <class name="PropertySignature" />
     <class name="GetAccessor" />
@@ -116,6 +120,9 @@
   </union>
 
   <!-- enum -->
+  <union type="EnumDeclaration.IModifier">
+    <keyword name="export" />
+  </union>
   <union type="EnumMember.IInitializer">
     <type name="literal" />
   </union>

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TypeSharp.AST;
+﻿using TypeSharp.AST;
 
 namespace TypeSharp;
 
@@ -53,4 +48,14 @@ internal static class ClrTypeUtil
 
         return new Identifier(typeName);
     }
+
+    public static bool IsNullableValue(Type type)
+    {
+        if (type.IsGenericType)
+        {
+            return type.GetGenericTypeDefinition() == typeof(Nullable<>);
+        }
+        return false;
+    }
+
 }

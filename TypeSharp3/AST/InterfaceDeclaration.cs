@@ -6,18 +6,41 @@ public partial class InterfaceDeclaration : INode
 
     public InterfaceDeclaration(Identifier name)
     {
+        Modifiers = [];
         Name = name;
         Members = [];
         TypeParameters = [];
     }
     public InterfaceDeclaration(Identifier name, TypeParameter[] typeParameters)
     {
+        Modifiers = [];
+        Name = name;
+        Members = [];
+        TypeParameters = typeParameters;
+    }
+    public InterfaceDeclaration(IModifier[] modifiers, Identifier name)
+    {
+        Modifiers = modifiers;
+        Name = name;
+        Members = [];
+        TypeParameters = [];
+    }
+    public InterfaceDeclaration(IModifier[] modifiers, Identifier name, TypeParameter[] typeParameters)
+    {
+        Modifiers = modifiers;
         Name = name;
         Members = [];
         TypeParameters = typeParameters;
     }
 
+    /// <summary>
+    /// <inheritdoc cref="IModifier" />
+    /// </summary>
+    public IModifier[] Modifiers { get; set; }
     public Identifier Name { get; set; }
+    /// <summary>
+    /// <inheritdoc cref="IMember" />
+    /// </summary>
     public IMember[] Members { get; set; }
     public TypeParameter[] TypeParameters { get; set; }
 
@@ -29,7 +52,7 @@ public partial class InterfaceDeclaration : INode
 
         return
             $"""
-            interface {Name.GetText()}{generics} {"{"}
+            {string.Join("", from m in Modifiers select $"{m.GetText()} ")}interface {Name.GetText()}{generics} {"{"}
             {indent + 1}{string.Join($"\r\n{indent + 1}", from m in Members select $"{m.GetText(indent + 1)};")}
             {indent}{"}"}
             """;

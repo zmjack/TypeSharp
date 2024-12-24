@@ -9,9 +9,14 @@ public partial class ModuleDeclaration : INode
         Modifiers = [];
         Name = name;
     }
+    public ModuleDeclaration(IModifier[] modifiers, Identifier name)
+    {
+        Modifiers = modifiers;
+        Name = name;
+    }
 
+    public IModifier[] Modifiers { get; set; }
     public Identifier Name { get; set; }
-    public IModifier[]? Modifiers { get; set; }
     public required ModuleBlock Body { get; set; }
 
     public string GetText(Indent indent = default)

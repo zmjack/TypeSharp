@@ -1,16 +1,19 @@
-﻿namespace TypeSharp.AST;
+﻿using System.Diagnostics;
 
+namespace TypeSharp.AST;
+
+[DebuggerDisplay("{Left.GetText()}.{Right.GetText()}")]
 public partial class QualifiedName : INode
 {
     public SyntaxKind Kind => SyntaxKind.QualifiedName;
 
-    public QualifiedName(string fullname)
+    public QualifiedName(string fullName)
     {
-        var lastDot = fullname.LastIndexOf('.');
-        if (lastDot == -1) throw new ArgumentException($"Not a qualified name. (FullName: {fullname})");
+        var lastDot = fullName.LastIndexOf('.');
+        if (lastDot == -1) throw new ArgumentException($"Not a qualified name. (FullName: {fullName})");
 
-        var left = fullname[..lastDot];
-        var right = fullname[(lastDot + 1)..];
+        var left = fullName[..lastDot];
+        var right = fullName[(lastDot + 1)..];
 
         Left = left.Contains('.') ? new QualifiedName(left) : new Identifier(left);
         Right = new Identifier(right);

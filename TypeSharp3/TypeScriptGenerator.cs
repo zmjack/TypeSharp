@@ -54,6 +54,7 @@ public class TypeScriptGenerator : IEnumerable<INode>
     private readonly Dictionary<Type, Lazy<IDeclaration>> _declarations = [];
     private readonly Dictionary<Type, Lazy<IGeneralType>> _generals = new()
     {
+        [typeof(object)] = new(() => AnyKeyword.Default),
         [typeof(void)] = new(() => VoidKeyword.Default),
         [typeof(string)] = new(() => new UnionType([StringKeyword.Default, UndefinedKeyword.Default])),
         [typeof(bool)] = new(() => BooleanKeyword.Default),
@@ -77,6 +78,12 @@ public class TypeScriptGenerator : IEnumerable<INode>
 #endif
     };
     private readonly List<Resolver> _resolvers = [];
+
+    [Obsolete("Need to be removed in the future.")]
+    public void AddTypeResolver(Type type, Lazy<IGeneralType> resolver)
+    {
+        _generals.Add(type, resolver);
+    }
 
     public void Add(Type type)
     {
@@ -224,7 +231,7 @@ public class TypeScriptGenerator : IEnumerable<INode>
             {
                 if (module.Key is not null)
                 {
-                    statements.Add(new ModuleDeclaration(module.Key)
+                    statements.Add(new ModuleDeclaration([ExportKeyword.Default], module.Key)
                     {
                         Body = new ModuleBlock()
                         {
