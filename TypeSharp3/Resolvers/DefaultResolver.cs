@@ -5,7 +5,7 @@ namespace TypeSharp.Resolvers;
 
 public class DefaultResolver : Resolver
 {
-    private IGeneralType Wrap(Type type, TypeReference typeReference)
+    private static IGeneralType Wrap(Type type, TypeReference typeReference)
     {
         if (type.IsClass)
         {

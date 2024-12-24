@@ -192,15 +192,25 @@ public partial class ControllerResolver : Resolver
                                 """);
                         }
 
-                        IGeneralType returnType;
-                        var returnFullName = method.ReturnType.FullName;
+                        TypeReference returnGeneralType;
+                        var returnType = method.ReturnType;
+                        if (returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Task<>))
+                        {
+                            returnType = returnType.GetGenericArguments()[0];
+                        }
+                        else if (returnType == typeof(Task))
+                        {
+                            returnType = typeof(void);
+                        }
+
+                        var returnFullName = returnType.FullName;
                         if (_actionResults.Any(name => returnFullName == name))
                         {
-                            returnType = TypeReference.Promise(AnyKeyword.Default);
+                            returnGeneralType = TypeReference.Promise(AnyKeyword.Default);
                         }
                         else if (returnFullName == _fileResult)
                         {
-                            returnType = TypeReference.Promise(VoidKeyword.Default);
+                            returnGeneralType = TypeReference.Promise(VoidKeyword.Default);
                             rawBuilder.AppendLine(
                                 $"""
                                   $ts_save(await response.blob(), $ts_hcd(response.headers['Content-Disposition']) ?? 'file');
@@ -208,8 +218,8 @@ public partial class ControllerResolver : Resolver
                         }
                         else
                         {
-                            var _returnType = TypeReference.Promise(Parser.GetOrCreateGeneralType(method.ReturnType));
-                            if (_returnType.TypeArguments[0].Kind == SyntaxKind.VoidKeyword)
+                            returnGeneralType = TypeReference.Promise(Parser.GetOrCreateGeneralType(returnType));
+                            if ((returnGeneralType as TypeReference)!.TypeArguments[0].Kind == SyntaxKind.VoidKeyword)
                             {
                                 rawBuilder.AppendLine(
                                     $"""
@@ -220,10 +230,9 @@ public partial class ControllerResolver : Resolver
                             {
                                 rawBuilder.AppendLine(
                                     $"""
-                                      return await response.json() as {_returnType.GetText()};
+                                      return await response.json() as {returnGeneralType.GetText()};
                                     """);
                             }
-                            returnType = _returnType;
                         }
 
                         rawBuilder.Append("});");
@@ -232,7 +241,7 @@ public partial class ControllerResolver : Resolver
                             [AsyncKeyword.Default],
                             methodName,
                             [.. from x in methodParams select x.Paramter],
-                            returnType
+                            returnGeneralType
                         )
                         {
                             Body = new Block()
