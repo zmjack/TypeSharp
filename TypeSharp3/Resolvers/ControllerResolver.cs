@@ -22,12 +22,12 @@ public partial class ControllerResolver : Resolver
     }
 
     public string? BaseAddress { get; set; }
+    public string DefaultRoute { get; set; } = "[Controller]/[Action]";
 
     private static readonly string[] _routes =
     [
         "Microsoft.AspNetCore.Mvc.RouteAttribute",
     ];
-    private static readonly string _defaultRouteTemplate = "[Controller]/{Action}";
     private static readonly string[] _controllers =
     [
         "Microsoft.AspNetCore.Mvc.Controller",
@@ -102,22 +102,16 @@ public partial class ControllerResolver : Resolver
         {
             templates = GetRouteTemplates(method.DeclaringType!);
         }
-        var template = templates.Length != 0
-            ? templates.First()
-            : _defaultRouteTemplate;
+        var template = templates.Length != 0 ? templates.First() : DefaultRoute;
 
         var controller = method.DeclaringType!.Name;
         if (controller.EndsWith("Controller")) controller = controller[..^10];
 
-        var uri = template;
-        uri = GetRouteControllerRegex().Replace(uri, controller);
-        uri = GetRouteActionRegex().Replace(uri, action.Name);
+        var route = template;
+        route = GetRouteControllerRegex().Replace(route, controller);
+        route = GetRouteActionRegex().Replace(route, action.Name);
 
-        if (BaseAddress is not null)
-        {
-            return uri.StartsWith('/') ? $"{BaseAddress}{uri}" : $"{BaseAddress}/{uri}";
-        }
-        else return uri;
+        return $"{BaseAddress}/{route}";
     }
 
     private static bool CanResolve(Type type)
@@ -145,7 +139,7 @@ public partial class ControllerResolver : Resolver
         var typeName = type.Name;
         general = new Lazy<IGeneralType>(() =>
         {
-            IIdentifier referenceName = Parser.ModuleCode != ModuleCode.None && type.Namespace is not null
+            IIdentifier referenceName = Generator.ModuleCode != ModuleCode.None && type.Namespace is not null
                 ? new QualifiedName($"{type.Namespace}.{typeName}")
                 : new Identifier(typeName);
             return new TypeReference(referenceName);
@@ -159,7 +153,7 @@ public partial class ControllerResolver : Resolver
             foreach (var method in methods)
             {
                 var methodName = method.Name;
-                if (Parser.CamelCase) methodName = StringEx.CamelCase(methodName);
+                if (Generator.CamelCase) methodName = StringEx.CamelCase(methodName);
 
                 var methodParams = (
                     from p in method.GetParameters()
@@ -167,7 +161,7 @@ public partial class ControllerResolver : Resolver
                     select new
                     {
                         InBody = attrs.Any(x => x.GetType().FullName == _fromBody),
-                        Paramter = new Parameter(p.Name!, Parser.GetOrCreateGeneralType(p.ParameterType))
+                        Paramter = new Parameter(p.Name!, Generator.GetOrCreateGeneralType(p.ParameterType))
                     }
                 ).ToArray();
                 var actions = GetActions(method);
@@ -193,7 +187,7 @@ public partial class ControllerResolver : Resolver
                     var rawBuilder = new StringBuilder();
                     rawBuilder.Append(
                         $"""
-                        return await fetch(`{uri}{(string.IsNullOrEmpty(query) ? "" : $"?{query}")}`, {"{"}
+                        return fetch(`{uri}{(string.IsNullOrEmpty(query) ? "" : $"?{query}")}`, {"{"}
                           method: '{action.Verb}'
                         """);
 
@@ -214,17 +208,19 @@ public partial class ControllerResolver : Resolver
                             $"""
                             ,
                               body: JSON.stringify({body.Name.GetText()})
-                            {"}"}).then(async response => {"{"}
                             """);
                     }
                     else
                     {
-                        rawBuilder.AppendLine(
-                            $"""
-
-                            {"}"}).then(async response => {"{"}
-                            """);
+                        rawBuilder.AppendLine();
                     }
+
+                    rawBuilder.AppendLine(
+                        $"""
+                        {"}"}).then(async response => {"{"}
+                          if (!($ts_handle_response?.(response) ?? true)) throw "Cancel resolve response.";
+                        """
+                    );
 
                     TypeReference returnGeneralType;
                     var returnType = method.ReturnType;
@@ -241,22 +237,27 @@ public partial class ControllerResolver : Resolver
                     if (_actionResults.Contains(returnFullName))
                     {
                         returnGeneralType = TypeReference.Promise(AnyKeyword.Default);
+                        rawBuilder.AppendLine(
+                            """
+                              return await response.json() as any;
+                            """);
                     }
                     else if (_fileResults.Contains(returnFullName))
                     {
                         returnGeneralType = TypeReference.Promise(VoidKeyword.Default);
                         rawBuilder.AppendLine(
-                            $"""
+                            """
                               $ts_save(await response.blob(), $ts_hcd(response.headers['Content-Disposition']) ?? 'file');
                             """);
                     }
                     else
                     {
-                        returnGeneralType = TypeReference.Promise(Parser.GetOrCreateGeneralType(returnType));
-                        if (returnGeneralType.TypeArguments[0].Kind == SyntaxKind.VoidKeyword)
+                        var awaitType = Generator.GetOrCreateGeneralType(returnType);
+                        returnGeneralType = TypeReference.Promise(awaitType);
+                        if (awaitType.Kind == SyntaxKind.VoidKeyword)
                         {
                             rawBuilder.AppendLine(
-                                $"""
+                                """
                                   // do nothing
                                 """);
                         }
@@ -264,12 +265,18 @@ public partial class ControllerResolver : Resolver
                         {
                             rawBuilder.AppendLine(
                                 $"""
-                                  return await response.json() as {returnGeneralType.GetText()};
+                                  return await response.json() as {awaitType.GetText()};
                                 """);
                         }
                     }
 
-                    rawBuilder.Append("});");
+                    rawBuilder.Append(
+                        """
+                        }).catch(reason => {
+                          $ts_handle_error?.(reason);
+                          return undefined;
+                        });
+                        """);
 
                     var methodDeclaration = new MethodDeclaration(
                         [AsyncKeyword.Default],

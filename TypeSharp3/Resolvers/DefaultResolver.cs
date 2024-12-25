@@ -13,20 +13,51 @@ public class DefaultResolver : Resolver
 
     public override bool TryResolve(Type type, out Lazy<IDeclaration>? declaration, out Lazy<IGeneralType>? general)
     {
-        Lazy<IGeneralType>? AsArrayOrDefault()
+        Lazy<IGeneralType>? AsDictionaryOrDefault(Type[] interfaces)
+        {
+            var dictionary2 = (
+                from x in interfaces
+                where x.IsGenericType
+                let e = x.IsGenericTypeDefinition ? x : x.GetGenericTypeDefinition()
+                where e == typeof(IDictionary<,>)
+                select x
+            ).FirstOrDefault();
+
+            if (dictionary2 is not null)
+            {
+                return new Lazy<IGeneralType>(() =>
+                {
+                    var args = type.GetGenericArguments();
+                    var keyType = Generator.GetOrCreateGeneralType(args[0]);
+                    var valueType = Generator.GetOrCreateGeneralType(args[1]);
+
+                    //TODO: If the type is a number, then the type of IndexSignature is a number.
+                    var typeLiteral = new TypeLiteral()
+                    {
+                        Members =
+                        [
+                            new IndexSignature(new("key", StringKeyword.Default), valueType)
+                        ]
+                    };
+                    return typeLiteral;
+                });
+            }
+            else return null;
+        }
+
+        Lazy<IGeneralType>? AsArrayOrDefault(Type[] interfaces)
         {
             if (type.IsArray)
             {
                 return new Lazy<IGeneralType>(() =>
                 {
                     var el = type.GetElementType()!;
-                    var typeReference = TypeReference.Array(Parser.GetOrCreateGeneralType(el));
+                    var typeReference = TypeReference.Array(Generator.GetOrCreateGeneralType(el));
                     return Nullable(typeReference);
                 });
             }
             else
             {
-                Type[] interfaces = [type, .. type.GetInterfaces()];
                 var enumerable1 = (
                     from x in interfaces
                     where x.IsGenericType
@@ -48,7 +79,7 @@ public class DefaultResolver : Resolver
                     return new Lazy<IGeneralType>(() =>
                     {
                         var el = type.GetGenericArguments()[0];
-                        var typeReference = TypeReference.Array(Parser.GetOrCreateGeneralType(el));
+                        var typeReference = TypeReference.Array(Generator.GetOrCreateGeneralType(el));
                         return Nullable(typeReference);
                     });
                 }
@@ -56,7 +87,15 @@ public class DefaultResolver : Resolver
             }
         }
 
-        var arr = AsArrayOrDefault();
+        Type[] interfaces = [type, .. type.GetInterfaces()];
+        var dict = AsDictionaryOrDefault(interfaces);
+        if (dict is not null)
+        {
+            declaration = null;
+            general = dict;
+            return true;
+        }
+        var arr = AsArrayOrDefault(interfaces);
         if (arr is not null)
         {
             declaration = null;
@@ -69,10 +108,10 @@ public class DefaultResolver : Resolver
             var typeName = type.Name;
             general = new Lazy<IGeneralType>(() =>
             {
-                var useNamespace = Parser.ModuleCode != ModuleCode.None;
+                var useNamespace = Generator.ModuleCode != ModuleCode.None;
                 var referenceName = ClrTypeUtil.GetIdentifier(useNamespace, type, typeName);
                 var typeReference = new TypeReference(referenceName);
-                return type.IsClass ? Nullable(typeReference) : typeReference;
+                return type.IsInterface || type.IsClass ? Nullable(typeReference) : typeReference;
             });
             declaration = new Lazy<IDeclaration>(() =>
             {
@@ -98,15 +137,15 @@ public class DefaultResolver : Resolver
                 var typeName = type.Name[..type.Name.IndexOf('`')];
                 general = new Lazy<IGeneralType>(() =>
                 {
-                    var useNamespace = Parser.ModuleCode != ModuleCode.None;
+                    var useNamespace = Generator.ModuleCode != ModuleCode.None;
                     var referenceName = ClrTypeUtil.GetIdentifier(useNamespace, type, typeName);
                     var typeReference = new TypeReference(referenceName,
                     [
                         ..
                         from arg in ((TypeInfo)type).GenericTypeParameters
-                        select Parser.GetOrCreateGeneralType(arg)
+                        select Generator.GetOrCreateGeneralType(arg)
                     ]);
-                    return type.IsClass ? Nullable(typeReference) : typeReference;
+                    return type.IsInterface || type.IsClass ? Nullable(typeReference) : typeReference;
                 });
                 declaration = new Lazy<IDeclaration>(() =>
                 {
@@ -118,16 +157,20 @@ public class DefaultResolver : Resolver
                     ]);
                     var members = new List<InterfaceDeclaration.IMember>();
 
-                    var props = from p in type.GetProperties() group p by p.Name into g select g.First();
+                    var props =
+                        from p in type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                        group p by p.Name into g
+                        select g.First();
                     foreach (var prop in props)
                     {
                         if (prop.GetCustomAttribute<TypeScriptIgnoreAttribute>() is not null) continue;
 
                         var propName = prop.Name;
-                        if (Parser.CamelCase) propName = StringEx.CamelCase(propName);
+                        if (Generator.CamelCase) propName = StringEx.CamelCase(propName);
 
-                        var general = Parser.GetOrCreateGeneralType(prop.PropertyType);
-                        if (type.IsClass || ClrTypeUtil.IsNullableValue(type))
+                        var propertyType = prop.PropertyType;
+                        var general = Generator.GetOrCreateGeneralType(propertyType);
+                        if (propertyType.IsInterface || propertyType.IsClass || ClrTypeUtil.IsNullableValue(propertyType))
                         {
                             members.Add(new PropertySignature(propName, general)
                             {
@@ -152,7 +195,7 @@ public class DefaultResolver : Resolver
                     var nullableValueType = type.GetGenericArguments()[0];
                     general = new Lazy<IGeneralType>(() =>
                     {
-                        var typeReference = Parser.GetOrCreateGeneralType(nullableValueType);
+                        var typeReference = Generator.GetOrCreateGeneralType(nullableValueType);
                         return new UnionType([typeReference, UndefinedKeyword.Default]);
                     });
                     declaration = null;
@@ -161,18 +204,18 @@ public class DefaultResolver : Resolver
                 else
                 {
                     var typeName = type.Name[..type.Name.IndexOf('`')];
-                    _ = Parser.GetOrCreateGeneralType(type.GetGenericTypeDefinition());
+                    _ = Generator.GetOrCreateGeneralType(type.GetGenericTypeDefinition());
                     general = new Lazy<IGeneralType>(() =>
                     {
-                        var useNamespace = Parser.ModuleCode != ModuleCode.None;
+                        var useNamespace = Generator.ModuleCode != ModuleCode.None;
                         var referenceName = ClrTypeUtil.GetIdentifier(useNamespace, type, typeName);
                         var typeReference = new TypeReference(referenceName,
                         [
                             ..
                             from arg in type.GenericTypeArguments
-                            select Parser.GetOrCreateGeneralType(arg)
+                            select Generator.GetOrCreateGeneralType(arg)
                         ]);
-                        return type.IsClass ? Nullable(typeReference) : typeReference;
+                        return type.IsInterface || type.IsClass ? Nullable(typeReference) : typeReference;
                     });
                     declaration = null;
                     return true;
@@ -184,26 +227,30 @@ public class DefaultResolver : Resolver
             var typeName = type.Name;
             general = new Lazy<IGeneralType>(() =>
             {
-                var useNamespace = Parser.ModuleCode != ModuleCode.None;
+                var useNamespace = Generator.ModuleCode != ModuleCode.None;
                 var referenceName = ClrTypeUtil.GetIdentifier(useNamespace, type, typeName);
                 var typeReference = new TypeReference(referenceName);
-                return type.IsClass ? Nullable(typeReference) : typeReference;
+                return type.IsInterface || type.IsClass ? Nullable(typeReference) : typeReference;
             });
             declaration = new Lazy<IDeclaration>(() =>
             {
                 var @interface = new InterfaceDeclaration([ExportKeyword.Default], typeName);
                 var members = new List<InterfaceDeclaration.IMember>();
 
-                var props = from p in type.GetProperties() group p by p.Name into g select g.First();
+                var props =
+                    from p in type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                    group p by p.Name into g
+                    select g.First();
                 foreach (var prop in props)
                 {
                     if (prop.GetCustomAttribute<TypeScriptIgnoreAttribute>() is not null) continue;
 
                     var propName = prop.Name;
-                    if (Parser.CamelCase) propName = StringEx.CamelCase(propName);
+                    if (Generator.CamelCase) propName = StringEx.CamelCase(propName);
 
-                    var general = Parser.GetOrCreateGeneralType(prop.PropertyType);
-                    if (type.IsClass || ClrTypeUtil.IsNullableValue(type))
+                    var propertyType = prop.PropertyType;
+                    var general = Generator.GetOrCreateGeneralType(propertyType);
+                    if (propertyType.IsInterface || propertyType.IsClass || ClrTypeUtil.IsNullableValue(propertyType))
                     {
                         members.Add(new PropertySignature(propName, general)
                         {

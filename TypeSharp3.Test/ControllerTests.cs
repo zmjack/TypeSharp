@@ -44,7 +44,7 @@ public class ControllerTests
     [TypeScriptGenerator]
     public class LabelValueNode<TValue>
     {
-        public LabelValueNode<TValue>[] Children { get; set; }
+        public Dictionary<string, string> Children { get; set; }
     }
 
     public class UpdateAgeRequest

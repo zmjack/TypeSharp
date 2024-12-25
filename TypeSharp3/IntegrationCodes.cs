@@ -1,9 +1,76 @@
-﻿namespace TypeSharp;
+﻿using System.Text;
 
-[Flags]
-public enum IntegrationCodes
+namespace TypeSharp;
+
+public static class IntegrationCode
 {
-    None = 0,
-    DeclareOnly = 0x01,
-    SaveFile = 0x10,
+    public const string SaveFile = "SaveFile";
+    public const string SaveFile_DeclareOnly = "SaveFile.d";
+    public const string HandleResponse_DeclareOnly = "HandleResponse.d";
+
+    internal static string GetCode(string[] names)
+    {
+        var builder = new StringBuilder();
+        foreach (var name in names)
+        {
+            var code = name switch
+            {
+                SaveFile => Code_SaveFile(),
+                SaveFile_DeclareOnly => Code_SaveFile_DeclareOnly(),
+                HandleResponse_DeclareOnly => Code_HandleResponse_DeclareOnly(),
+                _ => throw new NotSupportedException($"Invalid code name. (Name: {name})"),
+            };
+            builder.AppendLine(code);
+        }
+        return builder.ToString();
+    }
+
+    internal static string Code_SaveFile()
+    {
+        return
+            """
+            function $ts_hcd(header: string): string | undefined {
+              if (header === null || header === void 0) return undefined;
+              var name = (regex: RegExp) => {
+                var match: RegExpExecArray;
+                if ((match = regex.exec(header)) !== null)
+                  return decodeURI(match[1]);
+                else return null;
+              }
+              return name(/(?:filename\*=UTF-8'')([^;$]+)/g) ?? name(/(?:filename=)([^;$]+)/g);
+            }
+            function $ts_save(blob: Blob, filename: string): void {
+              if (window.navigator['msSaveOrOpenBlob']) {
+                window.navigator['msSaveOrOpenBlob'](blob, filename);
+              } else {
+                var el = document.createElement('a');
+                var href = window.URL.createObjectURL(blob);
+                el.href = href;
+                el.download = filename;
+                document.body.appendChild(el);
+                el.click();
+                document.body.removeChild(el);
+                window.URL.revokeObjectURL(href);
+              }
+            }
+            """;
+    }
+
+    internal static string Code_SaveFile_DeclareOnly()
+    {
+        return
+            """
+            declare var $ts_hcd: (header: string) => string | undefined;
+            declare var $ts_save: (blob: Blob, filename: string) => void;
+            """;
+    }
+
+    internal static string Code_HandleResponse_DeclareOnly()
+    {
+        return
+            """
+            declare var $ts_handle_response: (response: any) => boolean;
+            declare var $ts_handle_error: (reason: any) => void;
+            """;
+    }
 }

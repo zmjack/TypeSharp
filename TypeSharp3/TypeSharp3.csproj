@@ -8,7 +8,7 @@
     <RootNamespace>TypeSharp</RootNamespace>
     <LangVersion>preview</LangVersion>
 
-    <Version>3.0.0-alpha22</Version>
+    <Version>3.0.0-alpha41</Version>
     <Authors>zmjack</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
@@ -20,6 +20,14 @@
     <PackageIcon>typesharp.png</PackageIcon>
     <PackageId>TypeSharp</PackageId>
     <Configurations>Debug;Release;DebugAnalyzer</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0|AnyCPU'">
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0|AnyCPU'">
+    <DebugType>none</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
