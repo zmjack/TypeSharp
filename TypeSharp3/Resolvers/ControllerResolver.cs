@@ -218,7 +218,6 @@ public partial class ControllerResolver : Resolver
                     rawBuilder.AppendLine(
                         $"""
                         {"}"}).then(async response => {"{"}
-                          if (!($ts_handle_response?.(response) ?? true)) throw "Cancel resolve response.";
                         """
                     );
 
@@ -234,39 +233,43 @@ public partial class ControllerResolver : Resolver
                     }
 
                     var returnFullName = returnType.FullName;
-                    if (_actionResults.Contains(returnFullName))
-                    {
-                        returnGeneralType = TypeReference.Promise(AnyKeyword.Default);
-                        rawBuilder.AppendLine(
-                            """
-                              return await response.json() as any;
-                            """);
-                    }
-                    else if (_fileResults.Contains(returnFullName))
+                    if (_fileResults.Contains(returnFullName))
                     {
                         returnGeneralType = TypeReference.Promise(VoidKeyword.Default);
                         rawBuilder.AppendLine(
                             """
-                              $ts_save(await response.blob(), $ts_hcd(response.headers['Content-Disposition']) ?? 'file');
+                              const disposition = response.headers.get('Content-Disposition');
+                              $ts_save(await response.blob(), $ts_hcd(disposition != null ? disposition : 'file'));
                             """);
                     }
                     else
                     {
-                        var awaitType = Generator.GetOrCreateGeneralType(returnType);
-                        returnGeneralType = TypeReference.Promise(awaitType);
-                        if (awaitType.Kind == SyntaxKind.VoidKeyword)
+                        rawBuilder.AppendLine(
+                            """                            
+                              if ($ts_handle_response) {
+                                return await $ts_handle_response(response) as any;
+                              }
+                            """);
+
+                        if (_actionResults.Contains(returnFullName))
                         {
+                            returnGeneralType = TypeReference.Promise(AnyKeyword.Default);
                             rawBuilder.AppendLine(
-                                """
-                                  // do nothing
+                                """                            
+                                  return await response.json() as any;
                                 """);
                         }
                         else
                         {
-                            rawBuilder.AppendLine(
-                                $"""
-                                  return await response.json() as {awaitType.GetText()};
-                                """);
+                            var awaitType = Generator.GetOrCreateGeneralType(returnType);
+                            returnGeneralType = TypeReference.Promise(awaitType);
+                            if (awaitType.Kind != SyntaxKind.VoidKeyword)
+                            {
+                                rawBuilder.AppendLine(
+                                    $"""
+                                      return await response.json() as {awaitType.GetText()};
+                                    """);
+                            }
                         }
                     }
 

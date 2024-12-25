@@ -60,7 +60,7 @@ public static class IntegrationCode
     {
         return
             """
-            declare var $ts_hcd: (header: string) => string | undefined;
+            declare var $ts_hcd: (header: string) => string;
             declare var $ts_save: (blob: Blob, filename: string) => void;
             """;
     }
@@ -69,7 +69,7 @@ public static class IntegrationCode
     {
         return
             """
-            declare var $ts_handle_response: (response: any) => boolean;
+            declare var $ts_handle_response: (response: Response) => any;
             declare var $ts_handle_error: (reason: any) => void;
             """;
     }
