@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+    <Configurations>Debug;Release;DebugAnalyzer</Configurations>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="~npm\type-sharp\**" />
+    <Content Remove="~npm\type-sharp\**" />
+    <EmbeddedResource Remove="~npm\type-sharp\**" />
+    <None Remove="~npm\type-sharp\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\js\webpack\" />
+    <Folder Include="~npm\package\dist\" />
+    <Folder Include="~scripts\npm-clone\" />
+    <Folder Include="~scripts\typings\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="JSend" Version="1.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TypeSharp10\TypeSharp10.csproj" />
+  </ItemGroup>
+
+</Project>

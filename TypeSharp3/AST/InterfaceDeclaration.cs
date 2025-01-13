@@ -52,8 +52,11 @@ public partial class InterfaceDeclaration : INode
 
         return
             $"""
-            {string.Join("", from m in Modifiers select $"{m.GetText()} ")}interface {Name.GetText()}{generics} {"{"}
-            {indent + 1}{string.Join($"\r\n{indent + 1}", from m in Members select $"{m.GetText(indent + 1)};")}
+            {string.Join("", from m in Modifiers select $"{m.GetText()} ")}interface {Name.GetText()}{generics} {"{"}{(
+                Members.Length > 0
+                    ? string.Join("", from m in Members select $"\r\n{indent + 1}{m.GetText(indent + 1)};")
+                    : ""
+            )}
             {indent}{"}"}
             """;
     }

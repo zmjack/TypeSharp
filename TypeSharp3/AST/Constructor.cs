@@ -16,7 +16,7 @@ public partial class Constructor : INode
     {
         return
             $"""
-            constructor({string.Join(", ", from p in Parameters select p.GetText())}) {Body.GetText(indent + 1)}
+            constructor({string.Join(", ", from p in Parameters select p.GetText())}) {Body.GetText(indent)}
             """;
     }
 }

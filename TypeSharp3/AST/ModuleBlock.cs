@@ -10,8 +10,7 @@ public class ModuleBlock : INode
     {
         return
             $"""            
-            {"{"}
-            {indent + 1}{string.Join($"\r\n{indent + 1}", from s in Statements ?? [] select s.GetText(indent + 1))}
+            {"{"}{string.Join($"", from s in Statements ?? [] select $"\r\n{indent + 1}{s.GetText(indent + 1)}")}
             {indent}{"}"}
             """;
     }

@@ -32,14 +32,15 @@ public class DefaultResolver : Resolver
                     var valueType = Generator.GetOrCreateGeneralType(args[1]);
 
                     //TODO: If the type is a number, then the type of IndexSignature is a number.
-                    var typeLiteral = new TypeLiteral()
-                    {
-                        Members =
-                        [
-                            new IndexSignature(new("key", StringKeyword.Default), valueType)
-                        ]
-                    };
-                    return typeLiteral;
+                    //var typeLiteral = new TypeLiteral()
+                    //{
+                    //    Members =
+                    //    [
+                    //        new IndexSignature(new("key", StringKeyword.Default), valueType)
+                    //    ]
+                    //};
+                    var typeReference = TypeReference.Record(StringKeyword.Default, valueType);
+                    return typeReference;
                 });
             }
             else return null;

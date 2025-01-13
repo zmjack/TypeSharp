@@ -18,8 +18,7 @@ public partial class Block : INode
     {
         return
             $"""
-            {"{"}
-            {indent + 1}{string.Join($"\r\n{indent + 1}", from node in Statements select node.GetText(indent + 1))}
+            {"{"}{string.Join("", from node in Statements select $"\r\n{indent + 1}{node.GetText(indent + 1)}")}
             {indent}{"}"}
             """;
     }

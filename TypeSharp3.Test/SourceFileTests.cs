@@ -58,9 +58,9 @@ public class SourceFileTests
         Assert.Equal(
             """
             interface IPerson {
-                name: string;
-                get age(): number;
-                set age(n: number);
+              name: string;
+              get age(): number;
+              set age(n: number);
             }
             """,
             code
@@ -97,9 +97,9 @@ public class SourceFileTests
         Assert.Equal(
             """
             interface IPerson<T extends string> {
-                name: T;
-                get age(): number;
-                set age(n: number);
+              name: T;
+              get age(): number;
+              set age(n: number);
             }
             """,
             code
@@ -146,12 +146,11 @@ public class SourceFileTests
         Assert.Equal(
             """
             class SimpleApi {
-                constructor(api: string)     {
-
-                }
-                getUser(group: string): string     {
-                    return "123";
-                }
+              constructor(api: string) {
+              }
+              getUser(group: string): string {
+                return "123";
+              }
             }
             """,
             code

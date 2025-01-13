@@ -7,14 +7,18 @@ public partial class TypeReference : INode
 {
     public SyntaxKind Kind => SyntaxKind.TypeReference;
 
-    public static TypeReference Date { get; } = new TypeReference(new Identifier("Date"));
+    public static TypeReference Record(IGeneralType key, IGeneralType value)
+    {
+        return new(new Identifier("Record"), [key, value]);
+    }
+    public static TypeReference Date { get; } = new(new Identifier("Date"));
     public static TypeReference Promise(IGeneralType typeArgument)
     {
-        return new TypeReference(new Identifier("Promise"), [typeArgument]);
+        return new(new Identifier("Promise"), [typeArgument]);
     }
     public static TypeReference Array(IGeneralType typeArgument)
     {
-        return new TypeReference(new Identifier("Array"), [typeArgument]);
+        return new(new Identifier("Array"), [typeArgument]);
     }
 
     public TypeReference(IIdentifier typeName)
