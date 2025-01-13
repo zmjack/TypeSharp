@@ -30,7 +30,7 @@ public partial class EnumDeclaration : INode
             $"""
             {string.Join("", from m in Modifiers select $"{m.GetText()} ")}enum {Name.GetText()} {"{"}{(
                 Members.Length > 0
-                    ? $"{indent + 1}{string.Join($",\r\n{indent + 1}", from m in Members select m.GetText())}"
+                    ? $"\r\n{indent + 1}{string.Join($",\r\n{indent + 1}", from m in Members select m.GetText())}"
                     : ""
             )}            
             {indent}{"}"}
