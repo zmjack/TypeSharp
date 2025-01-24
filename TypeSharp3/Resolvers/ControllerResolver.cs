@@ -246,7 +246,7 @@ public partial class ControllerResolver : Resolver
                     {
                         rawBuilder.AppendLine(
                             """                            
-                              if ($ts_handle_response) {
+                              if (typeof $ts_handle_response !== 'undefined') {
                                 return await $ts_handle_response(response) as any;
                               }
                             """);
@@ -276,7 +276,9 @@ public partial class ControllerResolver : Resolver
                     rawBuilder.Append(
                         """
                         }).catch(reason => {
-                          $ts_handle_error?.(reason);
+                          if (typeof $ts_handle_error !== 'undefined') {
+                            $ts_handle_error(reason);
+                          }
                           return undefined;
                         });
                         """);

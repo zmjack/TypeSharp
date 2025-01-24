@@ -32,16 +32,17 @@ public static class IntegrationCode
             function $ts_hcd(header: string): string | undefined {
               if (header === null || header === void 0) return undefined;
               var name = (regex: RegExp) => {
-                var match: RegExpExecArray;
+                var match: RegExpExecArray | null;
                 if ((match = regex.exec(header)) !== null)
                   return decodeURI(match[1]);
-                else return null;
+                else return undefined;
               }
               return name(/(?:filename\*=UTF-8'')([^;$]+)/g) ?? name(/(?:filename=)([^;$]+)/g);
             }
             function $ts_save(blob: Blob, filename: string): void {
-              if (window.navigator['msSaveOrOpenBlob']) {
-                window.navigator['msSaveOrOpenBlob'](blob, filename);
+              if (typeof window.navigator !== 'undefined') {
+                var save = (window.navigator as any)['msSaveOrOpenBlob'];
+                save(blob, filename);
               } else {
                 var el = document.createElement('a');
                 var href = window.URL.createObjectURL(blob);

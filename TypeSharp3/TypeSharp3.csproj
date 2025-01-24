@@ -8,10 +8,10 @@
     <RootNamespace>TypeSharp</RootNamespace>
     <LangVersion>preview</LangVersion>
 
-    <Version>3.0.0-alpha44</Version>
+    <Version>3.0.0-alpha49</Version>
     <Authors>zmjack</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <Description>C# model to the TypeScript model compiler.</Description>
     <Copyright>Copyright © nstandard.net 2018</Copyright>
     <RepositoryUrl>https://github.com/zmjack/TypeSharp</RepositoryUrl>
@@ -35,7 +35,7 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
-    <None Include="..\LICENSE.md">
+    <None Include="..\LICENSE">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

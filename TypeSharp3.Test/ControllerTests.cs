@@ -52,13 +52,14 @@ public class ControllerTests
         public int? Age { get; set; }
     }
 
+    [TypeScriptGenerator]
     public class LoginController : Controller
     {
-        //[HttpGet]
-        //public Guid QueryId(string token)
-        //{
-        //    return Guid.Empty;
-        //}
+        [HttpGet]
+        public IEnumerable<UpdateAgeRequest> ReturnEnumerable()
+        {
+            return [];
+        }
 
         [HttpPut(Name = "userlogin")]
         public string[] Login([FromBody] LoginRequest<Guid> model)
