@@ -158,10 +158,15 @@ public partial class ControllerResolver : Resolver
                 var methodParams = (
                     from p in method.GetParameters()
                     let attrs = p.GetCustomAttributes()
+                    let parameterType = p.ParameterType
+                    let generalType = Generator.GetOrCreateGeneralType(parameterType)
                     select new
                     {
                         InBody = attrs.Any(x => x.GetType().FullName == _fromBody),
-                        Paramter = new Parameter(p.Name!, Generator.GetOrCreateGeneralType(p.ParameterType))
+                        Paramter = new Parameter(p.Name!, generalType)
+                        {
+                            QuestionToken = ClrTypeUtil.IsNullableValue(parameterType) ? new() : null,
+                        },
                     }
                 ).ToArray();
                 var actions = GetActions(method);

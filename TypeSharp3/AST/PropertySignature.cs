@@ -21,9 +21,16 @@ public partial class PropertySignature : INode, InterfaceDeclaration.IMember
 
     public string GetText(Indent indent = default)
     {
-        if (Type is not null)
+        IGeneralType? type = Type;
+        if (type is not null)
         {
-            return $"{Name.GetText()}{QuestionToken?.GetText()}: {Type.GetText()}";
+            if (QuestionToken is not null && type is UnionType union)
+            {
+                type = new UnionType([
+                    .. from x in union.Types where x != UndefinedKeyword.Default select x
+                ]);
+            }
+            return $"{Name.GetText()}{QuestionToken?.GetText()}: {type.GetText()}";
         }
         else
         {

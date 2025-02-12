@@ -51,6 +51,9 @@ internal static class ClrTypeUtil
 
     public static bool IsNullableValue(Type type)
     {
+        if (type.IsInterface) return true;
+        if (type.IsClass) return true;
+
         if (type.IsGenericType)
         {
             return type.GetGenericTypeDefinition() == typeof(Nullable<>);

@@ -171,17 +171,10 @@ public class DefaultResolver : Resolver
 
                         var propertyType = prop.PropertyType;
                         var general = Generator.GetOrCreateGeneralType(propertyType);
-                        if (propertyType.IsInterface || propertyType.IsClass || ClrTypeUtil.IsNullableValue(propertyType))
+                        members.Add(new PropertySignature(propName, general)
                         {
-                            members.Add(new PropertySignature(propName, general)
-                            {
-                                QuestionToken = new(),
-                            });
-                        }
-                        else
-                        {
-                            members.Add(new PropertySignature(propName, general));
-                        }
+                            QuestionToken = ClrTypeUtil.IsNullableValue(propertyType) ? new() : null,
+                        });
                     }
                     @interface.Members = [.. members];
 
@@ -251,17 +244,10 @@ public class DefaultResolver : Resolver
 
                     var propertyType = prop.PropertyType;
                     var general = Generator.GetOrCreateGeneralType(propertyType);
-                    if (propertyType.IsInterface || propertyType.IsClass || ClrTypeUtil.IsNullableValue(propertyType))
+                    members.Add(new PropertySignature(propName, general)
                     {
-                        members.Add(new PropertySignature(propName, general)
-                        {
-                            QuestionToken = new(),
-                        });
-                    }
-                    else
-                    {
-                        members.Add(new PropertySignature(propName, general));
-                    }
+                        QuestionToken = ClrTypeUtil.IsNullableValue(propertyType) ? new() : null,
+                    });
                 }
                 @interface.Members = [.. members];
 

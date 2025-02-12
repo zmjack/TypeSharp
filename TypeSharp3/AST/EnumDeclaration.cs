@@ -32,7 +32,7 @@ public partial class EnumDeclaration : INode
                 Members.Length > 0
                     ? $"\r\n{indent + 1}{string.Join($",\r\n{indent + 1}", from m in Members select m.GetText())}"
                     : ""
-            )}            
+            )}
             {indent}{"}"}
             """;
     }

@@ -19,7 +19,7 @@
   <!-- boolean -->
   <keyword name="true" />
   <keyword name="false" />
-  
+
   <!-- modifiers -->
   <keyword name="export" />
   <keyword name="public" />
