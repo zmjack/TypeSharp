@@ -30,9 +30,9 @@ public static class IntegrationCode
         return
             """
             const $ts_hcd = (function () {
-              const rules = [/(?:filename\*=UTF-8'')([^;$]+)/g, /(?:filename=)([^;$]+)/g];
+              const rules = [/(?:filename\*=UTF-8'')([^;$]+)/, /(?:filename=)([^;$]+)/];
               return function (header: string) {
-                if (header === null || header === void 0) return undefined;
+                if (header === void 0 || header === null) return void 0;
                 for (let rule of rules) {
                   const match = rule.exec(header);
                   if (match !== null) return decodeURI(match[1]);
