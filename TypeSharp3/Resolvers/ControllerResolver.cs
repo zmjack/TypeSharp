@@ -137,24 +137,6 @@ public partial class ControllerResolver : Resolver
         var parameterType = parameter.ParameterType;
 
         var general = Generator.GetOrCreateGeneralType(parameterType);
-        if (ClrTypeUtil.IsNullable(parameterType))
-        {
-            if (general is UnionType union)
-            {
-                return new(parameterName, union.WithoutUndefined())
-                {
-                    QuestionToken = new(),
-                };
-            }
-            if (general is TypeReference)
-            {
-                return new(parameterName, general)
-                {
-                    QuestionToken = new(),
-                };
-            }
-        }
-
         return new(parameterName, general);
     }
 

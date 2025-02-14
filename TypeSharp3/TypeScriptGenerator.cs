@@ -58,7 +58,7 @@ public class TypeScriptGenerator : IEnumerable<INode>
     private readonly Dictionary<Type, Lazy<IDeclaration>> _declarations = [];
     private readonly Dictionary<Type, Lazy<IGeneralType>> _generals = new()
     {
-        [typeof(object)] = new(() => AnyKeyword.Default),
+        [typeof(object)] = new(() => new UnionType([AnyKeyword.Default, UndefinedKeyword.Default])),
         [typeof(void)] = new(() => VoidKeyword.Default),
         [typeof(string)] = new(() => new UnionType([StringKeyword.Default, UndefinedKeyword.Default])),
         [typeof(bool)] = new(() => BooleanKeyword.Default),
