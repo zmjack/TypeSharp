@@ -49,11 +49,16 @@ internal static class ClrTypeUtil
         return new Identifier(typeName);
     }
 
-    public static bool IsNullableValue(Type type)
+    public static bool IsNullable(Type type)
     {
         if (type.IsInterface) return true;
         if (type.IsClass) return true;
 
+        return IsNullableValue(type);
+    }
+
+    public static bool IsNullableValue(Type type)
+    {
         if (type.IsGenericType)
         {
             return type.GetGenericTypeDefinition() == typeof(Nullable<>);

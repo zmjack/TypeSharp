@@ -1,4 +1,4 @@
-# TypeSharp
+# TypeSharp-V3
 
 C# model to the TypeScript model compiler.
 

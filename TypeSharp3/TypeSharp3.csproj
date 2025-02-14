@@ -8,7 +8,7 @@
     <RootNamespace>TypeSharp</RootNamespace>
     <LangVersion>preview</LangVersion>
 
-    <Version>3.0.0-alpha50</Version>
+    <Version>3.0.0-alpha52</Version>
     <Authors>zmjack</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>

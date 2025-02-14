@@ -22,6 +22,7 @@ public class ControllerTests
             ],
         })
         {
+            typeof(LoginController),
         };
 
         var code = parser.GetCode();
@@ -41,7 +42,6 @@ public class ControllerTests
         public int? Token { get; set; }
     }
 
-    [TypeScriptGenerator]
     public class LabelValueNode<TValue>
     {
         public Dictionary<string, string> Children { get; set; }
@@ -52,7 +52,6 @@ public class ControllerTests
         public int? Age { get; set; }
     }
 
-    [TypeScriptGenerator]
     public class LoginController : Controller
     {
         [HttpGet]

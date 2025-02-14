@@ -29,21 +29,27 @@ public static class IntegrationCode
     {
         return
             """
-            function $ts_hcd(header: string): string | undefined {
-              if (header === null || header === void 0) return undefined;
-              var name = (regex: RegExp) => {
-                var match: RegExpExecArray | null;
-                if ((match = regex.exec(header)) !== null)
-                  return decodeURI(match[1]);
-                else return undefined;
+            const $ts_hcd = (function () {
+              const rules = [/(?:filename\*=UTF-8'')([^;$]+)/g, /(?:filename=)([^;$]+)/g];
+              return function (header: string) {
+                if (header === null || header === void 0) return undefined;
+                for (let rule of rules) {
+                  const match = rule.exec(header);
+                  if (match !== null) return decodeURI(match[1]);
+                }
+                return void 0;
               }
-              return name(/(?:filename\*=UTF-8'')([^;$]+)/g) ?? name(/(?:filename=)([^;$]+)/g);
-            }
-            function $ts_save(blob: Blob, filename: string): void {
-              if (typeof window.navigator !== 'undefined') {
+            }());
+            const $ts_save = (function () {
+              if (window?.navigator !== void 0) {
                 var save = (window.navigator as any)['msSaveOrOpenBlob'];
-                save(blob, filename);
-              } else {
+                if (save !== void 0) {
+                  return function (blob: Blob, filename: string) {
+                    save(blob, filename);
+                  }
+                }
+              }
+              return function (blob: Blob, filename: string) {
                 var el = document.createElement('a');
                 var href = window.URL.createObjectURL(blob);
                 el.href = href;
@@ -52,8 +58,8 @@ public static class IntegrationCode
                 el.click();
                 document.body.removeChild(el);
                 window.URL.revokeObjectURL(href);
-              }
-            }
+              };
+            }());
             """;
     }
 

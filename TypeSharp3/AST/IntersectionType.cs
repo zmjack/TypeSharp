@@ -4,7 +4,7 @@ public partial class IntersectionType : INode
 {
     public SyntaxKind Kind => SyntaxKind.IntersectionType;
 
-    public IntersectionType(params IGeneralType[] types)
+    public IntersectionType(IGeneralType[] types)
     {
         Types = types;
     }

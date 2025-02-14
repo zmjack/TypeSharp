@@ -93,7 +93,23 @@ public class TypeScriptGenerator : IEnumerable<INode>
     {
         if (type.IsGenericParameter)
         {
-            _generals.Add(type, new Lazy<IGeneralType>(() => new TypeReference(new Identifier(type.Name))));
+            if (type.IsClass)
+            {
+                _generals.Add(type, new Lazy<IGeneralType>(() =>
+                {
+                    return new UnionType([
+                        new TypeReference(new Identifier(type.Name)),
+                        UndefinedKeyword.Default
+                    ]);
+                }));
+            }
+            else
+            {
+                _generals.Add(type, new Lazy<IGeneralType>(() =>
+                {
+                    return new TypeReference(new Identifier(type.Name));
+                }));
+            }
         }
         else
         {

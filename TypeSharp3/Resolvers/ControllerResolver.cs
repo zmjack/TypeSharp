@@ -127,6 +127,37 @@ public partial class ControllerResolver : Resolver
         return false;
     }
 
+    private Parameter GetParameter(ParameterInfo parameter)
+    {
+        var parameterName = parameter.Name!;
+        if (Generator.CamelCase)
+        {
+            parameterName = StringEx.CamelCase(parameterName);
+        }
+        var parameterType = parameter.ParameterType;
+
+        var general = Generator.GetOrCreateGeneralType(parameterType);
+        if (ClrTypeUtil.IsNullable(parameterType))
+        {
+            if (general is UnionType union)
+            {
+                return new(parameterName, union.WithoutUndefined())
+                {
+                    QuestionToken = new(),
+                };
+            }
+            if (general is TypeReference)
+            {
+                return new(parameterName, general)
+                {
+                    QuestionToken = new(),
+                };
+            }
+        }
+
+        return new(parameterName, general);
+    }
+
     public override bool TryResolve(Type type, out Lazy<IDeclaration>? declaration, out Lazy<IGeneralType>? general)
     {
         if (!CanResolve(type))
@@ -160,13 +191,11 @@ public partial class ControllerResolver : Resolver
                     let attrs = p.GetCustomAttributes()
                     let parameterType = p.ParameterType
                     let generalType = Generator.GetOrCreateGeneralType(parameterType)
+                    let inBody = attrs.Any(x => x.GetType().FullName == _fromBody)
                     select new
                     {
-                        InBody = attrs.Any(x => x.GetType().FullName == _fromBody),
-                        Paramter = new Parameter(p.Name!, generalType)
-                        {
-                            QuestionToken = ClrTypeUtil.IsNullableValue(parameterType) ? new() : null,
-                        },
+                        InBody = inBody,
+                        Paramter = GetParameter(p)
                     }
                 ).ToArray();
                 var actions = GetActions(method);

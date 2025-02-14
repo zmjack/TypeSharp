@@ -11,6 +11,52 @@ public class DefaultResolver : Resolver
         return new UnionType([typeReference, UndefinedKeyword.Default]);
     }
 
+    private static readonly string _required = "System.Runtime.CompilerServices.RequiredMemberAttribute";
+
+    private PropertySignature GetPropertySignature(PropertyInfo property)
+    {
+        var propertyName = property.Name;
+        if (Generator.CamelCase)
+        {
+            propertyName = StringEx.CamelCase(propertyName);
+        }
+        var propertyType = property.PropertyType;
+
+        var general = Generator.GetOrCreateGeneralType(propertyType);
+        var required = property.GetCustomAttributes().Any(x => x.GetType().FullName == _required);
+        if (required)
+        {
+            if (propertyType.IsClass)
+            {
+                if (general is UnionType union)
+                {
+                    return new(propertyName, union.WithoutUndefined());
+                }
+            }
+        }
+        else
+        {
+            if (ClrTypeUtil.IsNullable(propertyType))
+            {
+                if (general is UnionType union)
+                {
+                    return new(propertyName, union.WithoutUndefined())
+                    {
+                        QuestionToken = new(),
+                    };
+                }
+                if (general is TypeReference)
+                {
+                    return new(propertyName, general)
+                    {
+                        QuestionToken = new(),
+                    };
+                }
+            }
+        }
+        return new(propertyName, general);
+    }
+
     public override bool TryResolve(Type type, out Lazy<IDeclaration>? declaration, out Lazy<IGeneralType>? general)
     {
         Lazy<IGeneralType>? AsDictionaryOrDefault(Type[] interfaces)
@@ -165,16 +211,7 @@ public class DefaultResolver : Resolver
                     foreach (var prop in props)
                     {
                         if (prop.GetCustomAttribute<TypeScriptIgnoreAttribute>() is not null) continue;
-
-                        var propName = prop.Name;
-                        if (Generator.CamelCase) propName = StringEx.CamelCase(propName);
-
-                        var propertyType = prop.PropertyType;
-                        var general = Generator.GetOrCreateGeneralType(propertyType);
-                        members.Add(new PropertySignature(propName, general)
-                        {
-                            QuestionToken = ClrTypeUtil.IsNullableValue(propertyType) ? new() : null,
-                        });
+                        members.Add(GetPropertySignature(prop));
                     }
                     @interface.Members = [.. members];
 
@@ -238,16 +275,7 @@ public class DefaultResolver : Resolver
                 foreach (var prop in props)
                 {
                     if (prop.GetCustomAttribute<TypeScriptIgnoreAttribute>() is not null) continue;
-
-                    var propName = prop.Name;
-                    if (Generator.CamelCase) propName = StringEx.CamelCase(propName);
-
-                    var propertyType = prop.PropertyType;
-                    var general = Generator.GetOrCreateGeneralType(propertyType);
-                    members.Add(new PropertySignature(propName, general)
-                    {
-                        QuestionToken = ClrTypeUtil.IsNullableValue(propertyType) ? new() : null,
-                    });
+                    members.Add(GetPropertySignature(prop));
                 }
                 @interface.Members = [.. members];
 

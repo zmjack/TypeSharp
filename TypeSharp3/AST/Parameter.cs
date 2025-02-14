@@ -16,16 +16,9 @@ public partial class Parameter : INode
 
     public string GetText(Indent indent = default)
     {
-        IGeneralType? type = Type;
-        if (type is not null)
+        if (Type is not null)
         {
-            if (QuestionToken is not null && type is UnionType union)
-            {
-                type = new UnionType([
-                    .. from x in union.Types where x != UndefinedKeyword.Default select x
-                ]);
-            }
-            return $"{Name.GetText()}{QuestionToken?.GetText()}: {type.GetText()}";
+            return $"{Name.GetText()}{QuestionToken?.GetText()}: {Type.GetText()}";
         }
         else
         {
