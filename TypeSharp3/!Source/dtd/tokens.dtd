@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!ELEMENT token EMPTY>
+<!ATTLIST token
+  name CDATA #REQUIRED
+  mark CDATA #REQUIRED
+  >
+
+<!ELEMENT tokens (token*)>

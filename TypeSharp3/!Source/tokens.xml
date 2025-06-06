@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE tokens SYSTEM "dtd/tokens.dtd">
+
+<tokens>
+  <!-- Builtin types -->
+  <token name="question" mark="?" />
+</tokens>

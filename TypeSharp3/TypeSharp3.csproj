@@ -8,7 +8,7 @@
     <RootNamespace>TypeSharp</RootNamespace>
     <LangVersion>preview</LangVersion>
 
-    <Version>3.0.0-alpha56</Version>
+    <Version>3.0.0-alpha60</Version>
     <Authors>zmjack</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
@@ -54,12 +54,19 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="!Source\dtd\tokens.dtd">
+      <SubType>Designer</SubType>
+    </None>
     <None Update="!Source\dtd\keywords.dtd">
       <SubType>Designer</SubType>
     </None>
     <None Update="!Source\dtd\unions.dtd">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EditorConfigFiles Remove="D:\Solutions\Library\TypeSharp\TypeSharp3\.editorconfig" />
   </ItemGroup>
 
 </Project>

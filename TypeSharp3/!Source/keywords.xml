@@ -2,7 +2,7 @@
 <!DOCTYPE keywords SYSTEM "dtd/keywords.dtd">
 
 <keywords>
-  <!-- builtin types -->
+  <!-- Builtin types -->
   <keyword name="undefined" />
   <keyword name="any" />
   <keyword name="never" />
@@ -10,21 +10,25 @@
   <keyword name="unknown" />
   <keyword name="symbol" />
 
-  <!-- basic types -->
+  <!-- Basic types -->
   <keyword name="null" />
   <keyword name="number" />
   <keyword name="string" />
   <keyword name="boolean" />
 
-  <!-- boolean -->
+  <!-- Boolean -->
   <keyword name="true" />
   <keyword name="false" />
 
-  <!-- modifiers -->
+  <!-- Modifiers -->
   <keyword name="export" />
   <keyword name="public" />
   <keyword name="protected" />
   <keyword name="private" />
   <keyword name="declare" />
   <keyword name="async" />
+
+  <!-- Heritage -->
+  <keyword name="extends" />
+  <keyword name="implements" />
 </keywords>

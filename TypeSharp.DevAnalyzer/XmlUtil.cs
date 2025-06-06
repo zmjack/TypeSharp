@@ -16,6 +16,10 @@ internal static class XmlUtil
     {
         return GetOrCreate(context, "keywords.xml", KeywordsXml.Parse) ?? [];
     }
+    internal static IEnumerable<Token> GetTokens(GeneratorExecutionContext context)
+    {
+        return GetOrCreate(context, "tokens.xml", TokensXml.Parse) ?? [];
+    }
     internal static IEnumerable<Union> GetUnions(GeneratorExecutionContext context)
     {
         return GetOrCreate(context, "unions.xml", UnionXml.Parse) ?? [];

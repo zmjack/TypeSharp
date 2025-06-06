@@ -58,7 +58,7 @@ public class TypeScriptGenerator : IEnumerable<INode>
     private readonly Dictionary<Type, Lazy<IDeclaration>> _declarations = [];
     private readonly Dictionary<Type, Lazy<IGeneralType>> _generals = new()
     {
-        [typeof(object)] = new(() => new UnionType([AnyKeyword.Default, UndefinedKeyword.Default])),
+        [typeof(object)] = new(() => AnyKeyword.Default),
         [typeof(void)] = new(() => VoidKeyword.Default),
         [typeof(string)] = new(() => new UnionType([StringKeyword.Default, UndefinedKeyword.Default])),
         [typeof(bool)] = new(() => BooleanKeyword.Default),
@@ -93,23 +93,10 @@ public class TypeScriptGenerator : IEnumerable<INode>
     {
         if (type.IsGenericParameter)
         {
-            if (type.IsClass)
+            _generals.Add(type, new Lazy<IGeneralType>(() =>
             {
-                _generals.Add(type, new Lazy<IGeneralType>(() =>
-                {
-                    return new UnionType([
-                        new TypeReference(new Identifier(type.Name)),
-                        UndefinedKeyword.Default
-                    ]);
-                }));
-            }
-            else
-            {
-                _generals.Add(type, new Lazy<IGeneralType>(() =>
-                {
-                    return new TypeReference(new Identifier(type.Name));
-                }));
-            }
+                return new TypeReference(new Identifier(type.Name));
+            }));
         }
         else
         {

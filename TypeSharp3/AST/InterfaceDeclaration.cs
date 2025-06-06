@@ -10,6 +10,7 @@ public partial class InterfaceDeclaration : INode
         Name = name;
         Members = [];
         TypeParameters = [];
+        HeritageClauses = [];
     }
     public InterfaceDeclaration(Identifier name, TypeParameter[] typeParameters)
     {
@@ -17,6 +18,7 @@ public partial class InterfaceDeclaration : INode
         Name = name;
         Members = [];
         TypeParameters = typeParameters;
+        HeritageClauses = [];
     }
     public InterfaceDeclaration(IModifier[] modifiers, Identifier name)
     {
@@ -24,6 +26,7 @@ public partial class InterfaceDeclaration : INode
         Name = name;
         Members = [];
         TypeParameters = [];
+        HeritageClauses = [];
     }
     public InterfaceDeclaration(IModifier[] modifiers, Identifier name, TypeParameter[] typeParameters)
     {
@@ -31,6 +34,7 @@ public partial class InterfaceDeclaration : INode
         Name = name;
         Members = [];
         TypeParameters = typeParameters;
+        HeritageClauses = [];
     }
 
     /// <summary>
@@ -43,6 +47,7 @@ public partial class InterfaceDeclaration : INode
     /// </summary>
     public IMember[] Members { get; set; }
     public TypeParameter[] TypeParameters { get; set; }
+    public HeritageClause[] HeritageClauses { get; set; }
 
     public string GetText(Indent indent = default)
     {
@@ -52,7 +57,7 @@ public partial class InterfaceDeclaration : INode
 
         return
             $"""
-            {string.Join("", from m in Modifiers select $"{m.GetText()} ")}interface {Name.GetText()}{generics} {"{"}{(
+            {string.Join("", from m in Modifiers select $"{m.GetText()} ")}interface {Name.GetText()}{generics} {string.Join("", from c in HeritageClauses select $"{c.GetText()} ")}{"{"}{(
                 Members.Length > 0
                     ? string.Join("", from m in Members select $"\r\n{indent + 1}{m.GetText(indent + 1)};")
                     : ""

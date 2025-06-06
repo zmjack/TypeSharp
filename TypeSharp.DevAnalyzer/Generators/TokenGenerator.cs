@@ -4,7 +4,7 @@ using System.Text;
 namespace TypeSharp.DevAnalyzer.Generators;
 
 [Generator]
-public class KeywordGenerator : ISourceGenerator
+public class TokenGenerator : ISourceGenerator
 {
     public void Initialize(GeneratorInitializationContext context)
     {
@@ -14,33 +14,33 @@ public class KeywordGenerator : ISourceGenerator
     public void Execute(GeneratorExecutionContext context)
     {
         var typeWriter = new CodeWriter(context);
-        var keywords = XmlUtil.GetKeywords(context);
+        var tokens = XmlUtil.GetTokens(context);
 
-        foreach (var keyword in keywords)
+        foreach (var token in tokens)
         {
             var codeBuilder = new StringBuilder();
             typeWriter.WriteNamespaces(codeBuilder, new Indent(0, 4), Config.RootNamespace.Split('.'), indent =>
             {
                 codeBuilder.AppendLine(
                     $"""
-                    {indent}public partial class {keyword.ClassName} : INode, IKeyword<{keyword.ClassName}>
+                    {indent}public partial class {token.ClassName} : INode, IToken<{token.ClassName}>
                     {indent}{"{"}
-                    {indent}    public static {keyword.ClassName} Default {"{"} get; {"}"} = new {keyword.ClassName}();
+                    {indent}    public static {token.ClassName} Default {"{"} get; {"}"} = new {token.ClassName}();
                     {indent}    
-                    {indent}    protected {keyword.ClassName}() {"{"} {"}"}
+                    {indent}    protected {token.ClassName}() {"{"} {"}"}
                     {indent}    
-                    {indent}    public SyntaxKind Kind => SyntaxKind.{keyword.ClassName};
+                    {indent}    public SyntaxKind Kind => SyntaxKind.{token.ClassName};
                     {indent}    
                     {indent}    public string GetText(Indent indent = default)
                     {indent}    {"{"}
-                    {indent}        return "{keyword.Name}";
+                    {indent}        return "{token.Mark}";
                     {indent}    {"}"}
                     {indent}{"}"}
                     """
                 );
             });
             var code = codeBuilder.ToString();
-            context.AddSource($"{keyword.ClassName}.g.cs", code);
+            context.AddSource($"{token.ClassName}.g.cs", code);
         }
     }
 }

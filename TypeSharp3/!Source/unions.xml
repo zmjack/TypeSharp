@@ -98,6 +98,10 @@
     <class name="GetAccessor" />
     <class name="SetAccessor" />
   </union>
+  <union type="HeritageClause.IToken">
+    <keyword name="extends" />
+    <keyword name="implements" />
+  </union>
 
   <!-- class -->
   <union type="ClassDeclaration.IModifier">

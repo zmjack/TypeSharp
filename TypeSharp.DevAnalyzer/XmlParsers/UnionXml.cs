@@ -4,6 +4,18 @@ using System.Xml;
 
 namespace TypeSharp.DevAnalyzer.XmlParsers;
 
+internal class Union
+{
+    internal struct TypePair
+    {
+        public ConstrutctType ConstrutctType { get; set; }
+        public string Name { get; set; }
+    }
+
+    public string TypeName { get; set; }
+    public TypePair[] PossiableTypes { get; set; }
+}
+
 internal static class UnionXml
 {
     internal static IEnumerable<Union> Parse(string xml)
@@ -11,7 +23,7 @@ internal static class UnionXml
         var doc = new XmlDocument();
         doc.LoadXml(xml);
         List<Union> unionList = [];
-        Dictionary<string, TypePair[]> refDict = [];
+        Dictionary<string, Union.TypePair[]> refDict = [];
 
         var root = doc.DocumentElement;
         if (root.Name == "unions")
@@ -42,7 +54,7 @@ internal static class UnionXml
         return unionList;
     }
 
-    internal static Union? ParseNode(XmlNode node, Dictionary<string, TypePair[]> refDict)
+    internal static Union? ParseNode(XmlNode node, Dictionary<string, Union.TypePair[]> refDict)
     {
         string? typeName = node.Name switch
         {
@@ -53,7 +65,7 @@ internal static class UnionXml
 
         if (string.IsNullOrWhiteSpace(typeName)) return null;
 
-        var types = new List<TypePair>();
+        var types = new List<Union.TypePair>();
         foreach (var node1 in
             from x in node.ChildNodes.OfType<XmlNode>()
             where x.NodeType == XmlNodeType.Element

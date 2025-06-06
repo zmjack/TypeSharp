@@ -4,10 +4,11 @@ using System.Xml;
 
 namespace TypeSharp.DevAnalyzer.XmlParsers;
 
-internal class Keyword
+internal class Token
 {
     public string? ClassName { get; set; }
     public string? Name { get; set; }
+    public string? Mark { get; set; }
 
     public static string GetClassName(string name)
     {
@@ -15,20 +16,20 @@ internal class Keyword
 
         var chars = name.ToCharArray();
         chars[0] = char.ToUpper(chars[0]);
-        return $"{new string(chars)}Keyword";
+        return $"{new string(chars)}Token";
     }
 }
 
-internal static class KeywordsXml
+internal static class TokensXml
 {
-    internal static IEnumerable<Keyword> Parse(string xml)
+    internal static IEnumerable<Token> Parse(string xml)
     {
         var doc = new XmlDocument();
         doc.LoadXml(xml);
-        List<Keyword> list = [];
+        List<Token> list = [];
 
         var root = doc.DocumentElement;
-        if (root.Name == "keywords")
+        if (root.Name == "tokens")
         {
             foreach (var node in
                 from x in root.ChildNodes.OfType<XmlNode>()
@@ -36,15 +37,17 @@ internal static class KeywordsXml
                 select x
             )
             {
-                if (node.Name != "keyword") continue;
+                if (node.Name != "token") continue;
 
                 var name = node.Attributes["name"]?.Value!;
+                var mark = node.Attributes["mark"]?.Value!;
                 if (!string.IsNullOrWhiteSpace(name))
                 {
                     list.Add(new()
                     {
-                        ClassName = Keyword.GetClassName(name),
+                        ClassName = Token.GetClassName(name),
                         Name = name,
+                        Mark = mark,
                     });
                 }
             }

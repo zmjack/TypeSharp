@@ -11,7 +11,7 @@ public class ControllerTests
         var parser = new TypeScriptGenerator(new()
         {
             CamelCase = true,
-            DetectionMode = DetectionMode.AutoDetect,
+            DetectionMode = DetectionMode.None,
             ModuleCode = ModuleCode.Nested,
             Resolvers =
             [
@@ -22,7 +22,7 @@ public class ControllerTests
             ],
         })
         {
-            typeof(LoginController),
+            typeof(LoginRequest<>),
         };
 
         var code = parser.GetCode();
@@ -35,11 +35,29 @@ public class ControllerTests
         NotFound = 404,
     }
 
-    public class LoginRequest<T>
+    public class Tag
+    {
+    }
+
+    [TypeScriptGenerator]
+    public interface ILoginRequest<T>
+    {
+        HttpStatus Status { get; set; }
+        T Id { get; set; }
+        string Name { get; set; }
+        int? Token { get; set; }
+    }
+
+    public class LoginRequest<T> : ILoginRequest<T>
     {
         public HttpStatus Status { get; set; }
         public T Id { get; set; }
+        public string Name { get; set; }
         public int? Token { get; set; }
+        public required Tag ReqTag { get; set; }
+        public Tag? Tag { get; set; }
+        public required Dictionary<string, string> ReqDict { get; set; }
+        public Dictionary<string, string>? Dict { get; set; }
     }
 
     public class LabelValueNode<TValue>
