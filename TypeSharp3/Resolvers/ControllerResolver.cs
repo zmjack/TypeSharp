@@ -293,9 +293,9 @@ public partial class ControllerResolver : Resolver
                         """
                         }).catch(reason => {
                           if (typeof $ts_handle_error !== 'undefined') {
-                            $ts_handle_error(reason);
+                            return new Promise((_, reject) => reject($ts_handle_error(reason)));
                           }
-                          return undefined;
+                          return new Promise((_, reject) => reject(reason));
                         });
                         """);
 

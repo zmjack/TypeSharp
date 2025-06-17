@@ -77,7 +77,7 @@ public static class IntegrationCode
         return
             """
             declare var $ts_handle_response: (response: Response) => any;
-            declare var $ts_handle_error: (reason: any) => void;
+            declare var $ts_handle_error: (reason: any) => any;
             """;
     }
 }
