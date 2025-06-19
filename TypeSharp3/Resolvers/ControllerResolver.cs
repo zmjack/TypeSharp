@@ -255,7 +255,7 @@ public partial class ControllerResolver : Resolver
                         rawBuilder.AppendLine(
                             """
                               const disposition = response.headers.get('Content-Disposition');
-                              $ts_save(await response.blob(), $ts_hcd(disposition != null ? disposition : 'file'));
+                              $ts_save(await response.blob(), $ts_hcd(disposition));
                             """);
                     }
                     else

@@ -31,13 +31,13 @@ public static class IntegrationCode
             """
             const $ts_hcd = (function () {
               const rules = [/(?:filename\*=UTF-8'')([^;$]+)/, /(?:filename=)([^;$]+)/];
-              return function (header: string) {
-                if (header === void 0 || header === null) return void 0;
+              return function (header?: string | null) {
+                if (header === void 0 || header === null) return 'file';
                 for (let rule of rules) {
                   const match = rule.exec(header);
                   if (match !== null) return decodeURI(match[1]);
                 }
-                return void 0;
+                return 'file';
               }
             }());
             const $ts_save = (function () {
