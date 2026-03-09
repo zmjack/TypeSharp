@@ -31,10 +31,15 @@ public class ResolverUtil
             {
                 return new(propertyName, StringKeyword.Default);
             }
-            if (propertyType.IsClass)
+            else if (propertyType.IsValueType)
             {
-                return new(propertyName, new UnionType([general, UndefinedKeyword.Default]));
+                if (!ClrTypeUtil.IsNullableValue(propertyType))
+                {
+                    return new(propertyName, general);
+                }
             }
+
+            return new(propertyName, general);
         }
         else
         {
@@ -45,15 +50,19 @@ public class ResolverUtil
                     QuestionToken = QuestionToken.Default,
                 };
             }
-            if (ClrTypeUtil.IsNullable(propertyType))
+            else if (propertyType.IsValueType)
             {
-                return new(propertyName, general)
+                if (!ClrTypeUtil.IsNullableValue(propertyType))
                 {
-                    QuestionToken = QuestionToken.Default,
-                };
+                    return new(propertyName, general);
+                }
             }
+
+            return new(propertyName, general)
+            {
+                QuestionToken = QuestionToken.Default,
+            };
         }
-        return new(propertyName, general);
     }
 
     private string GetTypeName_Normal(Type type)
@@ -283,12 +292,13 @@ public class ResolverUtil
                     {
                         var useNamespace = _generator.ModuleCode != ModuleCode.None;
                         var referenceName = ClrTypeUtil.GetIdentifier(useNamespace, type, typeName);
-                        var typeReference = new TypeReference(referenceName,
+                        IGeneralType[] typeArguments =
                         [
                             ..
                             from arg in type.GenericTypeArguments
                             select _generator.GetOrCreateGeneralType(arg)
-                        ]);
+                        ];
+                        var typeReference = new TypeReference(referenceName, typeArguments);
                         return typeReference;
                     });
                     declaration = null;

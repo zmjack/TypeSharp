@@ -1,8 +1,9 @@
-﻿namespace TypeSharp.Test;
+﻿using static TypeSharp.Test.ModelTests;
+
+namespace TypeSharp.Test;
 
 public class ModelTests
 {
-    [TypeScriptGenerator]
     public enum HttpStatus
     {
         None,
@@ -10,41 +11,52 @@ public class ModelTests
         NotFound = 404,
     }
 
-    [TypeScriptGenerator]
     public class NormalModel
     {
+        public Guid Guid { get; set; }
         public int Int { get; set; }
         public string Str { get; set; }
         public object Obj { get; set; }
+        public HttpStatus Status { get; set; }
     }
 
-    [TypeScriptGenerator]
     public class NullableModel
     {
-        public int? Int_Nul { get; set; }
-        public string? Str_Nul { get; set; }
-        public object? Obj_Nul { get; set; }
+        public Guid? Guid { get; set; }
+        public int? Int { get; set; }
+        public string? Str { get; set; }
+        public object? Obj { get; set; }
+        public HttpStatus? Status { get; set; }
     }
 
-    [TypeScriptGenerator]
     public class RequiredModel
     {
+        public required Guid Guid { get; set; }
         public required int Int { get; set; }
         public required string Str { get; set; }
         public required object Obj { get; set; }
+        public required HttpStatus Status { get; set; }
     }
 
-    [TypeScriptGenerator]
     public class RequiredNullableModel
     {
-        public required int? Int_Nul { get; set; }
-        public required string? Str_Nul { get; set; }
-        public required object? Obj_Nul { get; set; }
+        public required Guid? Guid { get; set; }
+        public required int? Int { get; set; }
+        public required string Str { get; set; }
+        public required object? Obj { get; set; }
+        public required HttpStatus? Status { get; set; }
+        public Generic<string> G { get; set; }
     }
 
-    public class AA
+    public class Generic<T>
     {
-        public object Obj { get; set; }
+        public required T Value { get; set; }
+    }
+
+    public class GenericModel
+    {
+        public required Generic<string> GenericString { get; set; }
+        public required Generic<Guid> GenericGuid { get; set; }
     }
 
     [Fact]
@@ -56,7 +68,11 @@ public class ModelTests
             //DetectionMode = DetectionMode.AutoDetect,
         })
         {
-            typeof(AA),
+            //typeof(NormalModel),
+            //typeof(NullableModel),
+            //typeof(RequiredModel),
+            //typeof(RequiredNullableModel),
+            typeof(GenericModel)
         };
         var code = _generator.GetCode();
         var expected = """
@@ -66,18 +82,29 @@ export enum HttpStatus {
   OK = 200,
   NotFound = 404
 }
-export interface Model<T> {
+export interface NormalModel {
+  int: number;
+  str?: string;
+  obj?: any;
   status: HttpStatus;
-  typeRef?: T;
-  typeRef_N?: T;
-  typeRef_R: T;
-  typeRef_RN: T;
-  csInt32: number;
-  csInt32_N?: number;
-  csInt32_RN: number | undefined;
-  csString_N?: string;
-  csString_R: string;
-  csString_RN: string;
+}
+export interface NullableModel {
+  int?: number;
+  str?: string;
+  obj?: any;
+  status?: HttpStatus;
+}
+export interface RequiredModel {
+  int: number;
+  str: string;
+  obj: any;
+  status: HttpStatus;
+}
+export interface RequiredNullableModel {
+  int: number;
+  str: string;
+  obj: any;
+  status: HttpStatus;
 }
 """;
         Assert.Equal(expected, code);

@@ -23,6 +23,7 @@ public class ControllerTests
         })
         {
             typeof(LoginRequest<>),
+            typeof(LoginController),
         };
 
         var code = parser.GetCode();
@@ -80,6 +81,13 @@ public class ControllerTests
 
         [HttpPut(Name = "userlogin")]
         public string[] Login([FromBody] LoginRequest<Guid> model)
+        {
+            return ["OK."];
+        }
+
+        [HttpPost]
+        [Produces("application/json", "application/xml")]
+        public string[] ProducesXml()
         {
             return ["OK."];
         }

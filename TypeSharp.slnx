@@ -1,0 +1,33 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="DebugAnalyzer" />
+    <BuildType Name="Release" />
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Archived/">
+    <Project Path="Archived/TypeSharp.Antd/TypeSharp.Antd.csproj" />
+    <Project Path="Archived/TypeSharp.npm/TypeSharp.npm.csproj" />
+    <Project Path="Archived/TypeSharp10.Cli.Test/TypeSharp10.Cli.Test.csproj" />
+    <Project Path="Archived/TypeSharp10.Cli/TypeSharp10.Cli.csproj" />
+    <Project Path="Archived/TypeSharp10.Test/TypeSharp10.Test.csproj" />
+    <Project Path="Archived/TypeSharp10/TypeSharp10.csproj" />
+    <Project Path="Archived/TypeSharp20/TypeSharp20.csproj">
+      <BuildType Solution="DebugAnalyzer|*" Project="Debug" />
+    </Project>
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="LICENSE.md" />
+    <File Path="push.cmd" />
+    <File Path="README.cn.md" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Tests/TestApp/TestApp.csproj" />
+  </Folder>
+  <Project Path="TypeSharp.DevAnalyzer/TypeSharp.DevAnalyzer.csproj" />
+  <Project Path="TypeSharp3.Test/TypeSharp3.Test.csproj" />
+  <Project Path="TypeSharp3/TypeSharp3.csproj" />
+</Solution>
