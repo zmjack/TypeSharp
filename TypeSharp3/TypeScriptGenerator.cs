@@ -76,9 +76,9 @@ public class TypeScriptGenerator : IEnumerable<INode>
         [typeof(double)] = new(() => NumberKeyword.Default),
         [typeof(decimal)] = new(() => NumberKeyword.Default),
 #if NET6_0_OR_GREATER
-        [typeof(DateOnly)] = new(() => new UnionType([TypeReference.Date, StringKeyword.Default])),
-        [typeof(DateTime)] = new(() => new UnionType([TypeReference.Date, StringKeyword.Default])),
-        [typeof(DateTimeOffset)] = new(() => new UnionType([TypeReference.Date, StringKeyword.Default])),
+        [typeof(DateOnly)] = new(() => StringKeyword.Default),
+        [typeof(DateTime)] = new(() => StringKeyword.Default),
+        [typeof(DateTimeOffset)] = new(() => StringKeyword.Default),
 #endif
     };
     private readonly List<Resolver> _resolvers = [];

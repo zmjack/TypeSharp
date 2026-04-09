@@ -98,7 +98,7 @@ export interface NormalModel {
   str?: string;
   obj?: any;
   status: HttpStatus;
-  dateOnly: Date | string;
+  dateOnly: string;
 }
 export interface NullableModel {
   guid?: string;
@@ -106,7 +106,7 @@ export interface NullableModel {
   str?: string;
   obj?: any;
   status?: HttpStatus;
-  dateOnly?: Date | string;
+  dateOnly?: string;
 }
 export interface RequiredModel {
   guid: string;
@@ -114,7 +114,7 @@ export interface RequiredModel {
   str: string;
   obj: any;
   status: HttpStatus;
-  dateOnly: Date | string;
+  dateOnly: string;
 }
 export interface RequiredNullableModel {
   guid: string;
@@ -122,7 +122,7 @@ export interface RequiredNullableModel {
   str: string;
   obj: any;
   status: HttpStatus;
-  dateOnly: Date | string;
+  dateOnly: string;
 }
 """;
         Assert.Equal(expected, code);
