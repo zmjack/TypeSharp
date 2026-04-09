@@ -29,7 +29,7 @@
             return index switch
             {
                 int when index > 1 => $"{source[..(index - 1)].ToLower()}{source[index - 1]}{source[index..]}",
-                int when index == 1 => $"{char.ToLower(source[0])}{source.Substring(index)}",
+                int when index == 1 => $"{char.ToLower(source[0])}{source[index..]}",
                 int when index == 0 => source,
                 _ => source.ToLower(),
             };
