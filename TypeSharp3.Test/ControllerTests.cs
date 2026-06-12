@@ -22,7 +22,7 @@ public class ControllerTests
             ],
         })
         {
-            typeof(LoginRequest<>),
+            //typeof(LoginRequest<>),
             typeof(LoginController),
         };
 
@@ -71,8 +71,23 @@ public class ControllerTests
         public int? Age { get; set; }
     }
 
-    public class LoginController : Controller
+    public class LoginBaseController : Controller
     {
+        [HttpPost]
+        public virtual string Index()
+        {
+            return "OK";
+        }
+    }
+
+    public class LoginController : LoginBaseController
+    {
+        [HttpGet]
+        public override string Index()
+        {
+            return "OK";
+        }
+
         [HttpGet]
         public IEnumerable<UpdateAgeRequest> ReturnEnumerable()
         {

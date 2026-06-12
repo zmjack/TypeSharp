@@ -108,16 +108,16 @@ public partial class ControllerResolver : Resolver
     [GeneratedRegex(@"[\{\[][Aa]ction(?:\s*=[^\}\]]+)?[\}\]]")]
     private static partial Regex GetRouteActionRegex();
 
-    private string GetUri(MethodInfo method, Action action)
+    private string GetUri(Type controllerType, MethodInfo method, Action action)
     {
         var templates = GetRouteTemplates(method);
         if (templates.Length == 0)
         {
-            templates = GetRouteTemplates(method.DeclaringType!);
+            templates = GetRouteTemplates(controllerType!);
         }
         var template = templates.Length != 0 ? templates.First() : DefaultRoute;
 
-        var controller = method.DeclaringType!.Name;
+        var controller = controllerType!.Name;
         if (controller.EndsWith("Controller")) controller = controller[..^10];
 
         var route = template;
@@ -153,6 +153,30 @@ public partial class ControllerResolver : Resolver
         return new(parameterName, general);
     }
 
+    private static IEnumerable<MethodInfo> GetControllerMethods(Type type)
+    {
+        HashSet<MethodInfo> ignoredMethods = [];
+        for (var _type = type; !_controllers.Contains(_type!.FullName); _type = _type.BaseType)
+        {
+            var methods =
+                from method in _type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+                where !method.IsAbstract
+                select method;
+            foreach (var method in methods)
+            {
+                if (ignoredMethods.Contains(method)) continue;
+
+                var baseDefinition = method.GetBaseDefinition();
+                if (baseDefinition != method)
+                {
+                    ignoredMethods.Add(baseDefinition);
+                }
+
+                yield return method;
+            }
+        }
+    }
+
     public override bool TryResolve(Type type, out Lazy<IDeclaration>? declaration, out Lazy<IGeneralType>? general)
     {
         if (!CanResolve(type))
@@ -175,7 +199,7 @@ public partial class ControllerResolver : Resolver
             var declaration = new ClassDeclaration([ExportKeyword.Default], typeName);
             var members = new List<ClassDeclaration.IMember>();
 
-            var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+            MethodInfo[] methods = GetControllerMethods(type).ToArray();
             foreach (var method in methods)
             {
                 var methodName = method.Name;
@@ -195,7 +219,7 @@ public partial class ControllerResolver : Resolver
                 ).ToArray();
                 var actions = GetActions(method);
                 var action = actions.First();
-                var uri = GetUri(method, action);
+                var uri = GetUri(type, method, action);
 
                 var query = string.Join("&",
                     from p in methodParams
