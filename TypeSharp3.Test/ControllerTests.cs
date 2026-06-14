@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using TypeSharp.Resolvers;
 
 namespace TypeSharp.Test;
@@ -23,7 +24,8 @@ public class ControllerTests
         })
         {
             //typeof(LoginRequest<>),
-            typeof(LoginController),
+            typeof(LoginBaseController),
+            //typeof(LoginController),
         };
 
         var code = parser.GetCode();
@@ -77,6 +79,12 @@ public class ControllerTests
         public virtual string Index()
         {
             return "OK";
+        }
+
+        [HttpPost]
+        public void F(IFormFile file)
+        {
+
         }
     }
 

@@ -42,6 +42,7 @@ public partial class ControllerResolver : Resolver
         "Microsoft.AspNetCore.Mvc.ActionResult",
         "Microsoft.AspNetCore.Mvc.JsonResult",
     ];
+    private static readonly string _ifromFile = "Microsoft.AspNetCore.Http.IFormFile";
     private static readonly string _producesAttribute = "Microsoft.AspNetCore.Mvc.ProducesAttribute";
     private static readonly string _routeAttribute = "Microsoft.AspNetCore.Mvc.RouteAttribute";
     private static readonly string _fromBodyAttribute = "Microsoft.AspNetCore.Mvc.FromBodyAttribute";
@@ -199,7 +200,7 @@ public partial class ControllerResolver : Resolver
             var declaration = new ClassDeclaration([ExportKeyword.Default], typeName);
             var members = new List<ClassDeclaration.IMember>();
 
-            MethodInfo[] methods = GetControllerMethods(type).ToArray();
+            MethodInfo[] methods = [.. GetControllerMethods(type)];
             foreach (var method in methods)
             {
                 var methodName = method.Name;
@@ -210,9 +211,11 @@ public partial class ControllerResolver : Resolver
                     let attrs = p.GetCustomAttributes()
                     let fromServices = attrs.Any(x => x.GetType().FullName == _fromServicesAttribute)
                     where !fromServices
+                    let formFile = p.ParameterType.FullName == _ifromFile
                     let fromBody = attrs.Any(x => x.GetType().FullName == _fromBodyAttribute)
                     select new
                     {
+                        FormFile = formFile,
                         FromBody = fromBody,
                         Paramter = GetParameter(p)
                     }
@@ -223,11 +226,19 @@ public partial class ControllerResolver : Resolver
 
                 var query = string.Join("&",
                     from p in methodParams
-                    where !p.FromBody
+                    where !p.FromBody && !p.FormFile
                     let name = p.Paramter.Name.GetText()
                     select $"{name}=${{{name}}}"
                 );
-                var body =
+
+                var fileParameter =
+                (
+                    from p in methodParams
+                    where p.FormFile
+                    let name = p.Paramter
+                    select name
+                ).FirstOrDefault();
+                var bodyParameter =
                 (
                     from p in methodParams
                     where p.FromBody
@@ -238,41 +249,64 @@ public partial class ControllerResolver : Resolver
                 if (action.Verb is "GET" or "POST" or "PUT" or "DELETE" or "OPTIONS" or "HEAD" or "PATCH")
                 {
                     var rawBuilder = new StringBuilder();
-                    rawBuilder.Append($"""
-                    return fetch(`{uri}{(string.IsNullOrEmpty(query) ? "" : $"?{query}")}`, {"{"}
-                      method: '{action.Verb}',
-                      headers: {"{"}
-                        'Content-Type': 'application/json'
-                    """);
 
-                    if (action.Produces is not null)
+                    if (fileParameter is not null)
                     {
-                        if (action.Produces.Length > 1)
-                        {
-                            rawBuilder.Append($"""
-                            ,
-                                'Accept': __accept
-                            """);
-                        }
-                        else if (action.Produces.Length > 0)
-                        {
-                            rawBuilder.Append($"""
-                            ,
-                                'Accept': '{string.Join(", ", action.Produces)}'
-                            """);
-                        }
+                        rawBuilder.AppendLine($"""
+                        const formData = new FormData();
+                        formData.append('{fileParameter.Name.GetText()}', {fileParameter.Name.GetText()});
+                        """);
                     }
 
-                    rawBuilder.AppendLine();
                     rawBuilder.Append($"""
-                      {"}"}
+                    return fetch(`{uri}{(string.IsNullOrEmpty(query) ? "" : $"?{query}")}`, {"{"}
+                      method: '{action.Verb}'
                     """);
 
-                    if (body is not null)
+                    if (fileParameter is null)
+                    {
+                        rawBuilder.Append($"""
+                        ,
+                          headers: {"{"}
+                            'Content-Type': 'application/json'
+                        """);
+
+                        if (action.Produces is not null)
+                        {
+                            if (action.Produces.Length > 1)
+                            {
+                                rawBuilder.Append($"""
+                                ,
+                                    'Accept': __accept
+                                """);
+                            }
+                            else if (action.Produces.Length > 0)
+                            {
+                                rawBuilder.Append($"""
+                                ,
+                                    'Accept': '{string.Join(", ", action.Produces)}'
+                                """);
+                            }
+                        }
+
+                        rawBuilder.AppendLine();
+                        rawBuilder.Append($"""
+                          {"}"}
+                        """);
+                    }
+
+                    if (fileParameter is not null)
                     {
                         rawBuilder.AppendLine($"""
                         ,
-                          body: JSON.stringify({body.Name.GetText()})
+                          body: formData
+                        """);
+                    }
+                    else if (bodyParameter is not null)
+                    {
+                        rawBuilder.AppendLine($"""
+                        ,
+                          body: JSON.stringify({bodyParameter.Name.GetText()})
                         """);
                     }
                     else

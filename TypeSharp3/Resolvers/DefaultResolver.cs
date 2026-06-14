@@ -23,6 +23,10 @@ public class DefaultResolver : Resolver
         {
             return true;
         }
+        if (util.TryResolve_IFormFile(type, out general, out declaration))
+        {
+            return true;
+        }
         if (util.TryResolve_Normal(type, interfaces, out general, out declaration))
         {
             return true;

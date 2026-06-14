@@ -65,11 +65,11 @@ public class ResolverUtil
         }
     }
 
-    private string GetTypeName_Normal(Type type)
+    private static string GetTypeName_Normal(Type type)
     {
         return type.Name;
     }
-    private string GetTypeName_Generic(Type type)
+    private static string GetTypeName_Generic(Type type)
     {
         return type.Name[..type.Name.IndexOf('`')];
     }
@@ -193,6 +193,26 @@ public class ResolverUtil
                 ]);
                 return enumDeclaration;
             });
+            return true;
+        }
+        else
+        {
+            general = null;
+            declaration = null;
+            return false;
+        }
+    }
+
+    public bool TryResolve_IFormFile(Type type, out Lazy<IGeneralType>? general, out Lazy<IDeclaration>? declaration)
+    {
+        if (type.FullName == "Microsoft.AspNetCore.Http.IFormFile")
+        {
+            general = new Lazy<IGeneralType>(() =>
+            {
+                var typeReference = new TypeReference(new Identifier("File"));
+                return typeReference;
+            });
+            declaration = null;
             return true;
         }
         else
