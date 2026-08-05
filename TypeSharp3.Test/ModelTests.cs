@@ -62,6 +62,12 @@ public class ModelTests
         public required Generic<Guid> GenericGuid { get; set; }
     }
 
+    public class TypeEnum
+    {
+        public const string Class = "class";
+        public const string Struct = "struct";
+    }
+
     [Fact]
     public void Test()
     {
@@ -75,7 +81,8 @@ public class ModelTests
             typeof(NullableModel),
             typeof(RequiredModel),
             typeof(RequiredNullableModel),
-            typeof(GenericModel)
+            typeof(GenericModel),
+            typeof(TypeEnum),
         };
         var code = _generator.GetCode();
         var expected = """

@@ -178,7 +178,7 @@ public partial class ControllerResolver : Resolver
         }
     }
 
-    public override bool TryResolve(Type type, out Lazy<IDeclaration>? declaration, out Lazy<IGeneralType>? general)
+    public override bool TryResolve(Type type, out Lazy<IGeneralType>? general, out Lazy<IDeclaration>? declaration)
     {
         if (!CanResolve(type))
         {

@@ -25,5 +25,5 @@ public abstract class Resolver
         _generator = parser;
     }
 
-    public abstract bool TryResolve(Type type, out Lazy<IDeclaration>? declaration, out Lazy<IGeneralType>? general);
+    public abstract bool TryResolve(Type type, out Lazy<IGeneralType>? general, out Lazy<IDeclaration>? declaration);
 }

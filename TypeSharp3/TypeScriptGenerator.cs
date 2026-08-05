@@ -103,7 +103,7 @@ public class TypeScriptGenerator : IEnumerable<INode>
             IEnumerable<Resolver> resolvers = [.. _resolvers, _defaultResolver];
             foreach (var resolver in resolvers)
             {
-                if (resolver.TryResolve(type, out Lazy<IDeclaration>? declaration, out Lazy<IGeneralType>? general))
+                if (resolver.TryResolve(type, out Lazy<IGeneralType>? general, out Lazy<IDeclaration>? declaration))
                 {
                     if (declaration is not null)
                     {

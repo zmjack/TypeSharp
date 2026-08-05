@@ -5,15 +5,17 @@ namespace TypeSharp.DevAnalyzer;
 [DebuggerDisplay("{IndentValue} = {Value} * {Space}")]
 public struct Indent
 {
+    private int _space;
     public int Space
     {
-        get => field;
-        set => field = value < 0 ? 0 : value;
+        get => _space;
+        set => _space = value < 0 ? 0 : value;
     }
+    private int _value;
     public int Value
     {
-        get => field;
-        set => field = value < 0 ? 0 : value;
+        get => _value;
+        set => _value = value < 0 ? 0 : value;
     }
 
     public Indent(int value, int space)

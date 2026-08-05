@@ -31,13 +31,6 @@ public class ResolverUtil
             {
                 return new(propertyName, StringKeyword.Default);
             }
-            else if (propertyType.IsValueType)
-            {
-                if (!ClrTypeUtil.IsNullableValue(propertyType))
-                {
-                    return new(propertyName, general);
-                }
-            }
 
             return new(propertyName, general);
         }
@@ -65,13 +58,38 @@ public class ResolverUtil
         }
     }
 
-    private static string GetTypeName_Normal(Type type)
-    {
-        return type.Name;
-    }
     private static string GetTypeName_Generic(Type type)
     {
         return type.Name[..type.Name.IndexOf('`')];
+    }
+
+    public bool TryResolve_StaticConst(Type type, out Lazy<IGeneralType>? general, out Lazy<IDeclaration>? declaration)
+    {
+        if (type.IsClass && type.IsAbstract && type.IsSealed)
+        {
+            var typeName = type.Name;
+            general = null;
+            declaration = new Lazy<IDeclaration>(() =>
+            {
+                var fields = type.GetFields(BindingFlags.Public | BindingFlags.Static);
+                var enumDeclaration = new EnumDeclaration([ExportKeyword.Default], typeName,
+                [
+                    ..
+                    from field in fields
+                    where field.FieldType == typeof(string)
+                    let raw = field.GetRawConstantValue()
+                    select new EnumMember(field.Name, new StringLiteral(raw.ToString()!))
+                ]);
+                return enumDeclaration;
+            });
+            return true;
+        }
+        else
+        {
+            general = null;
+            declaration = null;
+            return false;
+        }
     }
 
     public bool TryResolve_Dictionary(Type type, Type[] selfAndInterfaces, out Lazy<IGeneralType>? general, out Lazy<IDeclaration>? declaration)
@@ -171,7 +189,7 @@ public class ResolverUtil
     {
         if (type.IsEnum)
         {
-            var typeName = GetTypeName_Normal(type);
+            var typeName = type.Name;
             general = new Lazy<IGeneralType>(() =>
             {
                 var useNamespace = _generator.ModuleCode != ModuleCode.None;

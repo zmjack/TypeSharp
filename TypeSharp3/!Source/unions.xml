@@ -21,6 +21,7 @@
   <!-- common -->
   <union type="IGeneralType">
     <keyword name="undefined" />
+    <keyword name="null" />
     <keyword name="any" />
     <keyword name="never" />
     <keyword name="void" />
