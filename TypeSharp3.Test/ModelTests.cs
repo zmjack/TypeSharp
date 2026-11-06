@@ -19,6 +19,16 @@ public class ModelTests
         public object Obj { get; set; }
         public HttpStatus Status { get; set; }
         public DateOnly DateOnly { get; set; }
+
+        public required Guid RequiedGuid { get; set; }
+        public required int RequiedInt { get; set; }
+        public required string RequiedStr { get; set; }
+        public required object RequiedObj { get; set; }
+        public required HttpStatus RequiedStatus { get; set; }
+        public required DateOnly RequiedDateOnly { get; set; }
+
+        public int OnlyGet { get; }
+        public int PrivateSet { get; private set; }
     }
 
     public class NullableModel
@@ -29,27 +39,18 @@ public class ModelTests
         public object? Obj { get; set; }
         public HttpStatus? Status { get; set; }
         public DateOnly? DateOnly { get; set; }
+
+        public required Guid? RequiedGuid { get; set; }
+        public required int? RequiedInt { get; set; }
+        public required string RequiedStr { get; set; }
+        public required object? RequiedObj { get; set; }
+        public required HttpStatus? RequiedStatus { get; set; }
+        public required DateOnly? RequiedDateOnly { get; set; }
+
+        public int? OnlyGet { get; }
+        public int? PrivateSet { get; private set; }
     }
 
-    public class RequiredModel
-    {
-        public required Guid Guid { get; set; }
-        public required int Int { get; set; }
-        public required string Str { get; set; }
-        public required object Obj { get; set; }
-        public required HttpStatus Status { get; set; }
-        public required DateOnly DateOnly { get; set; }
-    }
-
-    public class RequiredNullableModel
-    {
-        public required Guid? Guid { get; set; }
-        public required int? Int { get; set; }
-        public required string Str { get; set; }
-        public required object? Obj { get; set; }
-        public required HttpStatus? Status { get; set; }
-        public required DateOnly? DateOnly { get; set; }
-    }
 
     public class Generic<T>
     {
@@ -79,8 +80,6 @@ public class ModelTests
         {
             typeof(NormalModel),
             typeof(NullableModel),
-            typeof(RequiredModel),
-            typeof(RequiredNullableModel),
             typeof(GenericModel),
             typeof(TypeEnum),
         };
@@ -106,6 +105,14 @@ export interface NormalModel {
   obj?: any;
   status: HttpStatus;
   dateOnly: string;
+  requiedGuid: string;
+  requiedInt: number;
+  requiedStr: string;
+  requiedObj: any;
+  requiedStatus: HttpStatus;
+  requiedDateOnly: string;
+  onlyGet?: number;
+  privateSet?: number;
 }
 export interface NullableModel {
   guid?: string;
@@ -114,22 +121,16 @@ export interface NullableModel {
   obj?: any;
   status?: HttpStatus;
   dateOnly?: string;
+  requiedGuid: string;
+  requiedInt: number;
+  requiedStr: string;
+  requiedObj: any;
+  requiedStatus: HttpStatus;
+  requiedDateOnly: string;
+  onlyGet?: number;
+  privateSet?: number;
 }
-export interface RequiredModel {
-  guid: string;
-  int: number;
-  str: string;
-  obj: any;
-  status: HttpStatus;
-  dateOnly: string;
-}
-export interface RequiredNullableModel {
-  guid: string;
-  int: number;
-  str: string;
-  obj: any;
-  status: HttpStatus;
-  dateOnly: string;
+export interface TypeEnum {
 }
 """;
         Assert.Equal(expected, code);

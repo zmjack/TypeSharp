@@ -1,8 +1,5 @@
 <Solution>
   <Configurations>
-    <BuildType Name="Debug" />
-    <BuildType Name="DebugAnalyzer" />
-    <BuildType Name="Release" />
     <Platform Name="Any CPU" />
     <Platform Name="x64" />
     <Platform Name="x86" />
@@ -14,9 +11,7 @@
     <Project Path="Archived/TypeSharp10.Cli/TypeSharp10.Cli.csproj" />
     <Project Path="Archived/TypeSharp10.Test/TypeSharp10.Test.csproj" />
     <Project Path="Archived/TypeSharp10/TypeSharp10.csproj" />
-    <Project Path="Archived/TypeSharp20/TypeSharp20.csproj">
-      <BuildType Solution="DebugAnalyzer|*" Project="Debug" />
-    </Project>
+    <Project Path="Archived/TypeSharp20/TypeSharp20.csproj" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path="LICENSE.md" />

@@ -24,6 +24,14 @@ public class ResolverUtil
         var propertyType = property.PropertyType;
 
         var general = _generator.GetOrCreateGeneralType(propertyType);
+        if (!property.CanWrite || property.GetSetMethod() is null)
+        {
+            return new(propertyName, general)
+            {
+                QuestionToken = QuestionToken.Default,
+            };
+        }
+
         var required = property.GetCustomAttributes().Any(x => x.GetType().FullName == _required);
         if (required)
         {
@@ -31,7 +39,6 @@ public class ResolverUtil
             {
                 return new(propertyName, StringKeyword.Default);
             }
-
             return new(propertyName, general);
         }
         else

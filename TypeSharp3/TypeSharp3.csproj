@@ -4,11 +4,11 @@
     <TargetFrameworks>net7.0;net8.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Configurations>Debug;Release;DebugAnalyzer</Configurations>
+    <Configurations>Debug;Release</Configurations>
     <RootNamespace>TypeSharp</RootNamespace>
     <LangVersion>13.0</LangVersion>
 
-    <Version>3.0.0-alpha83</Version>
+    <Version>3.0.0-alpha84</Version>
     <Authors>zmjack</Authors>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>

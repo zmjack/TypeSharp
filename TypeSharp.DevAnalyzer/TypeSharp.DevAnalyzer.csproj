@@ -7,7 +7,7 @@
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <Nullable>enable</Nullable>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    <Configurations>Debug;Release;DebugAnalyzer</Configurations>
+    <Configurations>Debug;Release</Configurations>
 
       <Version>3.0.0-alpha82</Version>
   </PropertyGroup>
